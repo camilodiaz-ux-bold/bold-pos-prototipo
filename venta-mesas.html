@@ -80,7 +80,7 @@
 
     /* ─── Header ─── */
     #header {
-      background: var(--black-0);
+      background: transparent;
       flex-shrink: 0;
       z-index: 10;
       margin-top: 16px;
@@ -160,7 +160,7 @@
     #zone-text-tabs {
       display: flex;
       gap: 16px;
-      padding: 0 16px 0;
+      padding: 12px 16px 0;
       background: var(--background-page);
       flex-shrink: 0;
     }
@@ -815,6 +815,7 @@
 
 </div><!-- /app -->
 
+<script src="data-manager.js"></script>
 <script>
 /* ══════════════════════════════════════════
    DATA
@@ -866,6 +867,32 @@ const STATUS_TOKENS = {
   occupied:       { bg:"#FFF0F1", border:"2px solid #FF2947",   chair:"#FF2947", num:"#FF2947",  sub:"#6B7194", shadow:"0 2px 12px rgba(255,41,71,0.16)" },
   bill_requested: { bg:"#FFFBE6", border:"2px solid #FFB800",   chair:"#FFB800", num:"#92400E",  sub:"#78350F", shadow:"0 2px 12px rgba(255,184,0,0.16)" },
 };
+
+/* ══════════════════════════════════════════
+   SYNC DESDE LOCALSTORAGE
+══════════════════════════════════════════ */
+function syncFromDataManager() {
+  const mesas = DataManager.getMesas();
+  Object.values(ZONES_DATA).forEach(zone => {
+    zone.tables.forEach(table => {
+      const stored = mesas[table.id];
+      if (stored) {
+        table.status = stored.estado;
+        if (stored.estado !== "available" && stored.horaApertura) {
+          table.time   = DataManager.calcTime(stored.horaApertura);
+          table.amount = DataManager.fmtAmount(DataManager.getTotal(table.id));
+        } else {
+          delete table.time;
+          delete table.amount;
+        }
+      } else {
+        table.status = "available";
+        delete table.time;
+        delete table.amount;
+      }
+    });
+  });
+}
 
 /* ══════════════════════════════════════════
    STATE
@@ -1337,6 +1364,7 @@ function confirmTable() {
   if (!selectedTable) return;
   const table = selectedTable;
   const qty   = personCount;
+  DataManager.abrirMesa(table.id, activeZone, table.cap, qty);
   closeDropUp();
   showToast(`Mesa ${table.id} abierta`);
   setTimeout(() => goToDetalle(table, "occupied", qty), 1400);
@@ -1359,6 +1387,8 @@ function showToast(msg) {
 /* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
+DataManager.init();
+syncFromDataManager();
 renderZone("salon");
 </script>
 </body>
