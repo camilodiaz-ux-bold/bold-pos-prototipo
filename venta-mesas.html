@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>BoldPOS — Venta Mesas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js"></script>
+  <style>
+    /* ─── Merlin Design Tokens ─── */
+    :root {
+      --blue-100:        #121e6c;
+      --blue-30:         #babdd3;
+      --blue-10:         #f1f2f6;
+      --coral-100:       #ff2947;
+      --black-0:         #ffffff;
+      --black-40:        #969696;
+      --black-60:        #606060;
+      --black-100:       #1e1e1e;
+      --background-page: #f7f8fb;
+      --font:            'Montserrat', sans-serif;
+      --shadow-card:     0px 4px 12px rgba(18,30,108,0.08);
+      --gradient-brand:  linear-gradient(270deg,#95345b 13.86%,#4f2864 83.33%);
+
+      /* Table status tokens */
+      --avail-bg:     #EDEEF4;
+      --avail-border: #BABDC8;
+      --avail-chair:  #A8ADBE;
+      --avail-num:    #6B7194;
+      --avail-sub:    #8A8FA6;
+
+      --occ-bg:       #FFF0F1;
+      --occ-border:   #FF2947;
+      --occ-chair:    #FF2947;
+      --occ-num:      #FF2947;
+      --occ-sub:      #6B7194;
+
+      --bill-bg:      #FFFBE6;
+      --bill-border:  #FFB800;
+      --bill-chair:   #FFB800;
+      --bill-num:     #92400E;
+      --bill-sub:     #78350F;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: #d0d0d0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ─── Phone shell ─── */
+    #app {
+      width: 393px;
+      height: 100vh;
+      background: var(--background-page);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ─── Status bar ─── */
+    #status-bar {
+      background: transparent;
+      display: flex;
+      align-items: center;
+      padding: 8px 8px 0;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .sb-left { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--black-100); }
+    .sb-center { position:absolute; left:50%; transform:translateX(-50%); font-size:12px; font-weight:600; color:var(--black-100); }
+    .sb-right { margin-left:auto; display:flex; align-items:center; }
+
+    /* ─── Header ─── */
+    #header {
+      background: var(--black-0);
+      flex-shrink: 0;
+      z-index: 10;
+      margin-top: 16px;
+      padding-bottom: 0;
+    }
+    #nav-row {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 0;
+    }
+    #btn-back {
+      width: 24px; height: 24px;
+      border: none; background: transparent;
+      cursor: pointer; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    #nav-tabs-wrap {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ─── Tabs pill (inside nav row) ─── */
+    #tabs-pill {
+      display: inline-flex;
+      background: transparent;
+      border-radius: 100px;
+      gap: 4px;
+    }
+    .tab-btn {
+      border: none; cursor: pointer;
+      border-radius: 100px;
+      padding: 8px 12px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blue-100);
+      background: transparent;
+      transition: background-color .15s, color .15s;
+      white-space: nowrap;
+      min-width: 120px;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: var(--blue-100);
+      color: var(--black-0);
+      font-weight: 400;
+      box-shadow: 0px 4px 12px rgba(18,30,108,0.08);
+    }
+
+    /* ─── Search bar ─── */
+    #search-bar-wrap {
+      padding: 24px 16px 8px;
+      background: var(--background-page);
+      flex-shrink: 0;
+    }
+    #search-bar {
+      background: var(--black-0);
+      border-radius: 30px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px 0 12px;
+    }
+    .search-placeholder {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--black-60);
+      line-height: 20px;
+    }
+
+    /* ─── Zone text tabs ─── */
+    #zone-text-tabs {
+      display: flex;
+      gap: 16px;
+      padding: 0 16px 0;
+      background: var(--background-page);
+      flex-shrink: 0;
+    }
+    .zone-text-tab {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--blue-100);
+      padding: 0 0 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+    .zone-text-tab.active {
+      font-weight: 600;
+    }
+    .zone-tab-indicator {
+      height: 2px;
+      width: 100%;
+      background: var(--blue-100);
+      border-radius: 1px;
+      visibility: hidden;
+    }
+    .zone-text-tab.active .zone-tab-indicator {
+      visibility: visible;
+    }
+
+    /* ─── Map wrapper ─── */
+    #map-wrapper {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: var(--black-0);
+    }
+
+    /* Scroll container (pan) */
+    #map-scroll {
+      position: absolute;
+      inset: 0;
+      overflow: auto;
+      scrollbar-width: none;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      background: var(--black-0);
+    }
+    #map-scroll::-webkit-scrollbar { display: none; }
+    #map-scroll.grabbing { cursor: grabbing; }
+
+    /* Size wrapper — sets scrollable dimensions */
+    #map-size { position: relative; }
+
+    /* Canvas — scaled */
+    #map-canvas {
+      position: absolute;
+      top: 12px; left: 12px;
+      transform-origin: 0 0;
+      background: var(--black-0);
+    }
+
+    /* Table card */
+    .table-card {
+      position: absolute;
+    }
+    .table-surface {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      overflow: hidden;
+    }
+    .table-id {
+      font-family: var(--font);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.3px;
+    }
+    .table-cap {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-family: var(--font);
+      font-weight: 600;
+      font-size: 10px;
+      line-height: 1;
+    }
+    .table-cap svg { flex-shrink: 0; }
+
+    /* Chair dot */
+    .chair {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.85;
+    }
+
+    /* ─── Edge fades ─── */
+    .map-fade-right {
+      position: absolute; top: 0; right: 0; bottom: 0; width: 28;
+      background: linear-gradient(to left, rgba(247,248,251,.5) 0%, transparent 100%);
+      pointer-events: none; z-index: 5;
+    }
+    .map-fade-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 28;
+      background: linear-gradient(to top, rgba(247,248,251,.5) 0%, transparent 100%);
+      pointer-events: none; z-index: 5;
+    }
+
+    /* ─── Zoom controls ─── */
+    #zoom-controls {
+      position: absolute;
+      bottom: 14px; right: 14px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-radius: 14px;
+      background: var(--black-0);
+      box-shadow: 0 4px 20px rgba(0,0,0,.14), 0 1px 4px rgba(0,0,0,.08);
+      padding: 4px;
+      border: 1px solid #EEF0F8;
+    }
+    .zoom-btn {
+      width: 44px; height: 44px;
+      border: none; border-radius: 12px;
+      background: var(--black-0);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: opacity .15s;
+      flex-shrink: 0;
+    }
+    .zoom-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .zoom-divider {
+      height: 1px;
+      background: #EEF0F8;
+      margin: 0 4px;
+    }
+
+    /* Mostrador placeholder */
+    #mostrador-view {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      padding-bottom: 24px;
+    }
+    .mostrador-icon {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      background: var(--gradient-brand);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(79,40,100,.25);
+    }
+    #mostrador-view h2 { font-size: 17px; font-weight: 700; color: var(--black-100); margin-top: 4px; }
+    #mostrador-view p  { font-size: 13px; font-weight: 400; color: #9499B8; text-align: center; max-width: 230px; line-height: 1.5; }
+    .btn-mostrador-new {
+      margin-top: 12px;
+      background: var(--coral-100);
+      color: var(--black-0);
+      border: none; border-radius: 100px;
+      padding: 14px 36px;
+      font-family: var(--font);
+      font-weight: 500; font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,41,71,.3);
+    }
+
+    /* ─── Bottom panel ─── */
+    #bottom-panel {
+      background: var(--black-0);
+      border-top: 1px solid #EEF0F8;
+      flex-shrink: 0;
+      padding: 10px 16px 14px;
+    }
+    #legend-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+    }
+    #legend-chips::-webkit-scrollbar { display: none; }
+    .legend-chip {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 6px;
+      border-radius: 100px;
+      padding: 6px 10px;
+    }
+    .legend-chip.dashed { border-style: dashed !important; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+    .legend-label { font-size: 11px; font-weight: 600; white-space: nowrap; line-height: 1; }
+
+    /* ─── Search input & view toggle ─── */
+    #search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--black-100);
+    }
+    #search-input::placeholder {
+      color: var(--black-60);
+      font-weight: 300;
+    }
+    #btn-clear-search {
+      display: none;
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      flex-shrink: 0;
+      line-height: 0;
+    }
+    #view-toggle {
+      display: flex;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .view-btn {
+      width: 32px; height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .view-btn.active {
+      background: var(--blue-10);
+    }
+
+    /* ─── List view ─── */
+    #list-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--background-page);
+      scrollbar-width: none;
+    }
+    #list-view::-webkit-scrollbar { display: none; }
+    .list-card {
+      background: var(--black-0);
+      border-radius: var(--radius-card); /* 16px */
+      padding: 16px;
+      display: flex;
+      align-items: stretch;
+      gap: 16px;
+      box-shadow: var(--shadow-blue-8);
+      cursor: default;
+    }
+    .list-card.available { cursor: pointer; }
+    .list-card-indicator {
+      width: 4px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      align-self: stretch;
+    }
+    .list-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .list-card-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .list-card-id {
+      /* [APP]/Body/Bold */
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 20px;
+    }
+    .list-card-status {
+      /* Link/Small */
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 16px;
+    }
+    .list-card-meta {
+      /* [APP]/Caption/Regular */
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+      color: var(--black-40);
+    }
+    .list-card-time {
+      /* [APP]/Caption/Regular */
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+      color: var(--black-40);
+    }
+    .list-card-amount {
+      /* [APP]/Body/Semibold */
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 20px;
+    }
+
+    /* ─── Drop-up overlay ─── */
+    #dropup-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      background: rgba(30,30,30,.62);
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    #dropup-overlay.show { display: flex; }
+    #dropup-sheet {
+      background: var(--black-0);
+      border-radius: 32px 32px 0 0;
+      box-shadow: 0px -4px 8px rgba(0,0,0,0.12);
+      padding: 0 24px 32px;
+    }
+    .dropup-handle {
+      width: 36px; height: 4px;
+      background: #D1D3D9; border-radius: 2px;
+      margin: 12px auto 24px;
+    }
+    #dropup-mesa-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    #dropup-mesa-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--blue-100);
+      line-height: 24px;
+    }
+    #dropup-mesa-subtitle {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--black-60);
+      line-height: 20px;
+    }
+    #dropup-personas-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--black-100);
+      line-height: 22px;
+      margin-bottom: 20px;
+    }
+    #picker-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 28px;
+    }
+    .picker-btn {
+      width: 48px; height: 48px;
+      border-radius: 24px; border: none;
+      background: #EDEEF6; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #picker-count {
+      font-size: 44px; font-weight: 800; color: var(--blue-100);
+      min-width: 56px; text-align: center; line-height: 1;
+    }
+    #dropup-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #btn-confirm-dropup {
+      height: 48px;
+      border-radius: 100px;
+      border: none;
+      background: var(--coral-100);
+      color: var(--black-0);
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,41,71,.3);
+    }
+    #btn-cancel-dropup {
+      height: 44px;
+      border: none;
+      background: transparent;
+      color: var(--black-60);
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* ─── Toast ─── */
+    #toast {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      width: calc(100% - 32px);
+      max-width: 361px;
+      background: var(--black-100);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    #toast-text {
+      color: var(--black-0);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- STATUS BAR -->
+  <div id="status-bar">
+    <div class="sb-left">
+      <svg width="17" height="10" viewBox="0 0 17 10" fill="none" aria-hidden="true">
+        <rect x="0" y="6" width="3" height="4" rx="0.5" fill="#1e1e1e"/>
+        <rect x="4.5" y="4" width="3" height="6" rx="0.5" fill="#1e1e1e"/>
+        <rect x="9" y="2" width="3" height="8" rx="0.5" fill="#1e1e1e"/>
+        <rect x="13.5" y="0" width="3" height="10" rx="0.5" fill="#1e1e1e"/>
+      </svg>
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true">
+        <path d="M8 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#1e1e1e"/>
+        <path d="M3.5 6a6.5 6.5 0 0 1 9 0" stroke="#1e1e1e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path d="M1 3.5a10 10 0 0 1 14 0" stroke="#1e1e1e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span>Carrier</span>
+    </div>
+    <div class="sb-center">9:41</div>
+    <div class="sb-right">
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none" aria-hidden="true">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3.5" stroke="#1e1e1e" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="18" height="8" rx="2" fill="#1e1e1e"/>
+        <path d="M23.5 4v4a2 2 0 0 0 0-4z" fill="#1e1e1e" fill-opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="nav-row">
+      <button id="btn-back" aria-label="Volver" onclick="location.href='dashboard.html'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div id="nav-tabs-wrap">
+        <div id="tabs-pill">
+          <button class="tab-btn active" data-tab="mesas"     onclick="switchTab('mesas')">Mesas</button>
+          <button class="tab-btn"        data-tab="mostrador" onclick="switchTab('mostrador')">Mostrador</button>
+        </div>
+      </div>
+      <div style="width:24px;flex-shrink:0;"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH BAR -->
+  <div id="search-bar-wrap">
+    <div id="search-bar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
+        <circle cx="11" cy="11" r="7" stroke="#606060" stroke-width="1.5" fill="none"/>
+        <path d="M16.5 16.5L21 21" stroke="#606060" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input id="search-input" type="text" placeholder="Buscar mesa" oninput="filterTables(this.value)" autocomplete="off" />
+      <button id="btn-clear-search" onclick="clearSearch()" aria-label="Limpiar búsqueda">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M4 4l10 10M14 4L4 14" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div id="view-toggle">
+        <button id="btn-view-map" class="view-btn active" onclick="switchView('map')" aria-label="Vista mapa">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="1" y="1" width="6" height="6" rx="1.5" fill="#121e6c"/>
+            <rect x="11" y="1" width="6" height="6" rx="1.5" fill="#121e6c"/>
+            <rect x="1" y="11" width="6" height="6" rx="1.5" fill="#121e6c"/>
+            <rect x="11" y="11" width="6" height="6" rx="1.5" fill="#121e6c"/>
+          </svg>
+        </button>
+        <button id="btn-view-list" class="view-btn" onclick="switchView('list')" aria-label="Vista lista">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="1" y="2" width="16" height="2.5" rx="1.25" fill="#121e6c"/>
+            <rect x="1" y="7.75" width="16" height="2.5" rx="1.25" fill="#121e6c"/>
+            <rect x="1" y="13.5" width="16" height="2.5" rx="1.25" fill="#121e6c"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONE TEXT TABS -->
+  <div id="zone-text-tabs">
+    <button class="zone-text-tab active" data-zone="salon" onclick="switchZone('salon')">
+      <span id="ztab-salon">Salón 7/16</span>
+      <div class="zone-tab-indicator"></div>
+    </button>
+    <button class="zone-text-tab" data-zone="terraza" onclick="switchZone('terraza')">
+      <span id="ztab-terraza">Terraza 4/6</span>
+      <div class="zone-tab-indicator"></div>
+    </button>
+    <button class="zone-text-tab" data-zone="barra" onclick="switchZone('barra')">
+      <span id="ztab-barra">Barra 1/2</span>
+      <div class="zone-tab-indicator"></div>
+    </button>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="list-view" style="display:none;"></div>
+
+  <!-- MAP WRAPPER -->
+  <div id="map-wrapper">
+
+    <!-- Scrollable pan container -->
+    <div id="map-scroll">
+      <div id="map-size">
+        <div id="map-canvas"></div>
+      </div>
+    </div>
+
+    <!-- Edge fades -->
+    <div class="map-fade-right"></div>
+    <div class="map-fade-bottom"></div>
+
+    <!-- Zoom controls -->
+    <div id="zoom-controls">
+      <button class="zoom-btn" id="btn-zoom-in"  aria-label="Acercar"  onclick="zoomIn()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 4v12M4 10h12" stroke="#121e6c" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="zoom-divider"></div>
+      <button class="zoom-btn" id="btn-zoom-out" aria-label="Alejar"   onclick="zoomOut()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10h12" stroke="#121e6c" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="zoom-divider"></div>
+      <button class="zoom-btn" id="btn-center"   aria-label="Centrar"  onclick="centerMap()">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="3" stroke="#3E4983" stroke-width="1.8" fill="none"/>
+          <path d="M9 1v3M9 14v3M1 9h3M14 9h3" stroke="#3E4983" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mostrador placeholder -->
+    <div id="mostrador-view">
+      <div class="mostrador-icon">
+        <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+          <path d="M8 0H36C38.2 0 40 1.8 40 4V36C40 38.2 38.2 40 36 40H8C5.8 40 4 38.2 4 36V29C5.7 28.5 7 26.9 7 25C7 23.1 5.7 21.5 4 21V19C5.7 18.5 7 16.9 7 15C7 13.1 5.7 11.5 4 11V4C4 1.8 5.8 0 8 0Z" fill="rgba(255,255,255,0.25)"/>
+          <rect x="10" y="11" width="24" height="3" rx="1.5" fill="white"/>
+          <rect x="10" y="18" width="18" height="3" rx="1.5" fill="white"/>
+          <rect x="10" y="25" width="13" height="3" rx="1.5" fill="white"/>
+        </svg>
+      </div>
+      <h2>Venta Mostrador</h2>
+      <p>Crea una orden directa sin asignar mesa al cliente</p>
+      <button class="btn-mostrador-new">Nueva orden mostrador</button>
+    </div>
+
+  </div><!-- /map-wrapper -->
+
+  <!-- BOTTOM PANEL — legend only -->
+  <div id="bottom-panel">
+    <div id="legend-chips">
+      <div class="legend-chip" style="background:#EDEEF4;border:1.5px solid #BABDC8;">
+        <div class="legend-dot" style="background:#A8ADBE;"></div>
+        <span class="legend-label" style="color:#6B7194;">Disponible</span>
+      </div>
+      <div class="legend-chip" style="background:#FFF0F1;border:1.5px solid #FF2947;">
+        <div class="legend-dot" style="background:#FF2947;"></div>
+        <span class="legend-label" style="color:#FF2947;">Ocupada</span>
+      </div>
+      <div class="legend-chip" style="background:#FFFBE6;border:1.5px solid #FFB800;">
+        <div class="legend-dot" style="background:#FFB800;"></div>
+        <span class="legend-label" style="color:#92400E;">Cuenta solicitada</span>
+      </div>
+      <div class="legend-chip dashed" style="background:#F3F3F3;border:1.5px dashed #C0C0C0;">
+        <div class="legend-dot" style="background:#969696;"></div>
+        <span class="legend-label" style="color:#969696;">Inhabilitada</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DROP-UP OVERLAY — solo para mesas disponibles -->
+  <div id="dropup-overlay" onclick="handleOverlayClick(event)">
+    <div id="dropup-sheet">
+      <div class="dropup-handle"></div>
+      <div id="dropup-mesa-header">
+        <span id="dropup-mesa-title">Mesa S03</span>
+        <span id="dropup-mesa-subtitle">Salón · Capacidad para 4</span>
+      </div>
+      <div id="dropup-personas-label">¿Cuántas personas?</div>
+      <div id="picker-row">
+        <button class="picker-btn" onclick="changePerson(-1)">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10h12" stroke="#3E4983" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <span id="picker-count">2</span>
+        <button class="picker-btn" onclick="changePerson(1)">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 4v12M4 10h12" stroke="#3E4983" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div id="dropup-actions">
+        <button id="btn-confirm-dropup" onclick="confirmTable()">Abrir mesa</button>
+        <button id="btn-cancel-dropup" onclick="closeDropUp()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" fill="#10B981"/>
+      <path d="M7 12l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span id="toast-text"></span>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+/* ══════════════════════════════════════════
+   DATA
+══════════════════════════════════════════ */
+const ZONES_DATA = {
+  salon: {
+    label: "Salón", canvasW: 580, canvasH: 470,
+    tables: [
+      { id:"S01", shape:"round", x:16,  y:20,  w:72, h:72, status:"occupied",       cap:2, time:"1h 45min", amount:"$28.000"  },
+      { id:"S02", shape:"round", x:16,  y:122, w:72, h:72, status:"available",      cap:2 },
+      { id:"S03", shape:"rect",  x:122, y:20,  w:82, h:68, status:"available",      cap:4 },
+      { id:"S04", shape:"rect",  x:262, y:20,  w:82, h:68, status:"occupied",       cap:4, time:"2h 20min", amount:"$87.500"  },
+      { id:"S05", shape:"rect",  x:392, y:20,  w:82, h:68, status:"bill_requested", cap:4, time:"3h 5min",  amount:"$195.000" },
+      { id:"S15", shape:"round", x:494, y:20,  w:68, h:68, status:"occupied",       cap:2, time:"22min",    amount:"$15.000"  },
+      { id:"S16", shape:"round", x:494, y:116, w:68, h:68, status:"available",      cap:2 },
+      { id:"S06", shape:"rect",  x:122, y:148, w:82, h:68, status:"occupied",       cap:4, time:"45min",    amount:"$42.000"  },
+      { id:"S07", shape:"rect",  x:122, y:266, w:82, h:68, status:"available",      cap:4 },
+      { id:"S08", shape:"round", x:270, y:142, w:92, h:92, status:"available",      cap:6 },
+      { id:"S09", shape:"rect",  x:394, y:148, w:82, h:68, status:"occupied",       cap:4, time:"2h 55min", amount:"$134.000" },
+      { id:"S10", shape:"rect",  x:394, y:266, w:82, h:68, status:"bill_requested", cap:4, time:"2h 10min", amount:"$215.000" },
+      { id:"S11", shape:"rect",  x:16,  y:372, w:82, h:68, status:"occupied",       cap:4, time:"35min",    amount:"$54.000"  },
+      { id:"S12", shape:"rect",  x:152, y:372, w:82, h:68, status:"available",      cap:4 },
+      { id:"S13", shape:"rect",  x:290, y:372, w:82, h:68, status:"occupied",       cap:4, time:"1h 50min", amount:"$78.000"  },
+      { id:"S14", shape:"rect",  x:424, y:372, w:82, h:68, status:"available",      cap:4 },
+    ]
+  },
+  terraza: {
+    label: "Terraza", canvasW: 430, canvasH: 280,
+    tables: [
+      { id:"T01", shape:"round", x:24,  y:24,  w:86, h:86, status:"available",      cap:4 },
+      { id:"T02", shape:"round", x:150, y:24,  w:86, h:86, status:"available",      cap:4 },
+      { id:"T03", shape:"round", x:276, y:24,  w:86, h:86, status:"occupied",       cap:6, time:"35min",  amount:"$75.000" },
+      { id:"T04", shape:"rect",  x:24,  y:148, w:86, h:76, status:"available",      cap:4 },
+      { id:"T05", shape:"rect",  x:150, y:148, w:86, h:76, status:"bill_requested", cap:2, time:"55min",  amount:"$65.000" },
+      { id:"T06", shape:"rect",  x:276, y:148, w:86, h:76, status:"available",      cap:6 },
+    ]
+  },
+  barra: {
+    label: "Barra", canvasW: 430, canvasH: 280,
+    tables: [
+      { id:"B01", shape:"pill-v", x:18,  y:20,  w:72,  h:200, status:"occupied",  cap:7, time:"2h 32min", amount:"$74.500" },
+      { id:"B02", shape:"pill-h", x:130, y:120, w:180, h:58,  status:"available", cap:5 },
+    ]
+  }
+};
+
+const STATUS_TOKENS = {
+  available:      { bg:"#EDEEF4", border:"1.5px solid #BABDC8", chair:"#A8ADBE", num:"#6B7194",  sub:"#8A8FA6", shadow:"none" },
+  occupied:       { bg:"#FFF0F1", border:"2px solid #FF2947",   chair:"#FF2947", num:"#FF2947",  sub:"#6B7194", shadow:"0 2px 12px rgba(255,41,71,0.16)" },
+  bill_requested: { bg:"#FFFBE6", border:"2px solid #FFB800",   chair:"#FFB800", num:"#92400E",  sub:"#78350F", shadow:"0 2px 12px rgba(255,184,0,0.16)" },
+};
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let activeZone  = "salon";
+let activeTab   = "mesas";
+let activeView  = "map";
+let searchQuery = "";
+let zoom        = 1;
+const ZOOM_MIN = 0.5, ZOOM_MAX = 2.0, ZOOM_STEP = 0.2;
+
+let panning     = false;
+let hasMoved    = false;
+let dragStart   = { x:0, y:0 };
+let scrollStart = { x:0, y:0 };
+let lastPinchDist = null;
+
+let selectedTable = null;
+let personCount   = 2;
+
+/* ══════════════════════════════════════════
+   CHAIR RENDERING
+══════════════════════════════════════════ */
+const CD  = 8;  // chair diameter
+const CGAP = 5; // gap from table edge to chair center
+
+function makeChair(cx, cy, color) {
+  const d = document.createElement("div");
+  d.className = "chair";
+  d.style.cssText = `width:${CD}px;height:${CD}px;background:${color};left:${cx - CD/2}px;top:${cy - CD/2}px;`;
+  return d;
+}
+
+function renderChairs(container, table, color) {
+  const { shape, w, h, cap } = table;
+  const half = CD / 2;
+
+  if (shape === "round") {
+    const r   = w / 2;
+    const off = r + CGAP + half;
+    [[r, r - off],[r, r + off],[r - off, r],[r + off, r]].forEach(([cx,cy]) =>
+      container.appendChild(makeChair(cx, cy, color)));
+    return;
+  }
+
+  if (shape === "pill-v") {
+    const lx = -(CGAP + half), rx = w + CGAP + half;
+    const lc = Math.ceil(Math.min(cap,6)/2), rc = Math.floor(Math.min(cap,6)/2);
+    const pad = 24;
+    for (let i=0;i<lc;i++) container.appendChild(makeChair(lx, pad + i*((h-pad*2)/Math.max(lc-1,1)), color));
+    for (let i=0;i<rc;i++) container.appendChild(makeChair(rx, pad + i*((h-pad*2)/Math.max(rc-1,1)), color));
+    return;
+  }
+
+  if (shape === "pill-h") {
+    const ty = -(CGAP + half), by = h + CGAP + half;
+    const tc = Math.ceil(Math.min(cap,5)/2), bc = Math.floor(Math.min(cap,5)/2);
+    const pad = 20;
+    for (let i=0;i<tc;i++) container.appendChild(makeChair(pad + i*((w-pad*2)/Math.max(tc-1,1)), ty, color));
+    for (let i=0;i<bc;i++) container.appendChild(makeChair(pad + i*((w-pad*2)/Math.max(bc-1,1)), by, color));
+    return;
+  }
+
+  // rect
+  const perSide = Math.min(Math.round(cap/2), 3);
+  const pad = 14;
+  const topY = -(CGAP + half), btmY = h + CGAP + half;
+  for (let i=0;i<perSide;i++) {
+    const xp = perSide === 1 ? w/2 : pad + i*((w-pad*2)/(perSide-1));
+    container.appendChild(makeChair(xp, topY, color));
+    container.appendChild(makeChair(xp, btmY, color));
+  }
+}
+
+/* ══════════════════════════════════════════
+   TABLE RENDERING
+══════════════════════════════════════════ */
+function borderRadius(shape, w, h) {
+  if (shape === "round")   return "50%";
+  if (shape === "pill-v" || shape === "pill-h") return Math.min(w,h)/2 + "px";
+  return "18px";
+}
+
+function renderTable(table) {
+  const tk   = STATUS_TOKENS[table.status];
+  const wrap = document.createElement("div");
+  wrap.className = "table-card";
+  wrap.dataset.id = table.id;
+  wrap.style.cssText = `left:${table.x}px;top:${table.y}px;width:${table.w}px;height:${table.h}px;`;
+  wrap.style.cursor = "pointer";
+  wrap.addEventListener("click", () => handleTableTap(table));
+  wrap.addEventListener("mousedown", e => e.stopPropagation());
+
+  // chairs
+  renderChairs(wrap, table, tk.chair);
+
+  // surface
+  const surf = document.createElement("div");
+  surf.className = "table-surface";
+  surf.style.cssText = `border-radius:${borderRadius(table.shape,table.w,table.h)};background:${tk.bg};border:${tk.border};box-shadow:${tk.shadow};padding:${(table.shape==="pill-v"||table.shape==="pill-h")?"12px 8px":"6px"};`;
+
+  const isRound = table.shape === "round";
+  const isPill  = table.shape === "pill-v" || table.shape === "pill-h";
+
+  const idEl = document.createElement("span");
+  idEl.className = "table-id";
+  idEl.textContent = table.id;
+  idEl.style.cssText = `font-size:${isRound ? 14 : isPill ? 15 : 13}px;color:${tk.num};`;
+  surf.appendChild(idEl);
+
+  const capRow = document.createElement("div");
+  capRow.className = "table-cap";
+  capRow.style.color = tk.sub;
+  capRow.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="${tk.sub}" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>${table.cap}</span>`;
+  surf.appendChild(capRow);
+
+  wrap.appendChild(surf);
+  return wrap;
+}
+
+/* ══════════════════════════════════════════
+   MAP RENDERING
+══════════════════════════════════════════ */
+function renderZone(zoneKey) {
+  const zone   = ZONES_DATA[zoneKey];
+  const canvas = document.getElementById("map-canvas");
+  canvas.innerHTML = "";
+  canvas.style.width  = zone.canvasW + "px";
+  canvas.style.height = zone.canvasH + "px";
+  zone.tables.forEach(t => canvas.appendChild(renderTable(t)));
+  updateMapSize();
+
+  // update zone text tab labels
+  const avail  = zone.tables.filter(t => t.status === "available").length;
+  const total  = zone.tables.length;
+  const tabEl  = document.getElementById("ztab-" + zoneKey);
+  if (tabEl) tabEl.textContent = `${zone.label} ${avail}/${total}`;
+}
+
+function updateMapSize() {
+  const zone  = ZONES_DATA[activeZone];
+  const sizeEl = document.getElementById("map-size");
+  sizeEl.style.width  = Math.max(zone.canvasW * zoom + 24, 393) + "px";
+  sizeEl.style.height = zone.canvasH * zoom + 24 + "px";
+  document.getElementById("map-canvas").style.transform = `scale(${zoom})`;
+  document.getElementById("btn-zoom-in").disabled  = zoom >= ZOOM_MAX;
+  document.getElementById("btn-zoom-out").disabled = zoom <= ZOOM_MIN;
+}
+
+/* ══════════════════════════════════════════
+   ZOOM
+══════════════════════════════════════════ */
+function zoomIn()  { setZoom(Math.min(zoom + ZOOM_STEP, ZOOM_MAX)); }
+function zoomOut() { setZoom(Math.max(zoom - ZOOM_STEP, ZOOM_MIN)); }
+
+function setZoom(newZoom) {
+  zoom = newZoom;
+  updateMapSize();
+}
+
+function centerMap() {
+  zoom = 1;
+  updateMapSize();
+  const s = document.getElementById("map-scroll");
+  s.scrollTo({ top:0, left:0, behavior:"smooth" });
+}
+
+/* ══════════════════════════════════════════
+   PAN — MOUSE
+══════════════════════════════════════════ */
+const scrollEl = document.getElementById("map-scroll");
+
+scrollEl.addEventListener("mousedown", e => {
+  if (e.button !== 0) return;
+  e.preventDefault();
+  hasMoved    = false;
+  panning     = true;
+  dragStart   = { x:e.clientX, y:e.clientY };
+  scrollStart = { x:scrollEl.scrollLeft, y:scrollEl.scrollTop };
+  scrollEl.classList.add("grabbing");
+});
+
+document.addEventListener("mousemove", e => {
+  if (!panning) return;
+  const dx = e.clientX - dragStart.x, dy = e.clientY - dragStart.y;
+  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved = true;
+  scrollEl.scrollLeft = scrollStart.x - dx;
+  scrollEl.scrollTop  = scrollStart.y - dy;
+});
+
+document.addEventListener("mouseup", () => {
+  panning = false;
+  scrollEl.classList.remove("grabbing");
+});
+
+/* ══════════════════════════════════════════
+   PAN + PINCH — TOUCH
+══════════════════════════════════════════ */
+function pinchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+scrollEl.addEventListener("touchstart", e => {
+  if (e.touches.length === 2) {
+    panning = false;
+    lastPinchDist = pinchDist(e.touches);
+    return;
+  }
+  const t = e.touches[0];
+  hasMoved    = false;
+  panning     = true;
+  dragStart   = { x:t.clientX, y:t.clientY };
+  scrollStart = { x:scrollEl.scrollLeft, y:scrollEl.scrollTop };
+}, { passive: true });
+
+scrollEl.addEventListener("touchmove", e => {
+  e.preventDefault();
+  if (e.touches.length === 2 && lastPinchDist !== null) {
+    const newDist = pinchDist(e.touches);
+    setZoom(Math.min(Math.max(zoom * (newDist / lastPinchDist), ZOOM_MIN), ZOOM_MAX));
+    lastPinchDist = newDist;
+    return;
+  }
+  if (e.touches.length === 1 && panning) {
+    const t = e.touches[0];
+    const dx = t.clientX - dragStart.x, dy = t.clientY - dragStart.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved = true;
+    scrollEl.scrollLeft = scrollStart.x - dx;
+    scrollEl.scrollTop  = scrollStart.y - dy;
+  }
+}, { passive: false });
+
+scrollEl.addEventListener("touchend", e => {
+  if (e.touches.length < 2) lastPinchDist = null;
+  if (e.touches.length === 0) panning = false;
+}, { passive: true });
+
+/* ══════════════════════════════════════════
+   WHEEL ZOOM
+══════════════════════════════════════════ */
+scrollEl.addEventListener("wheel", e => {
+  e.preventDefault();
+  const factor  = e.deltaY < 0 ? 1.1 : 0.9;
+  const newZoom = Math.min(Math.max(zoom * factor, ZOOM_MIN), ZOOM_MAX);
+  if (newZoom === zoom) return;
+
+  const rect    = scrollEl.getBoundingClientRect();
+  const cursorX = e.clientX - rect.left;
+  const cursorY = e.clientY - rect.top;
+  const canvasX = (scrollEl.scrollLeft + cursorX) / zoom;
+  const canvasY = (scrollEl.scrollTop  + cursorY) / zoom;
+
+  zoom = newZoom;
+  updateMapSize();
+
+  requestAnimationFrame(() => {
+    scrollEl.scrollLeft = canvasX * zoom - cursorX;
+    scrollEl.scrollTop  = canvasY * zoom - cursorY;
+  });
+}, { passive: false });
+
+/* ══════════════════════════════════════════
+   VIEW TOGGLE (map / list)
+══════════════════════════════════════════ */
+function switchView(view) {
+  activeView = view;
+  document.getElementById("btn-view-map").classList.toggle("active", view === "map");
+  document.getElementById("btn-view-list").classList.toggle("active", view === "list");
+
+  const mapWrapper = document.getElementById("map-wrapper");
+  const listView   = document.getElementById("list-view");
+  const zoomCtrls  = document.getElementById("zoom-controls");
+
+  if (view === "map") {
+    mapWrapper.style.display = "";
+    listView.style.display   = "none";
+    zoomCtrls.style.display  = "";
+    document.querySelectorAll(".map-fade-right, .map-fade-bottom").forEach(el => el.style.display = "");
+  } else {
+    mapWrapper.style.display = "none";
+    listView.style.display   = "flex";
+    zoomCtrls.style.display  = "none";
+    document.querySelectorAll(".map-fade-right, .map-fade-bottom").forEach(el => el.style.display = "none");
+    renderListView(activeZone, searchQuery);
+  }
+}
+
+/* ══════════════════════════════════════════
+   SEARCH FILTER
+══════════════════════════════════════════ */
+function filterTables(query) {
+  searchQuery = query.trim().toLowerCase();
+  document.getElementById("btn-clear-search").style.display = query.length ? "block" : "none";
+
+  if (activeView === "map") {
+    document.querySelectorAll("#map-canvas .table-card").forEach(card => {
+      card.style.display = (card.dataset.id || "").toLowerCase().includes(searchQuery) ? "" : "none";
+    });
+  } else {
+    renderListView(activeZone, searchQuery);
+  }
+}
+
+function clearSearch() {
+  const input = document.getElementById("search-input");
+  input.value = "";
+  filterTables("");
+  input.focus();
+}
+
+/* ══════════════════════════════════════════
+   LIST VIEW RENDERER
+══════════════════════════════════════════ */
+const STATUS_LABELS = {
+  available:      "Disponible",
+  occupied:       "Ocupada",
+  bill_requested: "Cuenta solicitada",
+};
+const STATUS_TEXT_COLORS = {
+  available:      "#6B7194",
+  occupied:       "#FF2947",
+  bill_requested: "#92400E",
+};
+
+function renderListView(zoneKey, query) {
+  const zone = ZONES_DATA[zoneKey];
+  const listView = document.getElementById("list-view");
+  listView.innerHTML = "";
+
+  const q = (query || "").trim().toLowerCase();
+
+  zone.tables.forEach(table => {
+    if (q && !table.id.toLowerCase().includes(q)) return;
+
+    const tk           = STATUS_TOKENS[table.status];
+    const indicatorColor = tk.border.split(" ").pop();
+    const textColor    = STATUS_TEXT_COLORS[table.status];
+
+    const card = document.createElement("div");
+    card.className = "list-card" + (table.status === "available" ? " available" : "");
+    card.dataset.id = table.id;
+
+    card.innerHTML = `
+      <div class="list-card-indicator" style="background:${indicatorColor};"></div>
+      <div class="list-card-body">
+        <div class="list-card-row">
+          <span class="list-card-id" style="color:${tk.num};">${table.id}</span>
+          <span class="list-card-status" style="color:${textColor};">${STATUS_LABELS[table.status]}</span>
+        </div>
+        <div class="list-card-row">
+          <span class="list-card-meta">${table.cap} personas · ${zone.label}</span>
+          ${table.time ? `<span class="list-card-time">${table.time}</span>` : ""}
+        </div>
+        ${table.amount ? `<div class="list-card-row"><span></span><span class="list-card-amount" style="color:${tk.num};">${table.amount}</span></div>` : ""}
+      </div>
+    `;
+
+    card.addEventListener("click", () => handleTableTap(table));
+
+    listView.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════ */
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+
+  const mapScroll   = document.getElementById("map-scroll");
+  const zoomCtrls   = document.getElementById("zoom-controls");
+  const mostradorV  = document.getElementById("mostrador-view");
+
+  const searchWrap  = document.getElementById("search-bar-wrap");
+  const zoneTabsEl  = document.getElementById("zone-text-tabs");
+
+  const listView = document.getElementById("list-view");
+
+  if (tab === "mesas") {
+    if (searchWrap) searchWrap.style.display = "";
+    if (zoneTabsEl) zoneTabsEl.style.display = "";
+    mostradorV.style.display = "none";
+
+    if (activeView === "map") {
+      mapScroll.style.display = "";
+      if (listView) listView.style.display = "none";
+      zoomCtrls.style.display = "";
+      document.querySelectorAll(".map-fade-right, .map-fade-bottom").forEach(el => el.style.display = "");
+    } else {
+      mapScroll.style.display = "none";
+      if (listView) listView.style.display = "flex";
+      zoomCtrls.style.display = "none";
+      document.querySelectorAll(".map-fade-right, .map-fade-bottom").forEach(el => el.style.display = "none");
+      renderListView(activeZone, searchQuery);
+    }
+  } else {
+    mapScroll.style.display  = "none";
+    if (searchWrap) searchWrap.style.display = "none";
+    if (zoneTabsEl) zoneTabsEl.style.display = "none";
+    if (listView)   listView.style.display   = "none";
+    zoomCtrls.style.display  = "none";
+    mostradorV.style.display = "flex";
+    document.querySelectorAll(".map-fade-right, .map-fade-bottom").forEach(el => el.style.display = "none");
+  }
+}
+
+/* ══════════════════════════════════════════
+   ZONE SWITCHING
+══════════════════════════════════════════ */
+function switchZone(key) {
+  activeZone = key;
+  zoom = 1;
+  scrollEl.scrollTo({ top:0, left:0 });
+
+  document.querySelectorAll(".zone-text-tab").forEach(c => c.classList.toggle("active", c.dataset.zone === key));
+  renderZone(key);
+
+  if (activeView === "list") {
+    renderListView(key, searchQuery);
+  }
+}
+
+/* ══════════════════════════════════════════
+   NAVEGACIÓN AL DETALLE
+══════════════════════════════════════════ */
+function goToDetalle(table, estado, personas) {
+  const p = new URLSearchParams({ mesa: table.id, estado, zona: activeZone });
+  if (personas) p.set("personas", personas);
+  location.href = `detalle-mesa.html?${p.toString()}`;
+}
+
+/* ══════════════════════════════════════════
+   DROP-UP (solo mesas disponibles)
+══════════════════════════════════════════ */
+function handleTableTap(table) {
+  if (hasMoved) return;
+  if (table.status === "available") {
+    openDropUp(table);
+  } else {
+    goToDetalle(table, table.status);
+  }
+}
+
+function openDropUp(table) {
+  selectedTable = table;
+  personCount   = Math.min(2, table.cap);
+  const zone = ZONES_DATA[activeZone];
+  document.getElementById("dropup-mesa-title").textContent    = `Mesa ${table.id}`;
+  document.getElementById("dropup-mesa-subtitle").textContent = `${zone.label} · Capacidad para ${table.cap}`;
+  document.getElementById("picker-count").textContent         = personCount;
+  document.getElementById("dropup-overlay").classList.add("show");
+}
+
+function changePerson(delta) {
+  if (!selectedTable) return;
+  personCount = Math.min(Math.max(personCount + delta, 1), selectedTable.cap);
+  document.getElementById("picker-count").textContent = personCount;
+}
+
+function closeDropUp() {
+  document.getElementById("dropup-overlay").classList.remove("show");
+  selectedTable = null;
+}
+
+function confirmTable() {
+  if (!selectedTable) return;
+  const table = selectedTable;
+  const qty   = personCount;
+  closeDropUp();
+  showToast(`Mesa ${table.id} abierta`);
+  setTimeout(() => goToDetalle(table, "occupied", qty), 1400);
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById("dropup-overlay")) closeDropUp();
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  document.getElementById("toast-text").textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+renderZone("salon");
+</script>
+</body>
+</html>
