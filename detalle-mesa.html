@@ -422,8 +422,9 @@
       font-weight: 600;
       line-height: 16px;
     }
-    #comanda-status-row.sent     { display: flex; background: #D1FAE5; color: #0F6E56; }
-    #comanda-status-row.modified { display: flex; background: #FEF9C3; color: #854F0B; }
+    #comanda-status-row.sent          { display: flex; background: #D1FAE5; color: #0F6E56; }
+    #comanda-status-row.modified      { display: flex; background: #FEF9C3; color: #854F0B; }
+    #comanda-status-row.bill_requested{ display: flex; background: #FEF9C3; color: #854F0B; }
     /* Fila 2: resumen + botón (siempre visible) */
     #bottom-main-row {
       display: flex;
@@ -845,40 +846,75 @@
       <div id="actions-handle"></div>
       <p id="actions-sheet-title">Acciones de mesa</p>
 
-      <button class="action-item action-blue" onclick="solicitarPrecuenta()">
-        <span class="action-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#121e6c" stroke-width="1.6" stroke-linejoin="round"/>
-            <polyline points="14 2 14 8 20 8" stroke="#121e6c" stroke-width="1.6" stroke-linejoin="round"/>
-            <line x1="8" y1="13" x2="16" y2="13" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round"/>
-            <line x1="8" y1="17" x2="13" y2="17" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </span>
-        Solicitar precuenta
-      </button>
+      <!-- Grupo: mesa ocupada -->
+      <div id="actions-occupied">
+        <button class="action-item action-blue" onclick="solicitarPrecuenta()">
+          <span class="action-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#121e6c" stroke-width="1.6" stroke-linejoin="round"/>
+              <polyline points="14 2 14 8 20 8" stroke="#121e6c" stroke-width="1.6" stroke-linejoin="round"/>
+              <line x1="8" y1="13" x2="16" y2="13" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="8" y1="17" x2="13" y2="17" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          Solicitar precuenta
+        </button>
+        <button class="action-item action-gray" onclick="cambiarMesa()">
+          <span class="action-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M15 6l6 6-6 6" stroke="#374151" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          Cambiar mesa
+        </button>
+        <div class="actions-divider"></div>
+        <button class="action-item action-red" onclick="abrirConfirmCancelar()">
+          <span class="action-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <polyline points="3 6 5 6 21 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 11v6M14 11v6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="#FF2947" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          Cancelar y liberar mesa
+        </button>
+      </div>
 
-      <button class="action-item action-gray" onclick="cambiarMesa()">
-        <span class="action-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M5 12h14M15 6l6 6-6 6" stroke="#374151" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        Cambiar mesa
-      </button>
-
-      <div class="actions-divider"></div>
-
-      <button class="action-item action-red" onclick="abrirConfirmCancelar()">
-        <span class="action-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10 11v6M14 11v6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="#FF2947" stroke-width="1.6" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        Cancelar y liberar mesa
-      </button>
+      <!-- Grupo: cuenta solicitada -->
+      <div id="actions-bill-requested" style="display:none">
+        <button class="action-item action-blue" onclick="volverAOcupada()">
+          <span class="action-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M1 4v6h6" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3.51 15a9 9 0 1 0 .49-3" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          Volver a ocupada
+        </button>
+        <button class="action-item action-gray" onclick="imprimirPrecuenta()">
+          <span class="action-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <polyline points="6 9 6 2 18 2 18 9" stroke="#374151" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" stroke="#374151" stroke-width="1.6" stroke-linejoin="round"/>
+              <rect x="6" y="14" width="12" height="8" rx="1" stroke="#374151" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          Imprimir precuenta
+        </button>
+        <div class="actions-divider"></div>
+        <button class="action-item action-red" onclick="abrirConfirmCancelar()">
+          <span class="action-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <polyline points="3 6 5 6 21 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 11v6M14 11v6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="#FF2947" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          Cancelar y liberar mesa
+        </button>
+      </div>
     </div>
   </div>
 
@@ -983,6 +1019,8 @@ let cart           = {}; // productId → qty
 let currentMesaId  = null;
 // 'pending' | 'sent' | 'modified'
 let comandaState   = "pending";
+// 'occupied' | 'bill_requested'
+let mesaState      = "occupied";
 
 /* ══════════════════════════════════════════
    UTILS
@@ -1243,8 +1281,22 @@ function updateComandaUI() {
   const spinner = document.getElementById("spinner-principal");
 
   spinner.style.display = "none";
-  btn.disabled = Object.values(cart).reduce((a, b) => a + b, 0) === 0;
   row.className = "";
+
+  // Estado de mesa: cuenta solicitada
+  if (mesaState === "bill_requested") {
+    const hora = currentMesaId ? loadHoraCuenta(currentMesaId) : null;
+    row.classList.add("bill_requested");
+    rowIcon.textContent = "⏱";
+    rowText.textContent = hora ? `Cuenta solicitada · ${fmtHora(hora)}` : "Cuenta solicitada";
+    btnText.textContent = "Pagar";
+    btn.disabled = false;
+    return;
+  }
+
+  // Estado de mesa: ocupada — muestra estado de comanda
+  const totalQty = Object.values(cart).reduce((a, b) => a + b, 0);
+  btn.disabled = totalQty === 0;
 
   if (comandaState === "pending") {
     btnText.textContent = "Enviar comanda";
@@ -1261,6 +1313,44 @@ function updateComandaUI() {
     rowIcon.textContent = "⚠";
     rowText.textContent = "Cambios pendientes";
     btnText.textContent = "Reenviar comanda";
+  }
+}
+
+/* ── Helpers: hora de cuenta ─────────────── */
+function saveHoraCuenta(mesaId) {
+  localStorage.setItem("boldPOS_cuenta_" + mesaId, new Date().toISOString());
+}
+function loadHoraCuenta(mesaId) {
+  return localStorage.getItem("boldPOS_cuenta_" + mesaId) || null;
+}
+
+/* ── setMesaState: cambia estado ocupada ↔ bill_requested ── */
+function setMesaState(newState) {
+  mesaState = newState;
+  // Escribir directamente al storage (DataManager no expone setEstado)
+  try {
+    const raw  = localStorage.getItem("boldPOS_mesas");
+    const data = raw ? JSON.parse(raw) : {};
+    if (data[currentMesaId]) {
+      data[currentMesaId].estado = newState;
+      localStorage.setItem("boldPOS_mesas", JSON.stringify(data));
+    }
+  } catch(e) {}
+  updateTagEstado();
+  updateComandaUI();
+}
+
+function updateTagEstado() {
+  const tagEl   = document.getElementById("tag-estado");
+  const tagSpan = document.getElementById("tag-estado-text");
+  if (mesaState === "bill_requested") {
+    tagSpan.textContent    = "Cuen. solicitada";
+    tagEl.style.background = "#FEF9C3";
+    tagSpan.style.color    = "#854F0B";
+  } else {
+    tagSpan.textContent    = "Ocupada";
+    tagEl.style.background = "#FEE2E2";
+    tagSpan.style.color    = "#FF2947";
   }
 }
 
@@ -1290,8 +1380,9 @@ function fmtHora(iso) {
 
 /* ── Botón principal: despacha según estado ─ */
 function onBtnPrincipal() {
-  if (comandaState === "pending")  _enviarComanda("Comanda enviada a cocina", "sent");
-  else if (comandaState === "sent") _solicitarCuenta();
+  if (mesaState === "bill_requested") { _pagar(); return; }
+  if (comandaState === "pending")       _enviarComanda("Comanda enviada a cocina", "sent");
+  else if (comandaState === "sent")     _solicitarCuenta();
   else if (comandaState === "modified") _enviarComanda("Comanda actualizada", "sent");
 }
 
@@ -1321,17 +1412,23 @@ function _solicitarCuenta() {
   btnText.textContent   = "Procesando…";
 
   setTimeout(() => {
-    if (currentMesaId) DataManager.solicitarCuenta(currentMesaId);
-    if (currentMesaId) saveComandaState(currentMesaId, "pending", null);
+    if (currentMesaId) saveHoraCuenta(currentMesaId);
+    setMesaState("bill_requested");
     showToast("Cuenta solicitada");
-    setTimeout(() => { location.href = "venta-mesas.html"; }, 900);
   }, 900);
+}
+
+function _pagar() {
+  showToast("Próximamente: checkout");
 }
 
 /* ══════════════════════════════════════════
    ACTIONS SHEET
 ══════════════════════════════════════════ */
 function openActionsSheet() {
+  const isOccupied = mesaState === "occupied";
+  document.getElementById("actions-occupied").style.display     = isOccupied ? "" : "none";
+  document.getElementById("actions-bill-requested").style.display = isOccupied ? "none" : "";
   document.getElementById("actions-overlay").classList.add("show");
 }
 function closeActionsSheet() {
@@ -1351,6 +1448,20 @@ function solicitarPrecuenta() {
 function cambiarMesa() {
   closeActionsSheet();
   showToast("Cambio de mesa — próximamente");
+}
+
+/* ── Volver a ocupada ────────────────────── */
+function volverAOcupada() {
+  closeActionsSheet();
+  if (currentMesaId) localStorage.removeItem("boldPOS_cuenta_" + currentMesaId);
+  setMesaState("occupied");
+  showToast("Mesa activa nuevamente");
+}
+
+/* ── Imprimir precuenta ──────────────────── */
+function imprimirPrecuenta() {
+  closeActionsSheet();
+  showToast("Precuenta enviada a impresora");
 }
 
 /* ── Cancelar y liberar ──────────────────── */
@@ -1430,17 +1541,20 @@ function handleScanOverlayClick(e) {
   // Header: título = "Mesa S07"
   document.getElementById("nav-title").textContent = `Mesa ${mesaId}`;
 
+  // Estado de mesa
+  mesaState = (estado === "bill_requested") ? "bill_requested" : "occupied";
+
   // Tag estado
   const tagEl   = document.getElementById("tag-estado");
   const tagSpan = document.getElementById("tag-estado-text");
   if (estado === "bill_requested") {
-    tagSpan.textContent     = "Precuenta";
-    tagEl.style.background  = "#FEF9C3";
-    tagSpan.style.color     = "#854F0B";
+    tagSpan.textContent    = "Cuen. solicitada";
+    tagEl.style.background = "#FEF9C3";
+    tagSpan.style.color    = "#854F0B";
   } else if (estado === "available") {
-    tagSpan.textContent     = "Disponible";
-    tagEl.style.background  = "#D1FAE5";
-    tagSpan.style.color     = "#0F6E56";
+    tagSpan.textContent    = "Disponible";
+    tagEl.style.background = "#D1FAE5";
+    tagSpan.style.color    = "#0F6E56";
   } else {
     tagSpan.textContent = "Ocupada";
   }
