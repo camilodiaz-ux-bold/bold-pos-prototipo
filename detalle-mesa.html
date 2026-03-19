@@ -95,25 +95,70 @@
       gap: 8px;
       flex-shrink: 0;
     }
-    #mesa-chip {
+    #tag-estado {
       display: inline-flex;
       align-items: center;
-      background: transparent;
-      border: 1px solid var(--coral-100);
+      background: #FEE2E2;
       border-radius: 100px;
-      padding: 4px 12px;
+      padding: 4px 10px;
     }
-    #mesa-chip span {
+    #tag-estado span {
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--coral-100);
       line-height: 16px;
       white-space: nowrap;
     }
 
+    /* ─── Mesa info card ─── */
+    #mesa-info-card {
+      margin: 10px 16px 0;
+      background: var(--black-0);
+      border: 1px solid #E8E9F0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+    .info-val {
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--black-100);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .info-sep {
+      width: 1px;
+      height: 20px;
+      background: #E8E9F0;
+      flex-shrink: 0;
+      margin: 0 6px;
+    }
+    #btn-kebab {
+      width: 32px; height: 32px;
+      border: none; background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; padding: 0;
+      margin-left: 2px;
+      -webkit-tap-highlight-color: transparent;
+      border-radius: 8px;
+      transition: background .12s;
+    }
+    #btn-kebab:active { background: var(--blue-10); }
+
     /* ─── Search bar ─── */
     #search-bar-wrap {
-      padding: 24px 16px 0;
+      padding: 12px 16px 0;
       flex-shrink: 0;
     }
     #search-bar {
@@ -356,44 +401,6 @@
       z-index: 5;
     }
 
-    /* ─── Comanda tag ─── */
-    #comanda-tag {
-      display: none;
-      align-items: center;
-      gap: 6px;
-      margin: 8px 16px 0;
-      padding: 7px 12px;
-      border-radius: 10px;
-      font-family: var(--font);
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 16px;
-      flex-shrink: 0;
-    }
-    #comanda-tag.sent     { display: flex; background: #D1FAE5; color: #0F6E56; }
-    #comanda-tag.modified { display: flex; background: #FEF9C3; color: #854F0B; }
-
-    /* ─── FAB ─── */
-    #fab-more {
-      position: absolute;
-      bottom: 90px;
-      right: 16px;
-      width: 48px; height: 48px;
-      border-radius: 100px;
-      border: none;
-      background: var(--black-0);
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-      transition: box-shadow .15s, transform .12s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #fab-more:active {
-      box-shadow: 0px 2px 6px rgba(0,0,0,.1);
-      transform: scale(0.93);
-    }
-
     /* ─── Bottom bar ─── */
     #bottom-bar {
       background: rgba(255, 255, 255, 0.92);
@@ -401,10 +408,28 @@
       -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(0, 0, 0, 0.08);
       flex-shrink: 0;
-      padding: 12px 16px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Fila 1: estado comanda (condicional) */
+    #comanda-status-row {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 16px;
+    }
+    #comanda-status-row.sent     { display: flex; background: #D1FAE5; color: #0F6E56; }
+    #comanda-status-row.modified { display: flex; background: #FEF9C3; color: #854F0B; }
+    /* Fila 2: resumen + botón (siempre visible) */
+    #bottom-main-row {
       display: flex;
       align-items: center;
       gap: 12px;
+      padding: 12px 16px 20px;
     }
     #order-summary {
       flex: 1;
@@ -431,7 +456,7 @@
     #btn-principal {
       height: 46px;
       padding: 0 20px;
-      min-width: 156px;
+      min-width: 152px;
       border-radius: var(--radius-pill);
       border: none;
       background: var(--coral-100);
@@ -672,10 +697,10 @@
           <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <span id="nav-title">Agregando a</span>
+      <span id="nav-title">Mesa S03</span>
       <div id="nav-right">
-        <div id="mesa-chip">
-          <span>Mesa S03 &middot; Salón</span>
+        <div id="tag-estado">
+          <span id="tag-estado-text">Ocupada</span>
         </div>
         <button id="btn-close" aria-label="Cerrar" onclick="location.href='venta-mesas.html'">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -686,9 +711,53 @@
     </div>
   </div>
 
-  <!-- COMANDA TAG -->
-  <div id="comanda-tag" role="status" aria-live="polite">
-    <span id="comanda-tag-text"></span>
+  <!-- MESA INFO CARD -->
+  <div id="mesa-info-card">
+    <div class="info-item">
+      <!-- Location icon -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#606060" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="12" cy="9" r="2.5" stroke="#606060" stroke-width="1.6"/>
+      </svg>
+      <span class="info-val" id="info-zona">Salón</span>
+    </div>
+    <div class="info-sep"></div>
+    <div class="info-item">
+      <!-- People icon -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
+        <circle cx="9" cy="7" r="3" stroke="#606060" stroke-width="1.6"/>
+        <path d="M3 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M21 21v-1a4 4 0 0 0-3-3.85" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="info-val" id="info-personas">4</span>
+    </div>
+    <div class="info-sep"></div>
+    <div class="info-item">
+      <!-- Clock icon -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
+        <circle cx="12" cy="12" r="9" stroke="#606060" stroke-width="1.6"/>
+        <path d="M12 7v5l3 3" stroke="#606060" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="info-val" id="info-apertura">—</span>
+    </div>
+    <div class="info-sep"></div>
+    <div class="info-item">
+      <!-- Timer icon -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
+        <circle cx="12" cy="13" r="8" stroke="#606060" stroke-width="1.6"/>
+        <path d="M12 9v4l2.5 2.5" stroke="#606060" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 2h6M12 2v3" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="info-val" id="info-tiempo">—</span>
+    </div>
+    <button id="btn-kebab" onclick="openActionsSheet()" aria-label="Más acciones">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="5"  r="1.5" fill="#606060"/>
+        <circle cx="12" cy="12" r="1.5" fill="#606060"/>
+        <circle cx="12" cy="19" r="1.5" fill="#606060"/>
+      </svg>
+    </button>
   </div>
 
   <!-- SEARCH BAR -->
@@ -747,25 +816,24 @@
     <div id="products-grid"><!-- JS --></div>
   </div>
 
-  <!-- FAB -->
-  <button id="fab-more" onclick="openActionsSheet()" aria-label="Más acciones">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="5"  cy="12" r="1.5" fill="#121e6c"/>
-      <circle cx="12" cy="12" r="1.5" fill="#121e6c"/>
-      <circle cx="19" cy="12" r="1.5" fill="#121e6c"/>
-    </svg>
-  </button>
-
   <!-- BOTTOM BAR -->
   <div id="bottom-bar">
-    <div id="order-summary">
-      <span id="order-count">0 productos</span>
-      <span id="order-total">$0</span>
+    <!-- Fila 1: estado comanda (se muestra solo cuando hay comanda) -->
+    <div id="comanda-status-row" role="status" aria-live="polite">
+      <span id="comanda-status-icon"></span>
+      <span id="comanda-status-text"></span>
     </div>
-    <button id="btn-principal" disabled onclick="onBtnPrincipal()">
-      <div class="spinner" id="spinner-principal"></div>
-      <span id="btn-principal-text">Enviar comanda</span>
-    </button>
+    <!-- Fila 2: resumen + botón -->
+    <div id="bottom-main-row">
+      <div id="order-summary">
+        <span id="order-count">0 productos</span>
+        <span id="order-total">$0</span>
+      </div>
+      <button id="btn-principal" disabled onclick="onBtnPrincipal()">
+        <div class="spinner" id="spinner-principal"></div>
+        <span id="btn-principal-text">Enviar comanda</span>
+      </button>
+    </div>
   </div>
 
   <!-- TOAST -->
@@ -1167,31 +1235,51 @@ function setComandaState(newState, hora) {
 }
 
 function updateComandaUI() {
-  const tag     = document.getElementById("comanda-tag");
-  const tagText = document.getElementById("comanda-tag-text");
+  const row     = document.getElementById("comanda-status-row");
+  const rowIcon = document.getElementById("comanda-status-icon");
+  const rowText = document.getElementById("comanda-status-text");
   const btn     = document.getElementById("btn-principal");
   const btnText = document.getElementById("btn-principal-text");
   const spinner = document.getElementById("spinner-principal");
 
-  // Reset spinner
   spinner.style.display = "none";
   btn.disabled = Object.values(cart).reduce((a, b) => a + b, 0) === 0;
-
-  tag.className = "";
+  row.className = "";
 
   if (comandaState === "pending") {
     btnText.textContent = "Enviar comanda";
   } else if (comandaState === "sent") {
     const stored = currentMesaId ? loadComandaState(currentMesaId) : {};
     const hora   = stored.hora ? fmtHora(stored.hora) : "";
-    tag.classList.add("sent");
-    tagText.textContent = hora ? `Comanda enviada · ${hora}` : "Comanda enviada";
+    row.classList.add("sent");
+    rowIcon.textContent = "✓";
+    rowText.textContent = hora ? `Comanda enviada · ${hora}` : "Comanda enviada";
     btnText.textContent = "Solicitar cuenta";
     btn.disabled = false;
   } else if (comandaState === "modified") {
-    tag.classList.add("modified");
-    tagText.textContent = "Comanda modificada";
+    row.classList.add("modified");
+    rowIcon.textContent = "⚠";
+    rowText.textContent = "Cambios pendientes";
     btnText.textContent = "Reenviar comanda";
+  }
+}
+
+function fmtApertura(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  let h = d.getHours(), m = d.getMinutes();
+  const ampm = h >= 12 ? "p.m." : "a.m.";
+  h = h % 12 || 12;
+  return `${h}:${m.toString().padStart(2,"0")} ${ampm}`;
+}
+
+function updateInfoCard() {
+  if (!currentMesaId) return;
+  const mesa = DataManager.getMesa(currentMesaId);
+  if (!mesa) return;
+  const tiempoEl = document.getElementById("info-tiempo");
+  if (tiempoEl && mesa.horaApertura) {
+    tiempoEl.textContent = DataManager.calcTime(mesa.horaApertura);
   }
 }
 
@@ -1338,18 +1426,33 @@ function handleScanOverlayClick(e) {
   currentMesaId = mesaId;
 
   const zonaLabel = { salon:"Salón", terraza:"Terraza", barra:"Barra" };
-  document.querySelector("#mesa-chip span").textContent =
-    `Mesa ${mesaId} · ${zonaLabel[zona] || zona}`;
 
-  // Chip verde si está disponible, coral si está ocupada (default)
-  if (estado === "available") {
-    const chip = document.getElementById("mesa-chip");
-    chip.style.borderColor = "#10B981";
-    chip.querySelector("span").style.color = "#10B981";
+  // Header: título = "Mesa S07"
+  document.getElementById("nav-title").textContent = `Mesa ${mesaId}`;
+
+  // Tag estado
+  const tagEl   = document.getElementById("tag-estado");
+  const tagSpan = document.getElementById("tag-estado-text");
+  if (estado === "bill_requested") {
+    tagSpan.textContent     = "Precuenta";
+    tagEl.style.background  = "#FEF9C3";
+    tagSpan.style.color     = "#854F0B";
+  } else if (estado === "available") {
+    tagSpan.textContent     = "Disponible";
+    tagEl.style.background  = "#D1FAE5";
+    tagSpan.style.color     = "#0F6E56";
+  } else {
+    tagSpan.textContent = "Ocupada";
   }
 
-  // Cargar productos existentes de la mesa desde localStorage
+  // Info card
   const mesa = DataManager.getMesa(mesaId);
+  document.getElementById("info-zona").textContent     = zonaLabel[zona] || zona;
+  document.getElementById("info-personas").textContent = mesa ? mesa.personas + (mesa.personas === 1 ? " pers." : " pers.") : "—";
+  document.getElementById("info-apertura").textContent = mesa ? fmtApertura(mesa.horaApertura) : "—";
+  document.getElementById("info-tiempo").textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : "—";
+
+  // Cargar productos existentes
   if (mesa && mesa.productos && mesa.productos.length > 0) {
     mesa.productos.forEach(p => { cart[p.id] = p.cantidad; });
   }
@@ -1364,6 +1467,7 @@ function handleScanOverlayClick(e) {
 
 updateClock();
 setInterval(updateClock, 30000);
+setInterval(updateInfoCard, 60000);
 renderCategories();
 renderProducts();
 </script>
