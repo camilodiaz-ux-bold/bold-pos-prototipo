@@ -356,6 +356,44 @@
       z-index: 5;
     }
 
+    /* ─── Comanda tag ─── */
+    #comanda-tag {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin: 8px 16px 0;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 16px;
+      flex-shrink: 0;
+    }
+    #comanda-tag.sent     { display: flex; background: #D1FAE5; color: #0F6E56; }
+    #comanda-tag.modified { display: flex; background: #FEF9C3; color: #854F0B; }
+
+    /* ─── FAB ─── */
+    #fab-more {
+      position: absolute;
+      bottom: 90px;
+      right: 16px;
+      width: 48px; height: 48px;
+      border-radius: 100px;
+      border: none;
+      background: var(--black-0);
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: box-shadow .15s, transform .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #fab-more:active {
+      box-shadow: 0px 2px 6px rgba(0,0,0,.1);
+      transform: scale(0.93);
+    }
+
     /* ─── Bottom bar ─── */
     #bottom-bar {
       background: rgba(255, 255, 255, 0.92);
@@ -365,16 +403,12 @@
       flex-shrink: 0;
       padding: 12px 16px 20px;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    #bottom-top-row {
-      display: flex;
       align-items: center;
       gap: 12px;
     }
     #order-summary {
       flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 1px;
@@ -386,44 +420,38 @@
       line-height: 16px;
     }
     #order-total {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       color: var(--blue-100);
-      line-height: 26px;
+      line-height: 24px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    #btn-more {
-      width: 40px; height: 40px;
-      border-radius: 100px;
-      border: 1.5px solid rgba(18,30,108,.15);
-      background: var(--black-0);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: background .15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #btn-more:active { background: var(--blue-10); }
-    #btn-enviar {
-      width: 100%;
-      height: 48px;
+    #btn-principal {
+      height: 46px;
+      padding: 0 20px;
+      min-width: 156px;
       border-radius: var(--radius-pill);
       border: none;
       background: var(--coral-100);
       color: var(--black-0);
       font-family: var(--font);
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       box-shadow: 0 4px 16px rgba(255,41,71,.35);
       transition: opacity .15s, box-shadow .15s;
       display: flex; align-items: center; justify-content: center; gap: 8px;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
-    #btn-enviar:disabled {
+    #btn-principal:disabled {
       opacity: 0.38;
       cursor: not-allowed;
       box-shadow: none;
     }
-    #btn-enviar:not(:disabled):active { opacity: 0.85; }
+    #btn-principal:not(:disabled):active { opacity: 0.85; }
     .spinner {
       display: none;
       width: 18px; height: 18px;
@@ -658,6 +686,11 @@
     </div>
   </div>
 
+  <!-- COMANDA TAG -->
+  <div id="comanda-tag" role="status" aria-live="polite">
+    <span id="comanda-tag-text"></span>
+  </div>
+
   <!-- SEARCH BAR -->
   <div id="search-bar-wrap">
     <div id="search-bar">
@@ -714,24 +747,24 @@
     <div id="products-grid"><!-- JS --></div>
   </div>
 
+  <!-- FAB -->
+  <button id="fab-more" onclick="openActionsSheet()" aria-label="Más acciones">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="5"  cy="12" r="1.5" fill="#121e6c"/>
+      <circle cx="12" cy="12" r="1.5" fill="#121e6c"/>
+      <circle cx="19" cy="12" r="1.5" fill="#121e6c"/>
+    </svg>
+  </button>
+
   <!-- BOTTOM BAR -->
   <div id="bottom-bar">
-    <div id="bottom-top-row">
-      <div id="order-summary">
-        <span id="order-count">0 productos</span>
-        <span id="order-total">$0</span>
-      </div>
-      <button id="btn-more" onclick="openActionsSheet()" aria-label="Más acciones">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="5"  cy="12" r="1.5" fill="#121e6c"/>
-          <circle cx="12" cy="12" r="1.5" fill="#121e6c"/>
-          <circle cx="19" cy="12" r="1.5" fill="#121e6c"/>
-        </svg>
-      </button>
+    <div id="order-summary">
+      <span id="order-count">0 productos</span>
+      <span id="order-total">$0</span>
     </div>
-    <button id="btn-enviar" disabled onclick="enviarComanda()">
-      <div class="spinner" id="spinner-enviar"></div>
-      <span id="btn-enviar-text">Enviar comanda</span>
+    <button id="btn-principal" disabled onclick="onBtnPrincipal()">
+      <div class="spinner" id="spinner-principal"></div>
+      <span id="btn-principal-text">Enviar comanda</span>
     </button>
   </div>
 
@@ -880,6 +913,8 @@ let searchQuery    = "";
 let favorites      = new Set();
 let cart           = {}; // productId → qty
 let currentMesaId  = null;
+// 'pending' | 'sent' | 'modified'
+let comandaState   = "pending";
 
 /* ══════════════════════════════════════════
    UTILS
@@ -1063,6 +1098,10 @@ function addToCart(id) {
       });
     }
   }
+  // Si la comanda ya fue enviada, marcarla como modificada
+  if (comandaState === "sent") {
+    setComandaState("modified");
+  }
   syncCartBar();
   renderProducts();
 }
@@ -1077,7 +1116,7 @@ function syncCartBar() {
   document.getElementById("order-count").textContent =
     totalQty === 0 ? "0 productos" : `${totalQty} producto${totalQty !== 1 ? "s" : ""}`;
   document.getElementById("order-total").textContent = fmt(totalAmt);
-  document.getElementById("btn-enviar").disabled = totalQty === 0;
+  document.getElementById("btn-principal").disabled = totalQty === 0;
 }
 
 /* ══════════════════════════════════════════
@@ -1107,25 +1146,98 @@ function showToast(msg) {
 }
 
 /* ══════════════════════════════════════════
-   ACTIONS — ENVIAR COMANDA (principal)
+   COMANDA STATE MACHINE
+   'pending' → 'sent' → 'modified' → 'sent'
 ══════════════════════════════════════════ */
-function enviarComanda() {
-  const btn    = document.getElementById("btn-enviar");
-  const text   = document.getElementById("btn-enviar-text");
-  const spinner = document.getElementById("spinner-enviar");
+function loadComandaState(mesaId) {
+  try {
+    return JSON.parse(localStorage.getItem("boldPOS_comanda_" + mesaId)) || { estado: "pending", hora: null };
+  } catch(e) { return { estado: "pending", hora: null }; }
+}
+function saveComandaState(mesaId, estado, hora) {
+  localStorage.setItem("boldPOS_comanda_" + mesaId, JSON.stringify({ estado, hora }));
+}
 
-  btn.disabled   = true;
+function setComandaState(newState, hora) {
+  comandaState = newState;
+  if (currentMesaId) {
+    saveComandaState(currentMesaId, newState, hora || null);
+  }
+  updateComandaUI();
+}
+
+function updateComandaUI() {
+  const tag     = document.getElementById("comanda-tag");
+  const tagText = document.getElementById("comanda-tag-text");
+  const btn     = document.getElementById("btn-principal");
+  const btnText = document.getElementById("btn-principal-text");
+  const spinner = document.getElementById("spinner-principal");
+
+  // Reset spinner
+  spinner.style.display = "none";
+  btn.disabled = Object.values(cart).reduce((a, b) => a + b, 0) === 0;
+
+  tag.className = "";
+
+  if (comandaState === "pending") {
+    btnText.textContent = "Enviar comanda";
+  } else if (comandaState === "sent") {
+    const stored = currentMesaId ? loadComandaState(currentMesaId) : {};
+    const hora   = stored.hora ? fmtHora(stored.hora) : "";
+    tag.classList.add("sent");
+    tagText.textContent = hora ? `Comanda enviada · ${hora}` : "Comanda enviada";
+    btnText.textContent = "Solicitar cuenta";
+    btn.disabled = false;
+  } else if (comandaState === "modified") {
+    tag.classList.add("modified");
+    tagText.textContent = "Comanda modificada";
+    btnText.textContent = "Reenviar comanda";
+  }
+}
+
+function fmtHora(iso) {
+  const d = new Date(iso);
+  return d.getHours().toString().padStart(2, "0") + ":" + d.getMinutes().toString().padStart(2, "0");
+}
+
+/* ── Botón principal: despacha según estado ─ */
+function onBtnPrincipal() {
+  if (comandaState === "pending")  _enviarComanda("Comanda enviada a cocina", "sent");
+  else if (comandaState === "sent") _solicitarCuenta();
+  else if (comandaState === "modified") _enviarComanda("Comanda actualizada", "sent");
+}
+
+function _enviarComanda(toastMsg, nextState) {
+  const btn     = document.getElementById("btn-principal");
+  const btnText = document.getElementById("btn-principal-text");
+  const spinner = document.getElementById("spinner-principal");
+
+  btn.disabled  = true;
   spinner.style.display = "block";
-  text.textContent = "Enviando…";
+  btnText.textContent   = "Enviando…";
+
+  const hora = new Date().toISOString();
+  setTimeout(() => {
+    setComandaState(nextState, hora);
+    showToast(toastMsg);
+  }, 1200);
+}
+
+function _solicitarCuenta() {
+  const btn     = document.getElementById("btn-principal");
+  const btnText = document.getElementById("btn-principal-text");
+  const spinner = document.getElementById("spinner-principal");
+
+  btn.disabled  = true;
+  spinner.style.display = "block";
+  btnText.textContent   = "Procesando…";
 
   setTimeout(() => {
-    spinner.style.display = "none";
-    text.textContent = "Enviada ✓";
-    showToast("Comanda enviada a cocina");
-    setTimeout(() => {
-      location.href = "venta-mesas.html";
-    }, 1000);
-  }, 1500);
+    if (currentMesaId) DataManager.solicitarCuenta(currentMesaId);
+    if (currentMesaId) saveComandaState(currentMesaId, "pending", null);
+    showToast("Cuenta solicitada");
+    setTimeout(() => { location.href = "venta-mesas.html"; }, 900);
+  }, 900);
 }
 
 /* ══════════════════════════════════════════
@@ -1141,10 +1253,9 @@ function handleActionsOverlayClick(e) {
   if (e.target === document.getElementById("actions-overlay")) closeActionsSheet();
 }
 
-/* ── Solicitar precuenta ─────────────────── */
+/* ── Solicitar precuenta (desde sheet) ────── */
 function solicitarPrecuenta() {
   closeActionsSheet();
-  if (currentMesaId) DataManager.solicitarCuenta(currentMesaId);
   showToast("Precuenta generada");
 }
 
@@ -1163,8 +1274,8 @@ function closeCancelConfirm() {
   document.getElementById("confirm-overlay").classList.remove("show");
 }
 function ejecutarCancelar() {
-  const btn    = document.getElementById("btn-confirm-cancel-action");
-  const text   = document.getElementById("btn-cancelar-text");
+  const btn     = document.getElementById("btn-confirm-cancel-action");
+  const text    = document.getElementById("btn-cancelar-text");
   const spinner = document.getElementById("spinner-cancelar");
 
   btn.disabled  = true;
@@ -1172,7 +1283,10 @@ function ejecutarCancelar() {
   text.textContent = "Cancelando…";
 
   setTimeout(() => {
-    if (currentMesaId) DataManager.cerrarMesa(currentMesaId);
+    if (currentMesaId) {
+      DataManager.cerrarMesa(currentMesaId);
+      localStorage.removeItem("boldPOS_comanda_" + currentMesaId);
+    }
     location.href = "venta-mesas.html";
   }, 900);
 }
@@ -1238,8 +1352,14 @@ function handleScanOverlayClick(e) {
   const mesa = DataManager.getMesa(mesaId);
   if (mesa && mesa.productos && mesa.productos.length > 0) {
     mesa.productos.forEach(p => { cart[p.id] = p.cantidad; });
-    syncCartBar();
   }
+
+  // Restaurar estado de comanda
+  const stored = loadComandaState(mesaId);
+  comandaState = stored.estado || "pending";
+
+  syncCartBar();
+  updateComandaUI();
 })();
 
 updateClock();
