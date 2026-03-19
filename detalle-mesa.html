@@ -1419,7 +1419,7 @@ function _solicitarCuenta() {
 }
 
 function _pagar() {
-  showToast("Próximamente: checkout");
+  location.href = `checkout.html?mesa=${currentMesaId}`;
 }
 
 /* ══════════════════════════════════════════

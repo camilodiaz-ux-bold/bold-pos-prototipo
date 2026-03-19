@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>BoldPOS — Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Merlin Design Tokens ─── */
+    :root {
+      --blue-100:        #121e6c;
+      --blue-10:         #f1f2f6;
+      --coral-100:       #ff2947;
+      --black-0:         #ffffff;
+      --black-10:        #f3f3f3;
+      --black-40:        #969696;
+      --black-60:        #606060;
+      --black-100:       #1e1e1e;
+      --background-page: #f7f8fb;
+      --font:            'Montserrat', sans-serif;
+      --shadow-blue-8:   0px 8px 20px rgba(18,30,108,0.08);
+      --radius-card:     16px;
+      --radius-pill:     100px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: #d0d0d0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ─── Phone shell ─── */
+    #app {
+      width: 393px;
+      height: 100vh;
+      background: var(--background-page);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ─── Status bar ─── */
+    #status-bar {
+      background: var(--black-0);
+      display: flex;
+      align-items: center;
+      padding: 8px 8px 0;
+      flex-shrink: 0;
+    }
+    .sb-left   { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--black-100); }
+    .sb-center { position:absolute; left:50%; transform:translateX(-50%); font-size:12px; font-weight:600; color:var(--black-100); }
+    .sb-right  { margin-left:auto; display:flex; align-items:center; }
+
+    /* ─── Header ─── */
+    #header {
+      background: var(--black-0);
+      flex-shrink: 0;
+      padding: 12px 16px 16px;
+      border-bottom: 1px solid #F0F1F5;
+    }
+    #header-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    #checkout-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--black-60);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    #header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #btn-print {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid var(--blue-100);
+      background: transparent;
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue-100);
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .12s;
+    }
+    #btn-print:active { background: var(--blue-10); }
+    #btn-close-header {
+      width: 28px; height: 28px;
+      border: none; background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 0; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #mesa-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--black-100);
+      line-height: 30px;
+    }
+    #mesa-subtitle {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--black-60);
+      line-height: 20px;
+      margin-top: 2px;
+    }
+
+    /* ─── Scrollable content ─── */
+    #scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px 24px;
+      scrollbar-width: none;
+    }
+    #scroll-content::-webkit-scrollbar { display: none; }
+
+    /* ─── Section label ─── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .section-label-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--black-60);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+    .section-badge {
+      background: var(--blue-10);
+      color: var(--blue-100);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    /* ─── Product list ─── */
+    #product-list {
+      display: flex;
+      flex-direction: column;
+      background: var(--black-0);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-blue-8);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .product-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      gap: 12px;
+    }
+    .product-row + .product-row {
+      border-top: 1px solid #F0F1F5;
+    }
+    .product-row-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--black-100);
+      flex: 1;
+      line-height: 20px;
+    }
+    .product-row-qty {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--black-60);
+    }
+    .product-row-price {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black-100);
+      flex-shrink: 0;
+    }
+
+    /* ─── Totals card ─── */
+    #totals-card {
+      background: var(--background-page);
+      border: 1px solid #E8E9F0;
+      border-radius: var(--radius-card);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 20px;
+    }
+    .total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+    .total-row-label {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--black-60);
+    }
+    .total-row-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black-100);
+    }
+    .total-row-label.link {
+      color: var(--blue-100);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .total-row-value.propina-val {
+      color: var(--blue-100);
+    }
+    /* Propina selector (expandable) */
+    #propina-picker {
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 0 4px;
+    }
+    #propina-picker.open { display: flex; }
+    .pct-btn {
+      padding: 5px 12px;
+      border-radius: 100px;
+      border: 1.5px solid #E8E9F0;
+      background: var(--black-0);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--black-60);
+      cursor: pointer;
+      transition: all .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pct-btn.active {
+      background: var(--blue-100);
+      border-color: var(--blue-100);
+      color: var(--black-0);
+    }
+    .total-divider {
+      height: 1px;
+      background: #E8E9F0;
+      margin: 6px 0;
+    }
+    .total-row.grand {
+      padding-top: 12px;
+    }
+    .total-row.grand .total-row-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--black-100);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .total-row.grand .total-row-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--black-100);
+      line-height: 32px;
+    }
+
+    /* ─── Section divider ─── */
+    .section-divider {
+      height: 1px;
+      background: #E8E9F0;
+      margin-bottom: 20px;
+    }
+
+    /* ─── Dividir cuenta ─── */
+    #dividir-section {
+      margin-bottom: 8px;
+    }
+    .segmented {
+      display: flex;
+      background: #EDEEF4;
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+      margin-top: 10px;
+      width: 160px;
+    }
+    .seg-btn {
+      flex: 1;
+      height: 34px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black-60);
+      cursor: pointer;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .seg-btn.active {
+      background: var(--black-0);
+      color: var(--black-100);
+      box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    }
+    #dividir-detail {
+      display: none;
+      margin-top: 16px;
+    }
+    #dividir-detail.open { display: block; }
+    .dividir-subtext {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--black-60);
+      margin-bottom: 10px;
+    }
+    .personas-picker {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pers-btn {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      border: 1.5px solid #E8E9F0;
+      background: var(--black-0);
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--black-60);
+      cursor: pointer;
+      transition: all .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pers-btn.active {
+      background: var(--blue-100);
+      border-color: var(--blue-100);
+      color: var(--black-0);
+    }
+    #por-persona-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: var(--black-0);
+      border-radius: 12px;
+      border: 1px solid #E8E9F0;
+    }
+    #por-persona-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black-60);
+    }
+    #por-persona-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-100);
+    }
+
+    /* ─── Bottom bar ─── */
+    #bottom-bar {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0,0,0,0.08);
+      flex-shrink: 0;
+      padding: 14px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #bottom-total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #bottom-total-labels {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    #bottom-total-main-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--black-60);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+    #bottom-total-inc {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--black-40);
+    }
+    #bottom-total-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--black-100);
+      line-height: 32px;
+    }
+    #btn-row {
+      display: flex;
+      gap: 10px;
+    }
+    #btn-cancelar {
+      flex: 1;
+      height: 48px;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid #E8E9F0;
+      background: var(--black-0);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black-100);
+      cursor: pointer;
+      transition: background .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btn-cancelar:active { background: var(--black-10); }
+    #btn-confirmar {
+      flex: 2;
+      height: 48px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: var(--coral-100);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--black-0);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      box-shadow: 0 4px 16px rgba(255,41,71,.3);
+      transition: opacity .15s;
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    #btn-confirmar:active { opacity: 0.85; }
+    #bottom-legal {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--black-40);
+      text-align: center;
+      line-height: 15px;
+    }
+
+    /* ─── Toast ─── */
+    #toast {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--black-100);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: 100px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 400;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- STATUS BAR -->
+  <div id="status-bar">
+    <div class="sb-left">
+      <svg width="17" height="10" viewBox="0 0 17 10" fill="none" aria-hidden="true">
+        <rect x="0"    y="6" width="3" height="4"  rx="0.5" fill="#1e1e1e"/>
+        <rect x="4.5"  y="4" width="3" height="6"  rx="0.5" fill="#1e1e1e"/>
+        <rect x="9"    y="2" width="3" height="8"  rx="0.5" fill="#1e1e1e"/>
+        <rect x="13.5" y="0" width="3" height="10" rx="0.5" fill="#1e1e1e"/>
+      </svg>
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true">
+        <path d="M8 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#1e1e1e"/>
+        <path d="M3.5 6a6.5 6.5 0 0 1 9 0" stroke="#1e1e1e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path d="M1 3.5a10 10 0 0 1 14 0" stroke="#1e1e1e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span>Carrier</span>
+    </div>
+    <div class="sb-center" id="current-time">9:41</div>
+    <div class="sb-right">
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none" aria-hidden="true">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3.5" stroke="#1e1e1e" stroke-opacity="0.35"/>
+        <rect x="2"   y="2"   width="18" height="8"  rx="2"   fill="#1e1e1e"/>
+        <path d="M23.5 4v4a2 2 0 0 0 0-4z" fill="#1e1e1e" fill-opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-top-row">
+      <span id="checkout-label">Checkout</span>
+      <div id="header-actions">
+        <button id="btn-print" onclick="imprimirPrecuenta()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <polyline points="6 9 6 2 18 2 18 9" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <rect x="6" y="14" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          Imprimir pre-cuenta
+        </button>
+        <button id="btn-close-header" onclick="location.href='venta-mesas.html'" aria-label="Cerrar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="#606060" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="mesa-title">Mesa —</div>
+    <div id="mesa-subtitle">— · — personas</div>
+  </div>
+
+  <!-- SCROLLABLE CONTENT -->
+  <div id="scroll-content">
+
+    <!-- Resumen del pedido -->
+    <div class="section-label">
+      <span class="section-label-text">Resumen del pedido</span>
+      <span class="section-badge" id="items-badge">0 ítems</span>
+    </div>
+
+    <div id="product-list"><!-- JS --></div>
+
+    <!-- Totales -->
+    <div id="totals-card">
+      <div class="total-row">
+        <span class="total-row-label">Subtotal</span>
+        <span class="total-row-value" id="val-subtotal">$0</span>
+      </div>
+      <div class="total-row">
+        <span class="total-row-label">IVA 19%</span>
+        <span class="total-row-value" id="val-iva">$0</span>
+      </div>
+      <div class="total-row">
+        <span class="total-row-label link" id="propina-label" onclick="togglePropinaPicker()">
+          Propina
+          <span id="propina-pct-display">(10%)</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" id="propina-chevron" style="transition:transform .2s">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="total-row-value propina-val" id="val-propina">+$0</span>
+      </div>
+      <!-- Propina picker (expandable) -->
+      <div id="propina-picker">
+        <button class="pct-btn" data-pct="0"  onclick="setPropina(0)">0%</button>
+        <button class="pct-btn" data-pct="5"  onclick="setPropina(5)">5%</button>
+        <button class="pct-btn active" data-pct="10" onclick="setPropina(10)">10%</button>
+        <button class="pct-btn" data-pct="15" onclick="setPropina(15)">15%</button>
+        <button class="pct-btn" data-pct="20" onclick="setPropina(20)">20%</button>
+      </div>
+      <div class="total-divider"></div>
+      <div class="total-row grand">
+        <span class="total-row-label">Total</span>
+        <span class="total-row-value" id="val-total">$0</span>
+      </div>
+    </div>
+
+    <!-- Dividir cuenta -->
+    <div class="section-divider"></div>
+    <div id="dividir-section">
+      <div class="section-label">
+        <span class="section-label-text">¿Dividir cuenta?</span>
+      </div>
+      <div class="segmented" role="group" aria-label="Dividir cuenta">
+        <button class="seg-btn active" id="seg-no" onclick="setDividir(false)">No</button>
+        <button class="seg-btn"        id="seg-si" onclick="setDividir(true)">Sí</button>
+      </div>
+
+      <div id="dividir-detail">
+        <div class="dividir-subtext" style="margin-top:14px;">¿Entre cuántas personas?</div>
+        <div class="personas-picker" id="personas-picker"><!-- JS --></div>
+        <div id="por-persona-row">
+          <span id="por-persona-label">Por persona</span>
+          <span id="por-persona-value">$0</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /scroll-content -->
+
+  <!-- BOTTOM BAR -->
+  <div id="bottom-bar">
+    <div id="bottom-total-row">
+      <div id="bottom-total-labels">
+        <span id="bottom-total-main-label">Total a cobrar</span>
+        <span id="bottom-total-inc">Inc. propina $0</span>
+      </div>
+      <span id="bottom-total-value">$0</span>
+    </div>
+    <div id="btn-row">
+      <button id="btn-cancelar" onclick="cancelar()">Cancelar</button>
+      <button id="btn-confirmar" onclick="confirmarPago()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Confirmar pago
+      </button>
+    </div>
+    <p id="bottom-legal">Al confirmar se registra el pago en el sistema.</p>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast"><span id="toast-text"></span></div>
+
+</div><!-- /app -->
+
+<script src="data-manager.js"></script>
+<script>
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let mesaId      = "S09";
+let mesaData    = null;
+let subtotal    = 0;
+let propinaPct  = 10;
+let dividir     = false;
+let numPersonas = 2;
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function fmt(n) {
+  return "$" + Math.round(n).toLocaleString("es-CO");
+}
+
+function updateClock() {
+  const d = new Date();
+  document.getElementById("current-time").textContent =
+    d.getHours().toString().padStart(2,"0") + ":" +
+    d.getMinutes().toString().padStart(2,"0");
+}
+
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  document.getElementById("toast-text").textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
+}
+
+/* ══════════════════════════════════════════
+   CÁLCULOS
+══════════════════════════════════════════ */
+function calcTotals() {
+  const iva     = subtotal * 0.19;
+  const propina = subtotal * (propinaPct / 100);
+  const total   = subtotal + iva + propina;
+  return { iva, propina, total };
+}
+
+function renderTotals() {
+  const { iva, propina, total } = calcTotals();
+
+  document.getElementById("val-subtotal").textContent = fmt(subtotal);
+  document.getElementById("val-iva").textContent      = fmt(iva);
+  document.getElementById("val-propina").textContent  = "+" + fmt(propina);
+  document.getElementById("val-total").textContent    = fmt(total);
+
+  document.getElementById("bottom-total-value").textContent = fmt(total);
+  document.getElementById("bottom-total-inc").textContent   =
+    propinaPct > 0 ? `Inc. propina ${fmt(propina)}` : "Sin propina";
+
+  if (dividir && numPersonas > 1) {
+    document.getElementById("por-persona-value").textContent = fmt(total / numPersonas);
+  }
+}
+
+/* ══════════════════════════════════════════
+   PROPINA
+══════════════════════════════════════════ */
+let propinaPickerOpen = false;
+
+function togglePropinaPicker() {
+  propinaPickerOpen = !propinaPickerOpen;
+  const picker  = document.getElementById("propina-picker");
+  const chevron = document.getElementById("propina-chevron");
+  if (propinaPickerOpen) {
+    picker.classList.add("open");
+    chevron.style.transform = "rotate(180deg)";
+  } else {
+    picker.classList.remove("open");
+    chevron.style.transform = "";
+  }
+}
+
+function setPropina(pct) {
+  propinaPct = pct;
+  document.getElementById("propina-pct-display").textContent = `(${pct}%)`;
+  document.querySelectorAll(".pct-btn").forEach(btn => {
+    btn.classList.toggle("active", parseInt(btn.dataset.pct) === pct);
+  });
+  // Auto-cerrar picker
+  propinaPickerOpen = false;
+  document.getElementById("propina-picker").classList.remove("open");
+  document.getElementById("propina-chevron").style.transform = "";
+  renderTotals();
+}
+
+/* ══════════════════════════════════════════
+   DIVIDIR CUENTA
+══════════════════════════════════════════ */
+function setDividir(val) {
+  dividir = val;
+  document.getElementById("seg-no").classList.toggle("active", !val);
+  document.getElementById("seg-si").classList.toggle("active",  val);
+  const detail = document.getElementById("dividir-detail");
+  if (val) {
+    detail.classList.add("open");
+    renderTotals();
+  } else {
+    detail.classList.remove("open");
+  }
+}
+
+function setNumPersonas(n) {
+  numPersonas = n;
+  document.querySelectorAll(".pers-btn").forEach(btn => {
+    btn.classList.toggle("active", parseInt(btn.dataset.n) === n);
+  });
+  renderTotals();
+}
+
+function renderPersonasPicker() {
+  const picker = document.getElementById("personas-picker");
+  picker.innerHTML = "";
+  [2, 3, 4, 5, 6].forEach(n => {
+    const btn = document.createElement("button");
+    btn.className = "pers-btn" + (n === numPersonas ? " active" : "");
+    btn.dataset.n = n;
+    btn.textContent = n;
+    btn.addEventListener("click", () => setNumPersonas(n));
+    picker.appendChild(btn);
+  });
+}
+
+/* ══════════════════════════════════════════
+   RENDER PRODUCTOS
+══════════════════════════════════════════ */
+function renderProductos(productos) {
+  const list = document.getElementById("product-list");
+  list.innerHTML = "";
+  let total = 0;
+
+  productos.forEach(p => {
+    const lineTotal = p.precio * p.cantidad;
+    total += lineTotal;
+
+    const row = document.createElement("div");
+    row.className = "product-row";
+    row.innerHTML = `
+      <span class="product-row-name">
+        ${p.nombre}
+        <span class="product-row-qty"> × ${p.cantidad}</span>
+      </span>
+      <span class="product-row-price">${fmt(lineTotal)}</span>
+    `;
+    list.appendChild(row);
+  });
+
+  subtotal = total;
+  const totalItems = productos.reduce((s, p) => s + p.cantidad, 0);
+  document.getElementById("items-badge").textContent = `${totalItems} ítem${totalItems !== 1 ? "s" : ""}`;
+}
+
+/* ══════════════════════════════════════════
+   ACCIONES
+══════════════════════════════════════════ */
+function imprimirPrecuenta() {
+  showToast("Pre-cuenta enviada a impresora");
+}
+
+function cancelar() {
+  const params = new URLSearchParams({ mesa: mesaId });
+  if (mesaData) {
+    params.set("estado", mesaData.estado || "bill_requested");
+    params.set("zona",   mesaData.zona   || "salon");
+  }
+  location.href = `detalle-mesa.html?${params.toString()}`;
+}
+
+function confirmarPago() {
+  showToast("Próximamente: métodos de pago");
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+(function init() {
+  DataManager.init();
+
+  const p = new URLSearchParams(location.search);
+  mesaId  = p.get("mesa") || "S09";
+
+  mesaData = DataManager.getMesa(mesaId);
+
+  // Header
+  document.getElementById("mesa-title").textContent = `Mesa ${mesaId}`;
+  if (mesaData) {
+    const zonaLabel = { salon:"Salón", terraza:"Terraza", barra:"Barra" };
+    const zona      = zonaLabel[mesaData.zona] || mesaData.zona || "—";
+    const personas  = mesaData.personas || "—";
+    document.getElementById("mesa-subtitle").textContent =
+      `${zona} · ${personas} persona${personas !== 1 ? "s" : ""}`;
+  }
+
+  // Productos
+  const productos = mesaData && mesaData.productos ? mesaData.productos : [];
+  if (productos.length > 0) {
+    renderProductos(productos);
+  } else {
+    // Fallback de demostración si no hay productos
+    document.getElementById("product-list").innerHTML =
+      `<div class="product-row"><span class="product-row-name" style="color:var(--black-40)">Sin productos registrados</span></div>`;
+    subtotal = 0;
+  }
+
+  renderPersonasPicker();
+  renderTotals();
+
+  updateClock();
+  setInterval(updateClock, 30000);
+})();
+</script>
+</body>
+</html>
