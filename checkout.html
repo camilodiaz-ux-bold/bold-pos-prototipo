@@ -355,23 +355,37 @@
     }
     #por-persona-row {
       display: flex;
-      align-items: baseline;
-      gap: 6px;
+      flex-direction: column;
+      gap: 4px;
       margin-top: 14px;
-      padding: 12px 14px;
+      padding: 14px 16px;
       background: var(--black-0);
       border-radius: 12px;
       border: 1px solid #E8E9F0;
+      box-shadow: var(--shadow-blue-8);
     }
     #por-persona-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--black-60);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #por-persona-value-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+    #por-persona-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--blue-100);
+      line-height: 32px;
+    }
+    #por-persona-suffix {
       font-size: 13px;
       font-weight: 500;
       color: var(--black-60);
-    }
-    #por-persona-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--blue-100);
     }
 
     /* ─── Bottom bar ─── */
@@ -599,8 +613,11 @@
         <div class="dividir-subtext" style="margin-top:14px;">¿Entre cuántas personas?</div>
         <div class="personas-picker" id="personas-picker"><!-- JS --></div>
         <div id="por-persona-row">
-          <span id="por-persona-label">Por persona</span>
-          <span id="por-persona-value">$0</span>
+          <span id="por-persona-label">Cada persona paga:</span>
+          <div id="por-persona-value-wrap">
+            <span id="por-persona-value">$0</span>
+            <span id="por-persona-suffix">por persona</span>
+          </div>
         </div>
       </div>
     </div>
@@ -614,7 +631,10 @@
         <span id="bottom-total-main-label">Total a cobrar</span>
         <span id="bottom-total-inc">Inc. propina $0</span>
       </div>
-      <span id="bottom-total-value">$0</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+        <span id="bottom-total-value">$0</span>
+        <span id="bottom-total-full" style="display:none;font-size:11px;font-weight:500;color:var(--black-40)"></span>
+      </div>
     </div>
     <div id="btn-row">
       <button id="btn-cancelar" onclick="cancelar()">Cancelar</button>
@@ -684,12 +704,23 @@ function renderTotals() {
   document.getElementById("val-propina").textContent  = "+" + fmt(propina);
   document.getElementById("val-total").textContent    = fmt(total);
 
-  document.getElementById("bottom-total-value").textContent = fmt(total);
-  document.getElementById("bottom-total-inc").textContent   =
+  document.getElementById("bottom-total-inc").textContent =
     propinaPct > 0 ? `Inc. propina ${fmt(propina)}` : "Sin propina";
 
+  const fullEl = document.getElementById("bottom-total-full");
+
   if (dividir && numPersonas > 1) {
-    document.getElementById("por-persona-value").textContent = fmt(total / numPersonas);
+    const porPersona = Math.ceil(total / numPersonas);
+    document.getElementById("bottom-total-main-label").textContent =
+      `TOTAL A COBRAR (÷${numPersonas} pers.)`;
+    document.getElementById("bottom-total-value").textContent = fmt(porPersona);
+    fullEl.textContent = `Total completo: ${fmt(total)}`;
+    fullEl.style.display = "";
+    document.getElementById("por-persona-value").textContent = fmt(porPersona);
+  } else {
+    document.getElementById("bottom-total-main-label").textContent = "TOTAL A COBRAR";
+    document.getElementById("bottom-total-value").textContent = fmt(total);
+    fullEl.style.display = "none";
   }
 }
 
@@ -734,10 +765,10 @@ function setDividir(val) {
   const detail = document.getElementById("dividir-detail");
   if (val) {
     detail.classList.add("open");
-    renderTotals();
   } else {
     detail.classList.remove("open");
   }
+  renderTotals();
 }
 
 function setNumPersonas(n) {
