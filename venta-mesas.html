@@ -418,7 +418,6 @@
     }
     #list-view::-webkit-scrollbar { display: none; }
     .list-card {
-      background: var(--black-0);
       border-radius: var(--radius-card); /* 16px */
       padding: 16px;
       display: flex;
@@ -428,12 +427,7 @@
       cursor: default;
     }
     .list-card.available { cursor: pointer; }
-    .list-card-indicator {
-      width: 4px;
-      border-radius: 2px;
-      flex-shrink: 0;
-      align-self: stretch;
-    }
+    .list-card-indicator { display: none; }
     .list-card-body {
       flex: 1;
       display: flex;
@@ -452,10 +446,26 @@
       line-height: 20px;
     }
     .list-card-status {
-      /* Link/Small */
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       font-size: 12px;
       font-weight: 600;
       line-height: 16px;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.6; }
+    }
+    .status-pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #c0392b;
+      flex-shrink: 0;
+      animation: pulse-dot 1.2s ease-in-out infinite;
     }
     .list-card-meta {
       /* [APP]/Caption/Regular */
@@ -756,21 +766,21 @@
   <!-- BOTTOM PANEL — legend only -->
   <div id="bottom-panel">
     <div id="legend-chips">
-      <div class="legend-chip" style="background:#EDEEF4;border:1.5px solid #BABDC8;">
-        <div class="legend-dot" style="background:#A8ADBE;"></div>
-        <span class="legend-label" style="color:#6B7194;">Disponible</span>
+      <div class="legend-chip" style="background:#f0faf5;border:1.5px solid #2e7d5e;">
+        <div class="legend-dot" style="background:#2e7d5e;"></div>
+        <span class="legend-label" style="color:#2e7d5e;">Disponible</span>
       </div>
-      <div class="legend-chip" style="background:#FFF0F1;border:1.5px solid #FF2947;">
-        <div class="legend-dot" style="background:#FF2947;"></div>
-        <span class="legend-label" style="color:#FF2947;">Ocupada</span>
+      <div class="legend-chip" style="background:#fde8e8;border:1.5px solid #c0392b;">
+        <div class="legend-dot" style="background:#c0392b;"></div>
+        <span class="legend-label" style="color:#c0392b;">Ocupada</span>
       </div>
-      <div class="legend-chip" style="background:#FFFBE6;border:1.5px solid #FFB800;">
-        <div class="legend-dot" style="background:#FFB800;"></div>
-        <span class="legend-label" style="color:#92400E;">Cuenta solicitada</span>
+      <div class="legend-chip" style="background:#fde8e8;border:1.5px solid #c0392b;">
+        <span class="status-pulse-dot"></span>
+        <span class="legend-label" style="color:#c0392b;">Cuenta solicitada</span>
       </div>
-      <div class="legend-chip dashed" style="background:#F3F3F3;border:1.5px dashed #C0C0C0;">
-        <div class="legend-dot" style="background:#969696;"></div>
-        <span class="legend-label" style="color:#969696;">Inhabilitada</span>
+      <div class="legend-chip dashed" style="background:#f5f5f5;border:1.5px dashed #C0C0C0;">
+        <div class="legend-dot" style="background:#999999;"></div>
+        <span class="legend-label" style="color:#999999;">Inhabilitada</span>
       </div>
     </div>
   </div>
@@ -1212,11 +1222,25 @@ const STATUS_LABELS = {
   available:      "Disponible",
   occupied:       "Ocupada",
   bill_requested: "Cuenta solicitada",
+  disabled:       "Inhabilitada",
 };
 const STATUS_TEXT_COLORS = {
-  available:      "#6B7194",
-  occupied:       "#FF2947",
-  bill_requested: "#92400E",
+  available:      "#2e7d5e",
+  occupied:       "#c0392b",
+  bill_requested: "#c0392b",
+  disabled:       "#999999",
+};
+const STATUS_CARD_BG = {
+  available:      "#f0faf5",
+  occupied:       "#fde8e8",
+  bill_requested: "#fde8e8",
+  disabled:       "#f5f5f5",
+};
+const STATUS_BADGE_BG = {
+  available:      "transparent",
+  occupied:       "#fde8e8",
+  bill_requested: "#fde8e8",
+  disabled:       "transparent",
 };
 
 function renderListView(zoneKey, query) {
@@ -1229,20 +1253,24 @@ function renderListView(zoneKey, query) {
   zone.tables.forEach(table => {
     if (q && !table.id.toLowerCase().includes(q)) return;
 
-    const tk           = STATUS_TOKENS[table.status];
-    const indicatorColor = tk.border.split(" ").pop();
-    const textColor    = STATUS_TEXT_COLORS[table.status];
+    const tk        = STATUS_TOKENS[table.status];
+    const textColor = STATUS_TEXT_COLORS[table.status] || "#6B7194";
+    const cardBg    = STATUS_CARD_BG[table.status]     || "#ffffff";
+    const badgeBg   = STATUS_BADGE_BG[table.status]    || "transparent";
+    const pulseDot  = table.status === "bill_requested"
+      ? `<span class="status-pulse-dot"></span>` : "";
 
     const card = document.createElement("div");
     card.className = "list-card" + (table.status === "available" ? " available" : "");
     card.dataset.id = table.id;
+    card.style.background = cardBg;
 
     card.innerHTML = `
-      <div class="list-card-indicator" style="background:${indicatorColor};"></div>
+      <div class="list-card-indicator"></div>
       <div class="list-card-body">
         <div class="list-card-row">
           <span class="list-card-id" style="color:${tk.num};">${table.id}</span>
-          <span class="list-card-status" style="color:${textColor};">${STATUS_LABELS[table.status]}</span>
+          <span class="list-card-status" style="color:${textColor};background:${badgeBg};">${pulseDot}${STATUS_LABELS[table.status]}</span>
         </div>
         <div class="list-card-row">
           <span class="list-card-meta">${table.cap} personas · ${zone.label}</span>
