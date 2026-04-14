@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bold POS – Catálogo de Productos</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* ── Phone shell ── */
+  .phone {
+    width: 375px;
+    height: 700px;
+    background: #f7f8fb;
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 8px #2a2a3e, 0 0 0 10px #111;
+  }
+
+  /* ── Screens ── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    background: #f7f8fb;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeIn .18s ease;
+  }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideBack { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: translateX(0); } }
+  .screen.back { animation: slideBack .18s ease; }
+
+  /* ── Status bar ── */
+  .status-bar {
+    height: 20px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #1e1e1e;
+    flex-shrink: 0;
+  }
+  .status-bar.light { color: #fff; }
+  .status-bar .time { font-weight: 700; letter-spacing: .3px; }
+  .status-icons { display: flex; gap: 4px; align-items: center; }
+  .battery {
+    width: 22px; height: 11px; border: 1.5px solid currentColor; border-radius: 2px; position: relative;
+  }
+  .battery::after {
+    content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+    width: 2.5px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0;
+  }
+  .battery-fill { position: absolute; inset: 1.5px; background: currentColor; border-radius: 1px; width: 80%; }
+
+  /* ── Common tokens ── */
+  :root {
+    --blue: #121e6c;
+    --coral: #ff2947;
+    --coral-60: #ffb2bc;
+    --coral-30: #ffdfe4;
+    --bg: #f7f8fb;
+    --black: #1e1e1e;
+    --gray: #606060;
+    --white: #fff;
+    --shadow-blue: 0 4px 12px rgba(18,30,108,.08);
+  }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    background: var(--coral);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    height: 48px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn-primary:active { opacity: .85; transform: scale(.98); }
+  .btn-primary:disabled { background: var(--coral-60); color: var(--coral-30); cursor: not-allowed; transform: none; }
+
+  .btn-primary.blue {
+    background: var(--blue);
+  }
+
+  /* ── Tab pills ── */
+  .tab-nav {
+    display: flex;
+    background: var(--bg);
+    border-radius: 100px;
+    gap: 4px;          /* Figma: gap-[4px] */
+  }
+  .tab-nav.white { background: #fff; box-shadow: 0 4px 12px rgba(18,30,108,.08); }
+  .tab-pill {
+    flex: 1;
+    border-radius: 100px;
+    border: none;
+    background: transparent;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;  /* Medium – Figma: Montserrat Medium */
+    color: #121E6C;    /* Blue/100 */
+    padding: 8px 12px; /* Figma: px-[12px] py-[8px] */
+    cursor: pointer;
+    transition: background .15s, color .15s, box-shadow .15s;
+    white-space: nowrap;
+    line-height: 20px; /* App/Body/medium lineHeight */
+  }
+  .tab-pill.active {
+    background: #121E6C; /* Blue/100 */
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(18,30,108,.08); /* Blue shadow/2 */
+    font-weight: 700;  /* Bold */
+  }
+  /* Gradient variant – Figma: Pagos tab in home screen */
+  .tab-pill.active.gradient {
+    background: linear-gradient(-89.82deg, rgb(207,61,82) 0%, rgb(56,37,104) 100%);
+  }
+
+  /* ── Icon button ── */
+  .icon-btn {
+    width: 32px; height: 32px;
+    background: #fff;
+    border-radius: 100px;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-blue);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* ── Search bar ── */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 30px;
+    height: 40px;
+    padding: 0 16px 0 12px;
+    gap: 10px;
+    flex: 1;
+  }
+  .search-bar input {
+    border: none; background: transparent; flex: 1;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px; font-weight: 300; color: var(--gray);
+    outline: none;
+  }
+  .search-bar input::placeholder { color: var(--gray); }
+  .search-bar input.has-value { color: var(--blue); font-weight: 400; }
+
+  /* ── Product card ── */
+  .product-card {
+    background: #fff;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: box-shadow .15s, transform .1s;
+    position: relative;
+  }
+  .product-card:active { transform: scale(.99); }
+  .product-card.selected { box-shadow: 0 0 0 2px var(--coral); }
+  .product-thumb {
+    width: 72px; height: 72px;
+    background: var(--bg);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .product-thumb svg { opacity: .5; }
+  .product-info { flex: 1; min-width: 0; }
+  .product-name { font-size: 12px; font-weight: 400; color: var(--black); line-height: 16px; margin-bottom: 2px; }
+  .product-sku  { font-size: 12px; color: var(--gray); margin-bottom: 10px; }
+  .product-price { font-size: 14px; font-weight: 500; color: var(--black); }
+  .product-qty {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .qty-btn {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: none; background: var(--blue); color: #fff;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+  .qty-btn.minus { background: var(--bg); color: var(--blue); border: 1px solid #d2d4e1; }
+  .qty-count { font-size: 14px; font-weight: 600; color: var(--blue); min-width: 18px; text-align: center; }
+  .qty-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: var(--coral); color: #fff;
+    font-size: 10px; font-weight: 700;
+    border-radius: 100px; padding: 1px 6px;
+  }
+
+  /* ── Bottom bar (catalog) ── */
+  .bottom-pos-bar {
+    display: flex; align-items: center;
+    padding: 16px;
+    background: rgba(247,248,251,.95);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid rgba(18,30,108,.06);
+    flex-shrink: 0;
+  }
+  .cart-summary { flex: 1; }
+  .cart-count { font-size: 12px; color: var(--gray); margin-bottom: 2px; }
+  .cart-total { font-size: 16px; font-weight: 500; color: var(--black); }
+  .cobrar-btn {
+    width: 174px;
+    background: var(--coral-60); color: var(--coral-30);
+    font-weight: 700; font-size: 14px; letter-spacing: .3px;
+    border: none; border-radius: 100px; height: 48px;
+    cursor: not-allowed; font-family: 'Montserrat', sans-serif;
+    transition: background .2s, color .2s;
+  }
+  .cobrar-btn.active {
+    background: var(--coral); color: #fff; cursor: pointer;
+  }
+  .cobrar-btn.active:active { opacity: .85; }
+
+  /* ── Cart icon with badge ── */
+  .cart-icon-wrap { position: relative; }
+  .cart-badge {
+    position: absolute; top: -3px; right: -3px;
+    background: var(--coral); color: #fff;
+    font-size: 8px; font-weight: 700; border-radius: 50%;
+    width: 14px; height: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Numpad ── */
+  .numpad {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; padding: 0 16px;
+  }
+  .num-key {
+    background: var(--bg); border: none; border-radius: 16px;
+    height: 48px; font-family: 'Montserrat', sans-serif;
+    font-size: 16px; font-weight: 500; color: var(--blue);
+    cursor: pointer; transition: background .1s, transform .08s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .num-key:active { background: #e8eaf5; transform: scale(.96); }
+
+  /* ── Amount display ── */
+  .amount-display {
+    font-size: 52px; font-weight: 300; color: var(--black);
+    text-align: center; line-height: 1;
+  }
+
+  /* ── Scrollable content ── */
+  .scroll-content {
+    overflow-y: auto; flex: 1;
+    scrollbar-width: none;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* ── Empty state ── */
+  .empty-state {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px; padding: 24px;
+  }
+  .empty-state p { font-size: 14px; color: var(--black); text-align: center; line-height: 20px; }
+  .empty-link { font-size: 12px; font-weight: 600; color: var(--blue); text-decoration: underline; cursor: pointer; }
+
+  /* ── Tool grid ── */
+  .tools-grid {
+    display: flex; flex-wrap: wrap;
+    gap: 8px;          /* Figma: gap-[8px] */
+    align-content: flex-start;
+  }
+  .tool-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px;          /* Figma: gap-[8px] between icon and label */
+    min-width: 65px;   /* Figma: min-w-[65px] */
+    padding-top: 2px;  /* Figma: pt-[2px] */
+    cursor: pointer;
+  }
+  .tool-icon {
+    width: 64px; height: 64px;  /* Figma: size-[64px] */
+    background: #fff;
+    border-radius: 16px;         /* Figma: rounded-[16px] */
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px;                /* Figma: p-[4px] */
+    flex-shrink: 0;
+    /* No shadow on the icon itself in Figma; shadow is on parent cards */
+  }
+  .tool-icon img {
+    width: 44px; height: 44px;  /* Figma: size-[44px] for inner icon */
+    object-fit: contain;
+  }
+  /* Figma: font-medium 12px, color #1E1E1E, leading 16px, text-center, w-[79.75px] */
+  .tool-label {
+    font-size: 12px; font-weight: 500; color: #1E1E1E;
+    text-align: center; line-height: 16px; width: 79.75px;
+  }
+
+  /* ── Credit banner ── */
+  /* Figma: w-[343px], rounded-[16px], p-[16px], gap-[20px] flex-col
+     Background: three SVG radial gradients over #F4F5F8 base */
+  .credit-banner {
+    border-radius: 16px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* Approximate Figma radial gradients:
+       1. Coral spot top-right: rgba(238,66,78) fade
+       2. Navy spot bottom-left: rgba(18,30,108) deep
+       3. White shimmer bottom-right
+       Base: #F4F5F8 */
+    background:
+      radial-gradient(ellipse 240px 180px at 108% -10%, rgba(238,66,78,.85) 0%, rgba(240,111,121,.5) 30%, transparent 60%),
+      radial-gradient(ellipse 220px 260px at -8%  105%, rgba(18,30,108,1) 0%, rgba(75,84,143,.7) 40%, transparent 70%),
+      radial-gradient(ellipse 180px 180px at 112% 115%, rgba(255,255,255,.9) 0%, transparent 55%),
+      linear-gradient(90deg, #f4f5f8 0%, #f4f5f8 100%);
+  }
+  /* Decoration coin image (Figma: imgFrame9085, positioned overflow) */
+  .credit-banner .banner-deco {
+    position: absolute;
+    /* Figma: h-[287.7%] left-[30.59%] top-[39.61%] w-[154.78%] */
+    height: 287.7%; width: 154.78%;
+    left: 30.59%; top: 39.61%;
+    object-fit: contain;
+    pointer-events: none;
+    opacity: .9;
+  }
+  /* Figma: text area w-[184px], gap-[8px] */
+  .credit-banner .banner-text { width: 184px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+  /* Figma: font-bold 16px (Font/Size/md), color #121E6C, leading 20px (Font/Height/xs) */
+  .credit-banner h3 {
+    font-size: 16px; font-weight: 700; color: #121E6C;
+    line-height: 20px; margin: 0;
+  }
+  /* Figma: font-regular 12px (Font/Size/xs), color #121E6C, leading 16px (Font/Height/xxs) */
+  .credit-banner .banner-caption {
+    font-size: 12px; font-weight: 400; color: #121E6C; line-height: 16px;
+  }
+  /* Figma: APP Button/Action – bg #121E6C, rounded-[12px], px-[16px] py-[8px], h-[40px], w-[145px], font-medium 14px, text-white */
+  .credit-banner .banner-btn {
+    background: #121E6C; color: #fff;
+    border: none; border-radius: 12px;
+    height: 40px; width: 145px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px; font-weight: 500;
+    line-height: 20px;
+    cursor: pointer; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Chip / tag ── */
+  .tag-connected {
+    background: #f4fdf9; border-radius: 100px; padding: 2px 10px;
+    font-size: 11px; font-weight: 600; color: #1b8959;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ── Nav bottom (home) ── */
+  .nav-bottom {
+    display: flex; align-items: center; justify-content: space-around;
+    height: 56px; background: #fff; border-top: 1px solid #e8eaf0;
+    flex-shrink: 0; padding: 0 24px;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 9px; font-weight: 500; color: var(--gray); }
+  .nav-item.active .nav-label { color: var(--blue); }
+  .nav-item.active .nav-icon { filter: none; }
+
+  /* ── Back button ── */
+  .back-btn {
+    width: 32px; height: 32px; background: transparent; border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    transition: background .1s;
+  }
+  .back-btn:active { background: rgba(18,30,108,.08); }
+
+  /* ── Text link button ── */
+  .text-link {
+    font-size: 12px; font-weight: 700; color: #babdd3;
+    text-decoration: underline; background: none; border: none;
+    cursor: pointer; font-family: 'Montserrat', sans-serif;
+  }
+  .text-link.blue { color: var(--blue); }
+
+  /* ── Tax toggle pills ── */
+  .tax-pills { display: flex; gap: 8px; justify-content: center; }
+  .tax-pill {
+    background: #fff; border: 1px solid #fff;
+    border-radius: 100px; padding: 4px 18px;
+    font-size: 14px; font-weight: 500;
+    color: #d2d4e1; cursor: pointer;
+    box-shadow: 0 4px 8px rgba(18,30,108,.04);
+    font-family: 'Montserrat', sans-serif;
+    transition: color .15s, border-color .15s;
+  }
+  .tax-pill.active { color: var(--blue); border-color: var(--blue); }
+
+  /* ── Screen 5: order summary ── */
+  .order-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f1f6;
+  }
+  .order-item-info { flex: 1; }
+  .order-item-name { font-size: 13px; font-weight: 500; color: var(--black); }
+  .order-item-price { font-size: 12px; color: var(--gray); margin-top: 2px; }
+  .order-subtotal {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; font-size: 14px;
+  }
+  .order-subtotal .label { color: var(--gray); font-weight: 400; }
+  .order-subtotal .value { font-weight: 600; color: var(--black); }
+  .order-total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; border-top: 2px solid #f0f1f6;
+    font-size: 16px; font-weight: 700;
+  }
+
+  /* ── Progress indicator ── */
+  .screen-indicator {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px; z-index: 100;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255,255,255,.3); transition: background .2s, transform .2s;
+  }
+  .dot.active { background: #fff; transform: scale(1.3); }
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+
+  <!-- ══════════════════════════════════════
+       PANTALLA 1 – Home Dashboard
+  ══════════════════════════════════════ -->
+  <div class="screen active" id="screen1">
+
+    <!-- Status bar – Figma: h-[20px], time=Roboto SemiBold 12px color #121E6C, left=Carrier+icons -->
+    <div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 5px;flex-shrink:0;">
+      <!-- Left: signal + wifi + carrier text -->
+      <div style="display:flex;align-items:center;gap:4px;width:83px;">
+        <!-- Signal bars -->
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+          <rect x="0" y="7" width="3" height="5" rx=".5" fill="#121E6C"/>
+          <rect x="4.5" y="4.5" width="3" height="7.5" rx=".5" fill="#121E6C"/>
+          <rect x="9" y="2" width="3" height="10" rx=".5" fill="#121E6C"/>
+          <rect x="13.5" y="0" width="3" height="12" rx=".5" fill="#121E6C"/>
+        </svg>
+        <!-- WiFi -->
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+          <path d="M7.5 8.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" fill="#121E6C"/>
+          <path d="M4.6 6.3a4.1 4.1 0 0 1 5.8 0" stroke="#121E6C" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <path d="M2.2 3.8a7.5 7.5 0 0 1 10.6 0" stroke="#121E6C" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <path d="M.2 1.5A10.5 10.5 0 0 1 14.8 1.5" stroke="#121E6C" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span style="font-size:12px;color:#121E6C;font-family:'Montserrat',sans-serif;font-weight:400;letter-spacing:-.02px;">Carrier</span>
+      </div>
+      <!-- Center: time – Figma: Roboto SemiBold 12px color #121E6C -->
+      <span style="font-size:12px;font-weight:700;color:#121E6C;font-family:'Montserrat',sans-serif;letter-spacing:.2px;">1:11 PM</span>
+      <!-- Right: battery -->
+      <div style="display:flex;align-items:center;justify-content:flex-end;width:91px;padding-right:3px;">
+        <!-- Battery icon: Figma h-[11.5px] w-[26.5px] -->
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+          <rect x=".75" y=".75" width="21.5" height="10.5" rx="2.25" stroke="#121E6C" stroke-width="1.5"/>
+          <rect x="2" y="2" width="16" height="8" rx="1.5" fill="#121E6C"/>
+          <path d="M23.5 4.2v3.6c.8-.4 1.3-1 1.3-1.8s-.5-1.4-1.3-1.8z" fill="#121E6C"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- App Header / Dashboard
+         Figma: absolute top-[46px], pl-[16px] pr-[8px], gap-[16px], pb-[12px] -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px 12px 16px;flex-shrink:0;">
+      <!-- Merchant id: gap-[12px], w-[257px] -->
+      <div style="display:flex;align-items:center;gap:12px;">
+        <!-- Avatar: bg-[#121E6C], rounded-[100px], size-[40px] -->
+        <div style="width:40px;height:40px;background:#121E6C;border-radius:100px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <!-- ic_users icon – Figma: size-[24px] positioned left-[8px] top-[8px] -->
+          <img src="https://www.figma.com/api/mcp/asset/2c31c760-95a8-43ae-9390-38be2c9a9b98"
+               width="24" height="24" alt="" style="display:block;">
+        </div>
+        <!-- Merchant text: gap-[4px], text-[12px] -->
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <!-- Figma: font-semibold(600) 12px, leading-[16px], color #1E1E1E -->
+          <span style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;line-height:16px;color:#1E1E1E;">Restaurante Andrés</span>
+          <!-- Figma: font-regular(400) 12px, leading-[16px], color #1E1E1E -->
+          <span style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:400;line-height:16px;color:#1E1E1E;">Calle 123 # 12 -34 / Torre 1 ...</span>
+        </div>
+      </div>
+      <!-- Icon set: "Ayuda" tag
+           Figma: bg-white, h-[32px], px-[12px] py-[8px], rounded-[100px], shadow Blue/2, font-medium 14px, color #121E6C -->
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button style="background:#fff;height:32px;padding:0 12px;border-radius:100px;border:none;
+                       box-shadow:0 4px 12px rgba(18,30,108,.08);
+                       font-family:'Montserrat',sans-serif;font-size:14px;font-weight:500;
+                       line-height:20px;color:#121E6C;cursor:pointer;white-space:nowrap;">
+          Ayuda
+        </button>
+      </div>
+    </div>
+
+    <!-- APP Navigation Tabs: Pagos / Cuenta Bold
+         Figma: bg-white, rounded-[100px], gap-[4px], w-[343px], no outer padding (just left-[16px] from parent) -->
+    <div style="padding:0 16px 12px;flex-shrink:0;">
+      <div style="background:#fff;border-radius:100px;display:flex;gap:4px;align-items:center;width:343px;">
+        <!-- Active: Pagos – gradient -89.82deg #CF3D52→#382568, shadow Blue/2, bold 14px, text-white -->
+        <button onclick="goTo(2)"
+                style="flex:1;border:none;border-radius:100px;
+                       background:linear-gradient(-89.82deg, rgb(207,61,82) 0%, rgb(56,37,104) 100%);
+                       box-shadow:0 4px 12px rgba(18,30,108,.08);
+                       padding:8px 12px;
+                       font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;line-height:20px;
+                       color:#fff;cursor:pointer;white-space:nowrap;">
+          Pagos
+        </button>
+        <!-- Inactive: Cuenta Bold – transparent bg, medium 14px, color #121E6C -->
+        <button style="flex:1;border:none;border-radius:100px;background:transparent;
+                       padding:8px 12px;
+                       font-family:'Montserrat',sans-serif;font-size:14px;font-weight:500;line-height:20px;
+                       color:#121E6C;cursor:pointer;white-space:nowrap;">
+          Cuenta Bold
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="scroll-content">
+      <!-- Figma: left-[16px], top-[125px], gap-[16px] flex-col -->
+      <div style="padding:0 16px;display:flex;flex-direction:column;gap:16px;">
+
+        <!-- Credit banner card
+             Figma: w-[343px], rounded-[16px], p-[16px], gap-[20px] flex-col
+             + coin decoration image (imgFrame9085) positioned absolutely -->
+        <div class="credit-banner" style="width:343px;">
+          <!-- Coin decoration from Figma (imgFrame9085) -->
+          <img class="banner-deco"
+               src="https://www.figma.com/api/mcp/asset/a60a742b-f830-4b51-bff2-de9a42fc4d4e"
+               alt="">
+          <!-- Text block: w-[184px], gap-[8px] -->
+          <div class="banner-text">
+            <h3>¿Necesitas un crédito para tu negocio?</h3>
+            <span class="banner-caption">Tienes $100.000 pre-aprobados</span>
+          </div>
+          <!-- Action button: APP Button/Action – bg #121E6C, rounded-[12px], h-[40px], w-[145px], medium 14px -->
+          <button class="banner-btn">¡Solicítalo ya!</button>
+        </div>
+
+        <!-- Carousel dots
+             Figma: w-[180px], gap-[12px], p-[16px], overflow-clip, centered
+             Active = imgEllipse1 (coral), Inactive = imgEllipse2 (gray) size-[8px] -->
+        <div style="display:flex;justify-content:center;align-items:center;gap:12px;padding:0 16px;overflow:hidden;width:180px;margin:0 auto;">
+          <img src="https://www.figma.com/api/mcp/asset/0ad3e989-9c94-4179-8b91-b5a0e9e763b8"
+               width="8" height="8" alt="" style="border-radius:50%;flex-shrink:0;">
+          <img src="https://www.figma.com/api/mcp/asset/f2266e93-440a-4161-bb0e-908bb27e471d"
+               width="8" height="8" alt="" style="border-radius:50%;flex-shrink:0;">
+          <img src="https://www.figma.com/api/mcp/asset/f2266e93-440a-4161-bb0e-908bb27e471d"
+               width="8" height="8" alt="" style="border-radius:50%;flex-shrink:0;">
+        </div>
+
+        <!-- Herramientas para vender
+             Figma: gap-[24px] between header and grid, header font-bold 18px #121E6C leading-24px -->
+        <div style="display:flex;flex-direction:column;gap:24px;width:343px;">
+          <span style="font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;
+                       line-height:24px;color:#121E6C;">
+            Herramientas para vender
+          </span>
+          <!-- Tool grid: flex-wrap, gap-[8px], content-start -->
+          <div class="tools-grid">
+
+            <!-- QR Pro – imgVector6 -->
+            <div class="tool-item">
+              <div class="tool-icon">
+                <img src="https://www.figma.com/api/mcp/asset/73e0db70-8977-4682-b2d4-61a4738e54eb" alt="QR">
+              </div>
+              <span class="tool-label">QR Pro</span>
+            </div>
+
+            <!-- Saldo de ventas – imgSubtract (ic_money) -->
+            <div class="tool-item">
+              <div class="tool-icon">
+                <img src="https://www.figma.com/api/mcp/asset/2de8ad67-f0c5-4164-be28-bc54faf567fe" alt="Saldo">
+              </div>
+              <div class="tool-label">Saldo<br>de ventas</div>
+            </div>
+
+            <!-- Historial de ventas – imgVector5 (ic_historial) -->
+            <div class="tool-item">
+              <div class="tool-icon">
+                <img src="https://www.figma.com/api/mcp/asset/cea442d1-e5f3-471a-9c43-f59237a32609" alt="Historial">
+              </div>
+              <span class="tool-label">Historial de ventas</span>
+            </div>
+
+            <!-- Datáfonos – imgVector4 (ic_neo) -->
+            <div class="tool-item">
+              <div class="tool-icon">
+                <img src="https://www.figma.com/api/mcp/asset/2948054a-aea6-4c07-abae-1c28e33e40be" alt="Datáfonos">
+              </div>
+              <span class="tool-label">Datáfonos</span>
+            </div>
+
+            <!-- Simula una venta – imgVector3 (ic_click) -->
+            <div class="tool-item">
+              <div class="tool-icon">
+                <img src="https://www.figma.com/api/mcp/asset/8ac36d51-601a-4da3-9bb3-1fcd39ca2f24" alt="Simula">
+              </div>
+              <span class="tool-label">Simula una venta</span>
+            </div>
+
+            <!-- Links de pago – imgVector2 (ic_payment_link) -->
+            <div class="tool-item">
+              <div class="tool-icon">
+                <img src="https://www.figma.com/api/mcp/asset/80e31b12-297e-4aab-af60-880bfe920280" alt="Links">
+              </div>
+              <span class="tool-label">Links de pago</span>
+            </div>
+
+            <!-- Usuarios – imgVector1 (ic_users) -->
+            <div class="tool-item">
+              <div class="tool-icon">
+                <img src="https://www.figma.com/api/mcp/asset/27ade671-7167-404e-8f1a-4e2f19855be7" alt="Usuarios">
+              </div>
+              <span class="tool-label">Usuarios</span>
+            </div>
+
+            <!-- Factura electrónica – imgVector (ic_automatic_billing) -->
+            <div class="tool-item">
+              <div class="tool-icon">
+                <img src="https://www.figma.com/api/mcp/asset/535de8b6-7610-4c28-b92a-0eab38990dd6" alt="Factura">
+              </div>
+              <span class="tool-label">Factura electrónica</span>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="height:96px;"></div>
+      </div>
+    </div>
+
+    <!-- COBRAR button – APP Button / Default
+         Figma: absolute bottom-0 left-0, px-[16px] py-[24px], w-[375px], backdrop-blur-[1px]
+         Background: linear-gradient(0.638deg, #F7F8FB 35.923%, rgba(247,248,251,0) 98.003%)
+         Button: bg-[#FF2947], rounded-[100px], h-[48px], font-bold 14px uppercase, text-white -->
+    <div style="position:absolute;bottom:0;left:0;right:0;
+                padding:16px 16px 24px;
+                background:linear-gradient(0.64deg, #F7F8FB 35.92%, rgba(247,248,251,0) 98%);
+                backdrop-filter:blur(1px);
+                display:flex;align-items:center;justify-content:center;">
+      <button onclick="goTo(2)"
+              style="background:#FF2947;color:#fff;border:none;border-radius:100px;
+                     height:48px;width:100%;
+                     font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;
+                     line-height:20px;letter-spacing:.5px;text-transform:uppercase;
+                     cursor:pointer;transition:opacity .15s,transform .1s;"
+              onmousedown="this.style.opacity='.85'" onmouseup="this.style.opacity='1'">
+        COBRAR
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA 2 – Entrada de monto
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen2">
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span>Carrier  WiFi</span>
+      <span class="time">1:11 PM</span>
+      <div class="status-icons"><div class="battery"><div class="battery-fill"></div></div></div>
+    </div>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 16px 12px;flex-shrink:0;">
+      <button class="back-btn" onclick="goTo(1, true)">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="tab-nav white" style="width:205px;">
+        <button class="tab-pill active" id="tab-monto" onclick="setMontoTab('monto')">Monto</button>
+        <button class="tab-pill" id="tab-productos" onclick="goTo(3)">Productos</button>
+      </div>
+      <div class="tag-connected">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01" stroke="#1b8959" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <!-- Amount -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 0 0;">
+      <div class="amount-display" id="amount-display">$0</div>
+
+      <div style="margin-top:12px;">
+        <button class="text-link">Describe tu venta ✏️</button>
+      </div>
+
+      <div class="tax-pills" style="margin-top:16px;margin-bottom:24px;">
+        <button class="tax-pill" id="tax-con" onclick="setTax('con')">Con impuesto</button>
+        <button class="tax-pill" id="tax-sin" onclick="setTax('sin')">Sin impuesto</button>
+      </div>
+
+      <!-- Numpad -->
+      <div class="numpad" style="width:100%;max-width:343px;">
+        <button class="num-key" onclick="numPress('1')">1</button>
+        <button class="num-key" onclick="numPress('2')">2</button>
+        <button class="num-key" onclick="numPress('3')">3</button>
+        <button class="num-key" onclick="numPress('4')">4</button>
+        <button class="num-key" onclick="numPress('5')">5</button>
+        <button class="num-key" onclick="numPress('6')">6</button>
+        <button class="num-key" onclick="numPress('7')">7</button>
+        <button class="num-key" onclick="numPress('8')">8</button>
+        <button class="num-key" onclick="numPress('9')">9</button>
+        <button class="num-key" onclick="numPress('00')">00</button>
+        <button class="num-key" onclick="numPress('0')">0</button>
+        <button class="num-key" onclick="numPress('del')">
+          <svg width="22" height="16" viewBox="0 0 28 20" fill="none"><path d="M10 2H26a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10L2 10l8-8z" stroke="#121e6c" stroke-width="2" stroke-linejoin="round"/><path d="M18 7l-6 6M12 7l6 6" stroke="#121e6c" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Continue button -->
+    <div style="padding:16px 16px 24px;flex-shrink:0;background:linear-gradient(to top,#fff 50%,transparent);">
+      <button class="btn-primary" id="btn-continuar" disabled onclick="goTo(5)">CONTINUAR</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA 3 – Catálogo de productos
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen3">
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span>Carrier  WiFi</span>
+      <span class="time">1:11 PM</span>
+      <div class="status-icons"><div class="battery"><div class="battery-fill"></div></div></div>
+    </div>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 16px 12px;flex-shrink:0;">
+      <button class="back-btn" onclick="goTo(2, true)">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="tab-nav white" style="width:205px;">
+        <button class="tab-pill" onclick="goTo(2, true)">Monto</button>
+        <button class="tab-pill active">Productos</button>
+      </div>
+      <div class="cart-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="6" x2="21" y2="6" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="cart-badge" id="cart-badge" style="display:none;">0</div>
+      </div>
+    </div>
+
+    <!-- Search row -->
+    <div style="display:flex;align-items:center;gap:12px;padding:0 16px 12px;flex-shrink:0;">
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#606060" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="#606060" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="search-input" placeholder="Buscar ítem" oninput="handleSearch(this.value)">
+      </div>
+      <button class="text-link blue" style="white-space:nowrap;font-size:12px;">+ Nuevo</button>
+    </div>
+
+    <!-- Product list -->
+    <div class="scroll-content" id="product-list" style="padding:0 16px;display:flex;flex-direction:column;gap:8px;padding-bottom:8px;">
+      <!-- Products injected by JS -->
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="bottom-pos-bar">
+      <div class="cart-summary">
+        <div class="cart-count" id="cart-count-label">0 Productos</div>
+        <div class="cart-total" id="cart-total-label">$0</div>
+      </div>
+      <button class="cobrar-btn" id="cobrar-btn" onclick="if(cartCount>0)goTo(5)">Cobrar</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA 4 – Sin resultados de búsqueda
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen4">
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span>Carrier  WiFi</span>
+      <span class="time">1:11 PM</span>
+      <div class="status-icons"><div class="battery"><div class="battery-fill"></div></div></div>
+    </div>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 16px 12px;flex-shrink:0;">
+      <button class="back-btn" onclick="goTo(3, true)">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="tab-nav white" style="width:205px;">
+        <button class="tab-pill" onclick="goTo(2, true)">Monto</button>
+        <button class="tab-pill active">Productos</button>
+      </div>
+      <div class="cart-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="6" x2="21" y2="6" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="cart-badge" id="cart-badge-4" style="display:none;">0</div>
+      </div>
+    </div>
+
+    <!-- Search bar with value -->
+    <div style="display:flex;align-items:center;gap:12px;padding:0 16px 12px;flex-shrink:0;">
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#121e6c" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="#121e6c" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" value="Gorra" style="color:var(--blue);font-weight:400;flex:1;border:none;background:transparent;font-family:'Montserrat',sans-serif;font-size:14px;outline:none;">
+        <button onclick="goTo(3,true)" style="background:none;border:none;cursor:pointer;padding:2px;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2 2 14" stroke="#606060" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <button class="text-link blue" style="white-space:nowrap;font-size:12px;">+ Nuevo</button>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state">
+      <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+        <circle cx="38" cy="38" r="28" stroke="#d2d4e1" stroke-width="3" fill="none"/>
+        <circle cx="38" cy="38" r="14" fill="#e8eaf5"/>
+        <circle cx="38" cy="38" r="6" fill="#babdd3"/>
+        <line x1="58" y1="58" x2="80" y2="80" stroke="#d2d4e1" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <p>No encontramos resultados para <strong>"Gorra"</strong><br>Revisa si escribiste bien o prueba con otra palabra.</p>
+      <button class="empty-link" onclick="goTo(3, true)">Limpiar búsqueda</button>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="bottom-pos-bar">
+      <div class="cart-summary">
+        <div class="cart-count">0 Productos</div>
+        <div class="cart-total">$0</div>
+      </div>
+      <button class="cobrar-btn">Cobrar</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA 5 – Resumen del pedido / Cobrar
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen5" style="background:#fff;">
+    <!-- Status bar -->
+    <div class="status-bar" style="background:#fff;">
+      <span>Carrier  WiFi</span>
+      <span class="time">1:11 PM</span>
+      <div class="status-icons"><div class="battery"><div class="battery-fill"></div></div></div>
+    </div>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:16px;padding:4px 16px 12px;flex-shrink:0;border-bottom:1px solid #f0f1f6;">
+      <button class="back-btn" onclick="goTo(3, true)">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div style="font-size:18px;font-weight:700;color:var(--blue);">Resumen del cobro</div>
+    </div>
+
+    <div class="scroll-content">
+      <!-- Order items injected by JS -->
+      <div id="order-items"></div>
+
+      <div id="order-totals"></div>
+
+      <div style="padding:16px;margin-top:8px;">
+        <div style="background:#f7f8fb;border-radius:16px;padding:14px 16px;">
+          <div style="font-size:12px;font-weight:600;color:var(--gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Método de pago</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;background:var(--blue);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" stroke="white" stroke-width="2"/><line x1="2" y1="10" x2="22" y2="10" stroke="white" stroke-width="2"/></svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--black);">Datáfono Bold</div>
+              <div style="font-size:12px;color:var(--gray);">Conectado · 3G</div>
+            </div>
+            <div style="margin-left:auto;">
+              <div class="tag-connected">● Listo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:100px;"></div>
+    </div>
+
+    <!-- Bottom -->
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 24px;background:linear-gradient(to top,#fff 60%,transparent);flex-shrink:0;">
+      <button class="btn-primary" onclick="showSuccess()">COBRAR AHORA</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       OVERLAY – Pago exitoso
+  ══════════════════════════════════════ -->
+  <div id="success-overlay" style="display:none;position:absolute;inset:0;background:linear-gradient(135deg,#121e6c 0%,#2e3980 100%);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
+    <div style="width:80px;height:80px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:22px;font-weight:700;color:#fff;margin-bottom:8px;">¡Cobro exitoso!</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.7);">La venta se realizó correctamente</div>
+    </div>
+    <div id="success-amount" style="font-size:40px;font-weight:300;color:#fff;"></div>
+    <div style="background:rgba(255,255,255,.12);border-radius:16px;padding:16px 24px;text-align:center;width:100%;">
+      <div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px;">Restaurante Andrés</div>
+      <div style="font-size:13px;color:#fff;" id="success-items-summary"></div>
+    </div>
+    <button class="btn-primary" style="margin-top:8px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);" onclick="resetAll()">NUEVA VENTA</button>
+  </div>
+
+</div><!-- /phone -->
+
+<!-- Dot indicators -->
+<div class="screen-indicator" id="indicator">
+  <div class="dot active" onclick="goTo(1)"></div>
+  <div class="dot" onclick="goTo(2)"></div>
+  <div class="dot" onclick="goTo(3)"></div>
+  <div class="dot" onclick="goTo(4)"></div>
+  <div class="dot" onclick="goTo(5)"></div>
+</div>
+
+<script>
+/* ── Data ── */
+const products = [
+  { id:1, name:'Audífonos JBL inalámbricos tercera generación', sku:'NK-SB-BLUE: 1234', price:559000 },
+  { id:2, name:'Zapatillas Nike S', sku:'NK-SB-BLUE: 1234', price:1677000 },
+  { id:3, name:'Auriculares Beats Studio3 Wireless', sku:'AUD-BEAT-S3: 1234', price:798000 },
+  { id:4, name:'Zapatillas Nike SB edición especial', sku:'NK-SB-BLUE: 1234', price:1677000 },
+  { id:5, name:'Maletín Nike Sport 2.0', sku:'NK-SB-BLUE: 1234', price:589000 },
+  { id:6, name:'Camiseta Nike DRI-FIT Pro', sku:'NK-DRI-PRO: 5678', price:189000 },
+  { id:7, name:'Mochila Adidas Classic', sku:'AD-MCH-CL: 9012', price:329000 },
+];
+
+let cart = {}; // { productId: qty }
+let cartCount = 0;
+let cartTotal = 0;
+let amountStr = '';
+let currentScreen = 1;
+
+/* ── Format COP ── */
+function fmt(n) {
+  return '$' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+/* ── Navigation ── */
+function goTo(n, back = false) {
+  const cur = document.getElementById('screen' + currentScreen);
+  const next = document.getElementById('screen' + n);
+  if (!next) return;
+  cur.classList.remove('active','back');
+  next.classList.remove('active','back');
+  if (back) next.classList.add('back');
+  next.classList.add('active');
+  currentScreen = n;
+  updateIndicator();
+
+  if (n === 3) renderProducts();
+  if (n === 5) renderOrderSummary();
+}
+
+function updateIndicator() {
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i + 1 === currentScreen);
+  });
+}
+
+/* ── Numpad logic ── */
+function numPress(k) {
+  if (k === 'del') {
+    amountStr = amountStr.slice(0, -1);
+  } else if (k === '00') {
+    if (amountStr.length === 0) return;
+    amountStr += '00';
+  } else {
+    if (amountStr === '0') amountStr = k;
+    else amountStr += k;
+  }
+  if (amountStr.length > 10) amountStr = amountStr.slice(0, 10);
+
+  const num = parseInt(amountStr || '0', 10);
+  document.getElementById('amount-display').textContent = fmt(num);
+  const btn = document.getElementById('btn-continuar');
+  btn.disabled = num === 0;
+}
+
+function setTax(type) {
+  document.getElementById('tax-con').classList.toggle('active', type === 'con');
+  document.getElementById('tax-sin').classList.toggle('active', type === 'sin');
+}
+
+/* ── Product rendering ── */
+function renderProducts(filter = '') {
+  const list = document.getElementById('product-list');
+  const filtered = filter
+    ? products.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()))
+    : products;
+
+  if (filtered.length === 0) {
+    goTo(4);
+    return;
+  }
+
+  list.innerHTML = filtered.map(p => {
+    const qty = cart[p.id] || 0;
+    return `
+      <div class="product-card ${qty > 0 ? 'selected' : ''}" id="pc-${p.id}">
+        <div class="product-thumb">
+          <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+            <path d="M8 12h24l-3 18H11L8 12z" stroke="#babdd3" stroke-width="2" fill="#e8eaf5"/>
+            <path d="M15 12v-3a5 5 0 0 1 10 0v3" stroke="#babdd3" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">${p.name}</div>
+          <div class="product-sku">${p.sku}</div>
+          <div class="product-price">${fmt(p.price)}</div>
+        </div>
+        ${qty > 0 ? `
+          <div class="product-qty">
+            <button class="qty-btn minus" onclick="changeQty(${p.id}, -1, event)">−</button>
+            <span class="qty-count">${qty}</span>
+            <button class="qty-btn" onclick="changeQty(${p.id}, 1, event)">+</button>
+          </div>
+        ` : `
+          <button class="qty-btn" onclick="changeQty(${p.id}, 1, event)" style="width:32px;height:32px;">+</button>
+        `}
+        ${qty > 0 ? `<div class="qty-badge">${qty}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function changeQty(id, delta, e) {
+  e.stopPropagation();
+  const prev = cart[id] || 0;
+  const newQty = Math.max(0, prev + delta);
+  if (newQty === 0) delete cart[id];
+  else cart[id] = newQty;
+
+  const p = products.find(x => x.id === id);
+  cartTotal += delta * p.price;
+  if (cartTotal < 0) cartTotal = 0;
+  cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
+
+  updateCartUI();
+  renderProducts(document.getElementById('search-input')?.value || '');
+}
+
+function updateCartUI() {
+  const label = document.getElementById('cart-count-label');
+  const total = document.getElementById('cart-total-label');
+  const btn   = document.getElementById('cobrar-btn');
+  const badge = document.getElementById('cart-badge');
+  const badge4 = document.getElementById('cart-badge-4');
+
+  if (label) label.textContent = cartCount + (cartCount === 1 ? ' Producto' : ' Productos');
+  if (total) total.textContent = fmt(cartTotal);
+  if (btn)   { btn.classList.toggle('active', cartCount > 0); }
+  if (badge) { badge.style.display = cartCount > 0 ? 'flex' : 'none'; badge.textContent = cartCount; }
+  if (badge4){ badge4.style.display = cartCount > 0 ? 'flex' : 'none'; badge4.textContent = cartCount; }
+}
+
+function handleSearch(val) {
+  renderProducts(val);
+}
+
+/* ── Order summary ── */
+function renderOrderSummary() {
+  const el = document.getElementById('order-items');
+  const totEl = document.getElementById('order-totals');
+
+  const items = Object.entries(cart).map(([id, qty]) => {
+    const p = products.find(x => x.id === parseInt(id));
+    return { ...p, qty };
+  });
+
+  if (items.length === 0 && amountStr) {
+    // Came from monto screen
+    const num = parseInt(amountStr || '0', 10);
+    el.innerHTML = `<div class="order-item"><div class="order-item-info"><div class="order-item-name">Venta manual</div><div class="order-item-price">Monto ingresado</div></div><div style="font-size:15px;font-weight:600;color:var(--black);">${fmt(num)}</div></div>`;
+    totEl.innerHTML = `<div class="order-total-row"><span>Total</span><span>${fmt(num)}</span></div>`;
+    document.getElementById('success-amount').textContent = fmt(num);
+    document.getElementById('success-items-summary').textContent = 'Venta manual';
+    return;
+  }
+
+  el.innerHTML = items.map(p => `
+    <div class="order-item">
+      <div class="product-thumb" style="width:48px;height:48px;">
+        <svg width="26" height="26" viewBox="0 0 40 40" fill="none"><path d="M8 12h24l-3 18H11L8 12z" stroke="#babdd3" stroke-width="2" fill="#e8eaf5"/><path d="M15 12v-3a5 5 0 0 1 10 0v3" stroke="#babdd3" stroke-width="2"/></svg>
+      </div>
+      <div class="order-item-info">
+        <div class="order-item-name">${p.name}</div>
+        <div class="order-item-price">${fmt(p.price)} × ${p.qty}</div>
+      </div>
+      <div style="font-size:15px;font-weight:600;color:var(--black);">${fmt(p.price * p.qty)}</div>
+    </div>
+  `).join('');
+
+  const subtotal = cartTotal;
+  const iva = Math.round(subtotal * 0.19);
+  const total = subtotal;
+
+  totEl.innerHTML = `
+    <div class="order-subtotal"><span class="label">Subtotal</span><span class="value">${fmt(subtotal)}</span></div>
+    <div class="order-subtotal"><span class="label">IVA (0%)</span><span class="value">$0</span></div>
+    <div class="order-total-row"><span>Total</span><span style="color:var(--coral);">${fmt(total)}</span></div>
+  `;
+
+  document.getElementById('success-amount').textContent = fmt(total);
+  document.getElementById('success-items-summary').textContent = items.map(p => `${p.qty}× ${p.name.split(' ').slice(0,3).join(' ')}`).join(' · ');
+}
+
+/* ── Success overlay ── */
+function showSuccess() {
+  document.getElementById('success-overlay').style.display = 'flex';
+  document.getElementById('indicator').style.display = 'none';
+}
+
+function resetAll() {
+  cart = {}; cartCount = 0; cartTotal = 0; amountStr = '';
+  document.getElementById('success-overlay').style.display = 'none';
+  document.getElementById('indicator').style.display = 'flex';
+  document.getElementById('amount-display').textContent = '$0';
+  document.getElementById('btn-continuar').disabled = true;
+  goTo(1);
+}
+
+/* ── Init ── */
+renderProducts();
+</script>
+</body>
+</html>
