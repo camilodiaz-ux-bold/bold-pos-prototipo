@@ -89,12 +89,8 @@
       text-align: center;
       flex: 1;
     }
-    #nav-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
+    .nav-spacer { width: 24px; flex-shrink: 0; }
+
     #tag-estado {
       display: inline-flex;
       align-items: center;
@@ -156,12 +152,18 @@
     }
     #btn-kebab:active { background: var(--blue-10); }
 
-    /* ─── Search bar ─── */
+    /* ─── Search bar + badge row ─── */
     #search-bar-wrap {
       padding: 12px 16px 0;
       flex-shrink: 0;
     }
+    #search-and-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     #search-bar {
+      flex: 1;
       background: var(--black-0);
       border-radius: 30px;
       height: 40px;
@@ -170,6 +172,22 @@
       gap: 8px;
       padding: 0 12px;
       box-shadow: var(--shadow-blue-8);
+    }
+    #estado-badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btn-badge-dots {
+      width: 28px; height: 28px;
+      border: none; background: transparent;
+      cursor: pointer; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
     }
     #search-input {
       flex: 1;
@@ -254,10 +272,8 @@
 
     /* ─── Product card ─── */
     .product-card {
-      background: var(--black-0);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-blue-8);
-      border-left: 4px solid transparent;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -509,6 +525,92 @@
     }
     #toast.show { opacity: 1; }
 
+    /* ─── Order summary tappable ─── */
+    #order-summary { cursor: pointer; }
+
+    /* ─── Info Drop Up ─── */
+    #info-dropup-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0,0,0,.45);
+      align-items: flex-end;
+    }
+    #info-dropup-overlay.show { display: flex; }
+    #info-dropup-sheet {
+      width: 100%;
+      background: var(--black-0);
+      border-radius: 24px 24px 0 0;
+      padding: 8px 0 32px;
+      transform: translateY(100%);
+      transition: transform 200ms ease;
+    }
+    #info-dropup-overlay.show #info-dropup-sheet { transform: translateY(0); }
+    #info-dropup-handle {
+      width: 36px; height: 4px;
+      background: #D1D5DB;
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+    #info-dropup-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px 14px;
+    }
+    #info-dropup-heading {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--blue-100);
+    }
+    #info-dropup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 8px;
+      padding: 0 20px 16px;
+    }
+    .du-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .du-label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--black-40);
+      line-height: 14px;
+    }
+    .du-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black-100);
+      line-height: 18px;
+    }
+    #info-dropup-sep {
+      height: 1px;
+      background: rgba(0,0,0,.07);
+      margin: 0 20px 8px;
+    }
+    .du-action {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border: none;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--black-100);
+      cursor: pointer;
+      text-align: left;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .du-action:active { background: var(--blue-10); }
+    .du-action.du-action-red { color: #FF2947; }
+
     /* ─── Actions bottom sheet ─── */
     #actions-overlay {
       display: none;
@@ -699,16 +801,7 @@
         </svg>
       </button>
       <span id="nav-title">Mesa S03</span>
-      <div id="nav-right">
-        <div id="tag-estado">
-          <span id="tag-estado-text">Ocupada</span>
-        </div>
-        <button id="btn-close" aria-label="Cerrar" onclick="location.href='venta-mesas.html'">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6l12 12" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
+      <div class="nav-spacer"></div>
     </div>
   </div>
 
@@ -761,32 +854,47 @@
     </button>
   </div>
 
-  <!-- SEARCH BAR -->
+  <!-- SEARCH BAR + BADGE -->
   <div id="search-bar-wrap">
-    <div id="search-bar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;" aria-hidden="true">
-        <circle cx="11" cy="11" r="7" stroke="#606060" stroke-width="1.5" fill="none"/>
-        <path d="M16.5 16.5L21 21" stroke="#606060" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <input id="search-input" type="text" placeholder="Buscar por nombre o código" oninput="handleSearch(this.value)" autocomplete="off" />
-      <button id="btn-clear" onclick="clearSearch()" aria-label="Limpiar búsqueda">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M4 4l10 10M14 4L4 14" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
+    <div id="search-and-badge">
+      <div id="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" stroke="#606060" stroke-width="1.5" fill="none"/>
+          <path d="M16.5 16.5L21 21" stroke="#606060" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
-      </button>
-      <button id="btn-scan" onclick="openScanner()" aria-label="Escanear código de barras">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M2 7V5a2 2 0 0 1 2-2h2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M22 7V5a2 2 0 0 0-2-2h-2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M2 17v2a2 2 0 0 0 2 2h2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M22 17v2a2 2 0 0 1-2 2h-2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-          <line x1="7" y1="8" x2="7" y2="16" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-          <line x1="10" y1="8" x2="10" y2="16" stroke="#606060" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="13" y1="8" x2="13" y2="16" stroke="#606060" stroke-width="2" stroke-linecap="round"/>
-          <line x1="16" y1="8" x2="16" y2="16" stroke="#606060" stroke-width="1.2" stroke-linecap="round"/>
-          <line x1="18.5" y1="8" x2="18.5" y2="16" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-      </button>
+        <input id="search-input" type="text" placeholder="Buscar productos" oninput="handleSearch(this.value)" autocomplete="off" />
+        <button id="btn-clear" onclick="clearSearch()" aria-label="Limpiar búsqueda">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 4l10 10M14 4L4 14" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button id="btn-scan" onclick="openScanner()" aria-label="Escanear código de barras">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M2 7V5a2 2 0 0 1 2-2h2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M22 7V5a2 2 0 0 0-2-2h-2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M2 17v2a2 2 0 0 0 2 2h2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M22 17v2a2 2 0 0 1-2 2h-2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="7" y1="8" x2="7" y2="16" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="10" y1="8" x2="10" y2="16" stroke="#606060" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="13" y1="8" x2="13" y2="16" stroke="#606060" stroke-width="2" stroke-linecap="round"/>
+            <line x1="16" y1="8" x2="16" y2="16" stroke="#606060" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="18.5" y1="8" x2="18.5" y2="16" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <!-- BADGE DE ESTADO -->
+      <div id="estado-badge-wrap" onclick="openInfoDropUp()" aria-label="Info y acciones de mesa">
+        <div id="tag-estado">
+          <span id="tag-estado-text">Ocupada</span>
+        </div>
+        <button id="btn-badge-dots" aria-label="Más acciones" onclick="openInfoDropUp()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="5"  cy="12" r="1.5" fill="#606060"/>
+            <circle cx="12" cy="12" r="1.5" fill="#606060"/>
+            <circle cx="19" cy="12" r="1.5" fill="#606060"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -839,6 +947,52 @@
 
   <!-- TOAST -->
   <div id="toast" role="status" aria-live="polite"><span id="toast-text"></span></div>
+
+  <!-- INFO DROP UP (badge) -->
+  <div id="info-dropup-overlay" onclick="handleInfoDropUpClick(event)">
+    <div id="info-dropup-sheet">
+      <div id="info-dropup-handle"></div>
+      <div id="info-dropup-title-row">
+        <span id="info-dropup-heading">Detalle de mesa</span>
+        <div id="tag-estado-du" style="display:inline-flex;align-items:center;background:#FEE2E2;border-radius:100px;padding:4px 10px;">
+          <span id="tag-estado-du-text" style="font-size:12px;font-weight:600;color:#FF2947;line-height:16px;">Ocupada</span>
+        </div>
+      </div>
+      <div id="info-dropup-grid">
+        <div class="du-item">
+          <span class="du-label">Zona</span>
+          <span class="du-val" id="du-zona">—</span>
+        </div>
+        <div class="du-item">
+          <span class="du-label">Personas</span>
+          <span class="du-val" id="du-personas">—</span>
+        </div>
+        <div class="du-item">
+          <span class="du-label">Hora apertura</span>
+          <span class="du-val" id="du-apertura">—</span>
+        </div>
+        <div class="du-item">
+          <span class="du-label">Tiempo en mesa</span>
+          <span class="du-val" id="du-tiempo">—</span>
+        </div>
+      </div>
+      <div id="info-dropup-sep"></div>
+      <button class="du-action" onclick="closeInfoDropUp();cambiarMesa();">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12h14M15 6l6 6-6 6" stroke="#1e1e1e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Cambiar mesa
+      </button>
+      <button class="du-action du-action-red" onclick="closeInfoDropUp();abrirConfirmCancelar();">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <polyline points="3 6 5 6 21 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 11v6M14 11v6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        Cancelar y liberar mesa
+      </button>
+    </div>
+  </div>
 
   <!-- ACTIONS SHEET -->
   <div id="actions-overlay" onclick="handleActionsOverlayClick(event)">
@@ -1147,7 +1301,7 @@ function renderProducts() {
     const card = document.createElement("div");
     card.className = "product-card";
     card.dataset.id = product.id;
-    card.style.borderLeftColor = cat.color;
+    card.style.background = cat.bg;
 
     card.innerHTML = `
       ${qty > 0 ? `<div class="qty-badge">${qty}</div>` : ""}
@@ -1423,6 +1577,33 @@ function _pagar() {
 }
 
 /* ══════════════════════════════════════════
+   INFO DROP UP (badge)
+══════════════════════════════════════════ */
+function openInfoDropUp() {
+  // Sync info from existing info-card spans
+  document.getElementById("du-zona").textContent     = document.getElementById("info-zona").textContent;
+  document.getElementById("du-personas").textContent = document.getElementById("info-personas").textContent;
+  document.getElementById("du-apertura").textContent = document.getElementById("info-apertura").textContent;
+  document.getElementById("du-tiempo").textContent   = document.getElementById("info-tiempo").textContent;
+
+  // Sync badge state in drop up header
+  const tagSpan = document.getElementById("tag-estado-text");
+  const duSpan  = document.getElementById("tag-estado-du-text");
+  const duTag   = document.getElementById("tag-estado-du");
+  duSpan.textContent    = tagSpan.textContent;
+  duSpan.style.color    = tagSpan.style.color || "#FF2947";
+  duTag.style.background = document.getElementById("tag-estado").style.background || "#FEE2E2";
+
+  document.getElementById("info-dropup-overlay").classList.add("show");
+}
+function closeInfoDropUp() {
+  document.getElementById("info-dropup-overlay").classList.remove("show");
+}
+function handleInfoDropUpClick(e) {
+  if (e.target === document.getElementById("info-dropup-overlay")) closeInfoDropUp();
+}
+
+/* ══════════════════════════════════════════
    ACTIONS SHEET
 ══════════════════════════════════════════ */
 function openActionsSheet() {
@@ -1584,6 +1765,13 @@ setInterval(updateClock, 30000);
 setInterval(updateInfoCard, 60000);
 renderCategories();
 renderProducts();
+
+// Order summary → detalle-pedido.html
+document.getElementById("order-summary").addEventListener("click", () => {
+  if (!currentMesaId) return;
+  const p = new URLSearchParams(location.search);
+  location.href = `detalle-pedido.html?mesa=${currentMesaId}&zona=${p.get("zona")||"salon"}&estado=${p.get("estado")||"occupied"}`;
+});
 </script>
 </body>
 </html>
