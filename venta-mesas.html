@@ -397,6 +397,7 @@
     .list-card {
       border-radius: 12px;
       padding: 8px 16px;
+      min-height: 76px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -790,7 +791,7 @@ const ZONES_DATA = {
     label: "Salón", canvasW: 580, canvasH: 470,
     tables: [
       { id:"S01", shape:"round", x:16,  y:20,  w:72, h:72, status:"occupied",       cap:2, time:"1h 45min", amount:"$28.000"  },
-      { id:"S02", shape:"round", x:16,  y:122, w:72, h:72, status:"available",      cap:2 },
+      { id:"S02", shape:"round", x:16,  y:122, w:72, h:72, status:"bill_requested", cap:2, time:"2h 10min", amount:"$215.000" },
       { id:"S03", shape:"rect",  x:122, y:20,  w:82, h:68, status:"available",      cap:4 },
       { id:"S04", shape:"rect",  x:262, y:20,  w:82, h:68, status:"occupied",       cap:4, time:"2h 20min", amount:"$87.500"  },
       { id:"S05", shape:"rect",  x:392, y:20,  w:82, h:68, status:"bill_requested", cap:4, time:"3h 5min",  amount:"$195.000" },
@@ -800,7 +801,7 @@ const ZONES_DATA = {
       { id:"S07", shape:"rect",  x:122, y:266, w:82, h:68, status:"available",      cap:4 },
       { id:"S08", shape:"round", x:270, y:142, w:92, h:92, status:"available",      cap:6 },
       { id:"S09", shape:"rect",  x:394, y:148, w:82, h:68, status:"disabled",       cap:4 },
-      { id:"S10", shape:"rect",  x:394, y:266, w:82, h:68, status:"bill_requested", cap:4, time:"2h 10min", amount:"$215.000" },
+      { id:"S10", shape:"rect",  x:394, y:266, w:82, h:68, status:"available",      cap:4 },
       { id:"S11", shape:"rect",  x:16,  y:372, w:82, h:68, status:"disabled",       cap:4 },
       { id:"S12", shape:"rect",  x:152, y:372, w:82, h:68, status:"available",      cap:4 },
       { id:"S13", shape:"rect",  x:290, y:372, w:82, h:68, status:"available",      cap:4 },
@@ -812,17 +813,17 @@ const ZONES_DATA = {
     tables: [
       { id:"T01", shape:"round", x:24,  y:24,  w:86, h:86, status:"available",      cap:4 },
       { id:"T02", shape:"round", x:150, y:24,  w:86, h:86, status:"available",      cap:4 },
-      { id:"T03", shape:"round", x:276, y:24,  w:86, h:86, status:"occupied",       cap:6, time:"35min",  amount:"$75.000" },
+      { id:"T03", shape:"round", x:276, y:24,  w:86, h:86, status:"occupied",       cap:6, time:"35min",   amount:"$75.000"  },
       { id:"T04", shape:"rect",  x:24,  y:148, w:86, h:76, status:"available",      cap:4 },
-      { id:"T05", shape:"rect",  x:150, y:148, w:86, h:76, status:"bill_requested", cap:2, time:"55min",  amount:"$65.000" },
-      { id:"T06", shape:"rect",  x:276, y:148, w:86, h:76, status:"available",      cap:6 },
+      { id:"T05", shape:"rect",  x:150, y:148, w:86, h:76, status:"bill_requested", cap:2, time:"55min",   amount:"$65.000"  },
+      { id:"T06", shape:"rect",  x:276, y:148, w:86, h:76, status:"occupied",       cap:6, time:"1h 20min",amount:"$112.000" },
     ]
   },
   barra: {
     label: "Barra", canvasW: 430, canvasH: 280,
     tables: [
-      { id:"B01", shape:"pill-v", x:18,  y:20,  w:72,  h:200, status:"occupied",  cap:7, time:"2h 32min", amount:"$74.500" },
-      { id:"B02", shape:"pill-h", x:130, y:120, w:180, h:58,  status:"available", cap:5 },
+      { id:"B01", shape:"pill-v", x:18,  y:20,  w:72,  h:200, status:"available", cap:7 },
+      { id:"B02", shape:"pill-h", x:130, y:120, w:180, h:58,  status:"occupied",  cap:5, time:"2h 32min", amount:"$74.500" },
     ]
   }
 };
