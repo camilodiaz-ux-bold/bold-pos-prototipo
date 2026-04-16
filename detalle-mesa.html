@@ -80,7 +80,6 @@
       flex-shrink: 0;
     }
     #nav-title {
-      /* [APP]/Title */
       font-family: var(--font);
       font-size: 16px;
       font-weight: 600;
@@ -88,6 +87,22 @@
       color: var(--blue-100);
       text-align: center;
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .nav-title-sub {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--black-60);
+      line-height: 13px;
+    }
+    .nav-title-main {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--blue-100);
+      line-height: 20px;
     }
     .nav-spacer { width: 24px; flex-shrink: 0; }
 
@@ -108,14 +123,7 @@
 
     /* ─── Mesa info card ─── */
     #mesa-info-card {
-      margin: 10px 16px 0;
-      background: var(--black-0);
-      border: 1px solid #E8E9F0;
-      border-radius: 12px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
+      display: none;
     }
     .info-item {
       display: flex;
@@ -427,20 +435,8 @@
       display: flex;
       flex-direction: column;
     }
-    /* Fila 1: estado comanda (condicional) */
-    #comanda-status-row {
-      display: none;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 16px;
-      font-family: var(--font);
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 16px;
-    }
-    #comanda-status-row.sent          { display: flex; background: #D1FAE5; color: #0F6E56; }
-    #comanda-status-row.modified      { display: flex; background: #FEF9C3; color: #854F0B; }
-    #comanda-status-row.bill_requested{ display: flex; background: #FEF9C3; color: #854F0B; }
+    /* Fila 1: estado comanda — hidden in catalog mode */
+    #comanda-status-row { display: none !important; }
     /* Fila 2: resumen + botón (siempre visible) */
     #bottom-main-row {
       display: flex;
@@ -795,12 +791,15 @@
   <!-- HEADER -->
   <div id="header">
     <div id="nav-row">
-      <button id="btn-back" aria-label="Volver" onclick="location.href='venta-mesas.html'">
+      <button id="btn-back" aria-label="Volver" onclick="goBackToPedido()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <span id="nav-title">Mesa S03</span>
+      <span id="nav-title">
+        <span class="nav-title-sub">Agregar productos a</span>
+        <span class="nav-title-main" id="nav-mesa-label">Mesa S03</span>
+      </span>
       <div class="nav-spacer"></div>
     </div>
   </div>
@@ -938,9 +937,9 @@
         <span id="order-count">0 productos</span>
         <span id="order-total">$0</span>
       </div>
-      <button id="btn-principal" disabled onclick="onBtnPrincipal()">
+      <button id="btn-principal" onclick="goBackToPedido()">
         <div class="spinner" id="spinner-principal"></div>
-        <span id="btn-principal-text">Enviar comanda</span>
+        <span id="btn-principal-text">Agregar</span>
       </button>
     </div>
   </div>
@@ -1376,7 +1375,18 @@ function syncCartBar() {
   document.getElementById("order-count").textContent =
     totalQty === 0 ? "0 productos" : `${totalQty} producto${totalQty !== 1 ? "s" : ""}`;
   document.getElementById("order-total").textContent = fmt(totalAmt);
-  document.getElementById("btn-principal").disabled = totalQty === 0;
+  // btn-principal is always enabled — it goes back to detalle-pedido
+  document.getElementById("btn-principal").disabled = false;
+}
+
+function goBackToPedido() {
+  const p = new URLSearchParams(location.search);
+  const params = new URLSearchParams({
+    mesa:   currentMesaId || p.get("mesa") || "S03",
+    zona:   p.get("zona")   || "salon",
+    estado: p.get("estado") || mesaState
+  });
+  location.href = "detalle-pedido.html?" + params.toString();
 }
 
 /* ══════════════════════════════════════════
@@ -1423,7 +1433,7 @@ function setComandaState(newState, hora) {
   if (currentMesaId) {
     saveComandaState(currentMesaId, newState, hora || null);
   }
-  updateComandaUI();
+  // UI update skipped — detalle-mesa is pure catalog; state is read by detalle-pedido
 }
 
 function updateComandaUI() {
@@ -1491,7 +1501,6 @@ function setMesaState(newState) {
     }
   } catch(e) {}
   updateTagEstado();
-  updateComandaUI();
 }
 
 function updateTagEstado() {
@@ -1714,18 +1723,14 @@ function handleScanOverlayClick(e) {
   const mesaId = p.get("mesa")   || "S03";
   const estado = p.get("estado") || "occupied";
   const zona   = p.get("zona")   || "salon";
+  const origen = p.get("origen") || "pedido"; // "nueva" | "pedido"
 
   currentMesaId = mesaId;
 
-  const zonaLabel = { salon:"Salón", terraza:"Terraza", barra:"Barra" };
+  // Two-line header
+  document.getElementById("nav-mesa-label").textContent = "Mesa " + mesaId;
 
-  // Header: título = "Mesa S07"
-  document.getElementById("nav-title").textContent = `Mesa ${mesaId}`;
-
-  // Estado de mesa
-  mesaState = (estado === "bill_requested") ? "bill_requested" : "occupied";
-
-  // Tag estado
+  // Badge label in search bar
   const tagEl   = document.getElementById("tag-estado");
   const tagSpan = document.getElementById("tag-estado-text");
   if (estado === "bill_requested") {
@@ -1740,24 +1745,24 @@ function handleScanOverlayClick(e) {
     tagSpan.textContent = "Ocupada";
   }
 
-  // Info card
-  const mesa = DataManager.getMesa(mesaId);
-  document.getElementById("info-zona").textContent     = zonaLabel[zona] || zona;
-  document.getElementById("info-personas").textContent = mesa ? mesa.personas + (mesa.personas === 1 ? " pers." : " pers.") : "—";
-  document.getElementById("info-apertura").textContent = mesa ? fmtApertura(mesa.horaApertura) : "—";
-  document.getElementById("info-tiempo").textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : "—";
+  // Button label depends on origen
+  document.getElementById("btn-principal-text").textContent =
+    origen === "nueva" ? "Agregar" : "Guardar cambios";
 
-  // Cargar productos existentes
+  // Mesa state
+  mesaState = (estado === "bill_requested") ? "bill_requested" : "occupied";
+
+  // Load existing products
+  const mesa = DataManager.getMesa(mesaId);
   if (mesa && mesa.productos && mesa.productos.length > 0) {
-    mesa.productos.forEach(p => { cart[p.id] = p.cantidad; });
+    mesa.productos.forEach(prod => { cart[prod.id] = prod.cantidad; });
   }
 
-  // Restaurar estado de comanda
+  // Restore comanda state (needed for "modified" tracking)
   const stored = loadComandaState(mesaId);
   comandaState = stored.estado || "pending";
 
   syncCartBar();
-  updateComandaUI();
 })();
 
 updateClock();
@@ -1766,12 +1771,8 @@ setInterval(updateInfoCard, 60000);
 renderCategories();
 renderProducts();
 
-// Order summary → detalle-pedido.html
-document.getElementById("order-summary").addEventListener("click", () => {
-  if (!currentMesaId) return;
-  const p = new URLSearchParams(location.search);
-  location.href = `detalle-pedido.html?mesa=${currentMesaId}&zona=${p.get("zona")||"salon"}&estado=${p.get("estado")||"occupied"}`;
-});
+// Order summary is non-interactive in catalog mode
+document.getElementById("order-summary").style.cursor = "default";
 </script>
 </body>
 </html>

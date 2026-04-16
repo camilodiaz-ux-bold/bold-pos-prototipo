@@ -1357,7 +1357,7 @@ function switchZone(key) {
 function goToDetalle(table, estado, personas) {
   const p = new URLSearchParams({ mesa: table.id, estado, zona: activeZone });
   if (personas) p.set("personas", personas);
-  location.href = `detalle-mesa.html?${p.toString()}`;
+  location.href = `detalle-pedido.html?${p.toString()}`;
 }
 
 /* ══════════════════════════════════════════
