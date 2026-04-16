@@ -390,7 +390,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      background: var(--background-page);
+      background: #FFFFFF;
       scrollbar-width: none;
     }
     #list-view::-webkit-scrollbar { display: none; }
@@ -402,6 +402,7 @@
       align-items: center;
       gap: 12px;
       cursor: default;
+      border: 1px solid rgba(0, 0, 0, 0.08);
     }
     .list-card.available { cursor: pointer; }
     .list-card-indicator { display: none; }
@@ -1204,8 +1205,51 @@ const STATUS_TIME_COLOR = {
   bill_requested: "#606060",
 };
 
+/* Datos mock exclusivos de la vista lista — no afectan el mapa */
+const LIST_ZONES_DATA = {
+  salon: {
+    label: "Salón",
+    tables: [
+      { id:"S01", cap:2, status:"bill_requested", time:"2h 10min", amount:"$215.000" },
+      { id:"S02", cap:2, status:"occupied",       time:"1h 45min", amount:"$28.000"  },
+      { id:"S03", cap:4, status:"occupied",       time:"45min",    amount:"$42.000"  },
+      { id:"S04", cap:4, status:"occupied",       time:"2h 20min", amount:"$87.500"  },
+      { id:"S05", cap:4, status:"bill_requested", time:"3h 5min",  amount:"$195.000" },
+      { id:"S06", cap:4, status:"available" },
+      { id:"S07", cap:4, status:"available" },
+      { id:"S08", cap:6, status:"available" },
+      { id:"S09", cap:4, status:"available" },
+      { id:"S10", cap:4, status:"available" },
+      { id:"S11", cap:4, status:"available" },
+      { id:"S12", cap:4, status:"available" },
+      { id:"S13", cap:4, status:"available" },
+      { id:"S14", cap:4, status:"available" },
+      { id:"S15", cap:2, status:"disabled" },
+      { id:"S16", cap:2, status:"disabled" },
+    ]
+  },
+  terraza: {
+    label: "Terraza",
+    tables: [
+      { id:"T01", cap:4, status:"available" },
+      { id:"T02", cap:4, status:"available" },
+      { id:"T03", cap:6, status:"occupied",       time:"35min",    amount:"$75.000"  },
+      { id:"T04", cap:4, status:"available" },
+      { id:"T05", cap:2, status:"bill_requested", time:"55min",    amount:"$65.000"  },
+      { id:"T06", cap:6, status:"occupied",       time:"1h 20min", amount:"$112.000" },
+    ]
+  },
+  barra: {
+    label: "Barra",
+    tables: [
+      { id:"B01", cap:7, status:"available" },
+      { id:"B02", cap:5, status:"occupied",       time:"2h 32min", amount:"$74.500"  },
+    ]
+  }
+};
+
 function renderListView(zoneKey, query) {
-  const zone = ZONES_DATA[zoneKey];
+  const zone = LIST_ZONES_DATA[zoneKey];
   const listView = document.getElementById("list-view");
   listView.innerHTML = "";
 
