@@ -37,18 +37,18 @@
       overflow: hidden; position: relative;
     }
 
-    /* Status bar */
+    /* ─── Status bar ─── */
     #status-bar {
       background: transparent; display: flex; align-items: center;
-      padding: 8px 8px 0; flex-shrink: 0; position: relative;
+      padding: 8px 8px 0; flex-shrink: 0;
     }
     .sb-left  { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--black-100); }
     .sb-right { margin-left:auto; display:flex; align-items:center; }
 
-    /* Header */
-    #header { background: transparent; flex-shrink: 0; margin-top: 16px; }
+    /* ─── Header ─── */
+    #header { background: transparent; flex-shrink: 0; margin-top: 12px; }
     #nav-row {
-      height: 44px; display: flex; align-items: center;
+      height: 52px; display: flex; align-items: center;
       justify-content: space-between; padding: 0 16px;
     }
     #btn-back {
@@ -58,15 +58,49 @@
       border-radius: 8px; transition: background .12s;
     }
     #btn-back:active { background: var(--blue-10); }
+    /* Title group: mesa name + badge stacked */
+    #nav-title-group {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 5px;
+    }
     #nav-title {
-      font-family: var(--font); font-size: 16px; font-weight: 600;
-      line-height: 20px; color: var(--blue-100); text-align: center; flex: 1;
+      font-size: 16px; font-weight: 700; color: var(--blue-100); line-height: 20px;
     }
     #nav-spacer { width: 32px; flex-shrink: 0; }
 
-    /* Mesa info card */
+    /* ─── Estado badge (in header) ─── */
+    .badge-estado {
+      display: inline-flex; align-items: center; gap: 5px;
+      border-radius: 100px; padding: 3px 10px; flex-shrink: 0;
+    }
+    .badge-estado .badge-text {
+      font-size: 11px; font-weight: 600; line-height: 16px; white-space: nowrap;
+    }
+    .badge-occupied  { background: #FEE2E2; }
+    .badge-occupied .badge-text { color: #FF2947; }
+    .badge-bill      { background: #fde8e8; }
+    .badge-bill .badge-text { color: #c0392b; }
+    .badge-available { background: #D1FAE5; }
+    .badge-available .badge-text { color: #065F46; }
+
+    /* Pulse dot for cuenta solicitada */
+    .pulse-dot {
+      display: none; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .badge-bill .pulse-dot {
+      display: inline-block;
+      background: #c0392b;
+      animation: pulse-dot 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.5); opacity: 0.6; }
+    }
+
+    /* ─── Mesa info card ─── */
     #mesa-info-card {
-      margin: 10px 16px 0; background: var(--black-0);
+      margin: 8px 16px 0; background: var(--black-0);
       border: 1px solid #E8E9F0; border-radius: 12px;
       padding: 10px 12px; display: flex; align-items: center; flex-shrink: 0;
     }
@@ -76,18 +110,6 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .info-sep { width: 1px; height: 20px; background: #E8E9F0; flex-shrink: 0; margin: 0 5px; }
-    .badge-estado {
-      display: inline-flex; align-items: center; border-radius: 100px;
-      padding: 3px 8px; flex-shrink: 0; margin-left: 6px;
-    }
-    .badge-estado span { font-size: 11px; font-weight: 600; line-height: 16px; white-space: nowrap; }
-    .badge-occupied     { background: #FEE2E2; }
-    .badge-occupied span{ color: #FF2947; }
-    .badge-bill         { background: #FEF9C3; }
-    .badge-bill span    { color: #854F0B; }
-    .badge-available    { background: #D1FAE5; }
-    .badge-available span { color: #065F46; }
-
     #btn-dots-info {
       width: 28px; height: 28px; border: none; background: transparent;
       cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;
@@ -96,31 +118,50 @@
     }
     #btn-dots-info:active { background: var(--blue-10); }
 
-    /* Section title */
+    /* ─── Section title ─── */
     #pedido-title {
       padding: 14px 16px 0; font-size: 11px; font-weight: 700;
       color: var(--black-40); letter-spacing: 0.08em; text-transform: uppercase; flex-shrink: 0;
     }
 
-    /* Products area */
+    /* ─── Products area ─── */
     #products-area {
       flex: 1; overflow-y: auto; padding: 12px 16px;
       scrollbar-width: none; display: flex; flex-direction: column;
     }
     #products-area::-webkit-scrollbar { display: none; }
+
+    /* Empty state */
     #empty-state {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      color: var(--black-40); font-size: 14px; font-weight: 500;
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      padding: 24px 32px;
+    }
+    .empty-icon { color: #CBD5E1; }
+    .empty-label {
+      font-size: 15px; font-weight: 600; color: var(--black-60); text-align: center;
+    }
+    #btn-empty-agregar {
+      margin-top: 6px;
+      height: 48px; padding: 0 28px;
+      border-radius: var(--radius-pill); border: none;
+      background: var(--coral-100); color: var(--black-0);
+      font-family: var(--font); font-size: 14px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: opacity .15s; -webkit-tap-highlight-color: transparent;
+    }
+    #btn-empty-agregar:active { opacity: 0.85; }
+
+    /* Product list card */
+    #products-list {
+      background: var(--black-0); border-radius: var(--radius-card);
+      overflow: hidden; box-shadow: var(--shadow-blue-8); padding: 0 14px;
     }
     .product-item {
       background: var(--black-0); padding: 12px 0;
       display: flex; flex-direction: column; gap: 4px;
     }
     .product-item + .product-item { border-top: 1px solid #EEF0F8; }
-    #products-list {
-      background: var(--black-0); border-radius: var(--radius-card);
-      overflow: hidden; box-shadow: var(--shadow-blue-8); padding: 0 14px;
-    }
     .product-row-top { display: flex; align-items: center; gap: 8px; }
     .product-name {
       font-size: 14px; font-weight: 600; color: var(--black-100);
@@ -145,20 +186,21 @@
     .btn-delete:active { background: #FEE2E2; }
     .product-row-bottom { font-size: 12px; font-weight: 400; color: var(--black-60); }
 
-    /* Footer */
+    /* ─── Footer ─── */
     #footer {
       background: var(--black-0); border-top: 1px solid rgba(0,0,0,0.08);
-      padding: 14px 16px 20px; flex-shrink: 0; display: flex; flex-direction: column;
+      padding: 12px 16px 20px; flex-shrink: 0; display: flex; flex-direction: column;
     }
-    .totals-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+    #totals-wrap { display: flex; flex-direction: column; }
+    .totals-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
     .totals-label { font-size: 13px; font-weight: 500; color: var(--black-60); }
     .totals-amount { font-size: 13px; font-weight: 500; color: var(--black-100); }
-    .totals-sep { height: 1px; background: #EEF0F8; margin: 6px 0; }
+    .totals-sep { height: 1px; background: #EEF0F8; margin: 5px 0; }
     .totals-row-total .totals-label { font-size: 15px; font-weight: 700; color: var(--black-100); }
     .totals-row-total .totals-amount { font-size: 18px; font-weight: 700; color: var(--blue-100); }
 
-    /* Action bar */
-    #action-bar { margin-top: 14px; display: flex; gap: 10px; }
+    /* ─── Action bar ─── */
+    #action-bar { margin-top: 12px; display: flex; gap: 10px; }
     #btn-secondary {
       flex: 1; height: 48px; border-radius: var(--radius-pill);
       border: 1.5px solid rgba(18,30,108,0.2); background: transparent;
@@ -186,7 +228,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Info Drop Up */
+    /* ─── Info Drop Up ─── */
     #info-dropup-overlay {
       display: none; position: absolute; inset: 0; z-index: 300;
       background: rgba(0,0,0,.45); align-items: flex-end;
@@ -201,9 +243,7 @@
       width: 36px; height: 4px; background: #D1D5DB;
       border-radius: 2px; margin: 0 auto 16px;
     }
-    #info-dropup-title-row {
-      display: flex; align-items: center; justify-content: space-between; padding: 0 20px 14px;
-    }
+    #info-dropup-title-row { padding: 0 20px 14px; }
     #info-dropup-heading { font-size: 16px; font-weight: 700; color: var(--blue-100); }
     #info-dropup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 8px; padding: 0 20px 16px; }
     .du-item { display: flex; flex-direction: column; gap: 2px; }
@@ -219,7 +259,7 @@
     .du-action:active { background: var(--blue-10); }
     .du-action.du-action-red { color: #FF2947; }
 
-    /* Confirm modal */
+    /* ─── Confirm modal ─── */
     #confirm-overlay {
       display: none; position: absolute; inset: 0; z-index: 350;
       background: rgba(0,0,0,.5); align-items: center; justify-content: center; padding: 24px;
@@ -278,7 +318,7 @@
     </div>
   </div>
 
-  <!-- Header -->
+  <!-- Header: ← [Mesa S05 + badge] [spacer] -->
   <div id="header">
     <div id="nav-row">
       <button id="btn-back" onclick="goBack()">
@@ -286,12 +326,18 @@
           <path d="M15 18l-6-6 6-6" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <div id="nav-title">Cargando…</div>
+      <div id="nav-title-group">
+        <span id="nav-title">Cargando…</span>
+        <div class="badge-estado badge-occupied" id="badge-estado">
+          <span class="pulse-dot" id="badge-pulse"></span>
+          <span class="badge-text" id="badge-estado-text">Ocupada</span>
+        </div>
+      </div>
       <div id="nav-spacer"></div>
     </div>
   </div>
 
-  <!-- Mesa info card -->
+  <!-- Mesa info card: zona · personas · apertura · tiempo · ⋯ -->
   <div id="mesa-info-card">
     <div class="info-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
@@ -327,7 +373,6 @@
       </svg>
       <span class="info-val" id="du-tiempo">—</span>
     </div>
-    <div class="badge-estado" id="badge-estado"><span id="badge-estado-text">—</span></div>
     <button id="btn-dots-info" onclick="openInfoDropUp()" aria-label="Más acciones">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <circle cx="5"  cy="12" r="1.5" fill="#606060"/>
@@ -342,25 +387,41 @@
 
   <!-- Products area -->
   <div id="products-area">
-    <div id="products-list"></div>
-    <div id="empty-state" style="display:none"><span>Sin productos aún</span></div>
+    <!-- Empty state: icon + label + CTA -->
+    <div id="empty-state">
+      <svg class="empty-icon" width="72" height="72" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+        <line x1="9"  y1="12" x2="15" y2="12"/>
+        <line x1="9"  y1="16" x2="13" y2="16"/>
+      </svg>
+      <span class="empty-label">Sin productos aún</span>
+      <button id="btn-empty-agregar" onclick="goToAgregar()">Agregar productos</button>
+    </div>
+    <!-- Product list (shown when cart has items) -->
+    <div id="products-list" style="display:none"></div>
   </div>
 
   <!-- Footer -->
   <div id="footer">
-    <div class="totals-row">
-      <span class="totals-label">Subtotal</span>
-      <span class="totals-amount" id="val-subtotal">$0</span>
+    <!-- Totals (hidden when cart is empty) -->
+    <div id="totals-wrap">
+      <div class="totals-row">
+        <span class="totals-label">Subtotal</span>
+        <span class="totals-amount" id="val-subtotal">$0</span>
+      </div>
+      <div class="totals-row">
+        <span class="totals-label">IVA (19%)</span>
+        <span class="totals-amount" id="val-iva">$0</span>
+      </div>
+      <div class="totals-sep"></div>
+      <div class="totals-row totals-row-total">
+        <span class="totals-label">Total</span>
+        <span class="totals-amount" id="val-total">$0</span>
+      </div>
     </div>
-    <div class="totals-row">
-      <span class="totals-label">IVA (19%)</span>
-      <span class="totals-amount" id="val-iva">$0</span>
-    </div>
-    <div class="totals-sep"></div>
-    <div class="totals-row totals-row-total">
-      <span class="totals-label">Total</span>
-      <span class="totals-amount" id="val-total">$0</span>
-    </div>
+    <!-- Action bar -->
     <div id="action-bar">
       <button id="btn-secondary" onclick="goToAgregar()">Agregar productos</button>
       <button id="btn-primary" class="coral" onclick="handlePrimary()">Cargando…</button>
@@ -477,7 +538,10 @@
   function setMesaBillRequested(mId) {
     try {
       const data = JSON.parse(localStorage.getItem("boldPOS_mesas")) || {};
-      if (data[mId]) { data[mId].estado = "bill_requested"; localStorage.setItem("boldPOS_mesas", JSON.stringify(data)); }
+      if (data[mId]) {
+        data[mId].estado = "bill_requested";
+        localStorage.setItem("boldPOS_mesas", JSON.stringify(data));
+      }
     } catch(e) {}
   }
 
@@ -492,16 +556,31 @@
     return `${h}:${min} ${ampm}`;
   }
   function fmtMoney(n) { return "$" + n.toLocaleString("es-CO"); }
-  function escHtml(str) {
-    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-  }
+  function escHtml(s)  { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
   /* ── Navigation ── */
   function goBack() { location.href = "venta-mesas.html"; }
 
   function goToAgregar() {
-    const p = new URLSearchParams({ mesa: mesaId, zona: zona, estado: mesaEstado, origen: "pedido" });
+    const p = new URLSearchParams({ mesa: mesaId, zona, estado: mesaEstado, origen: "pedido" });
     location.href = "detalle-mesa.html?" + p.toString();
+  }
+
+  /* ── Render header badge ── */
+  function renderBadge(curEstado) {
+    const badge    = document.getElementById("badge-estado");
+    const badgeTxt = document.getElementById("badge-estado-text");
+
+    if (curEstado === "bill_requested") {
+      badge.className = "badge-estado badge-bill";
+      badgeTxt.textContent = "Cuenta solicitada";
+    } else if (curEstado === "available") {
+      badge.className = "badge-estado badge-available";
+      badgeTxt.textContent = "Disponible";
+    } else {
+      badge.className = "badge-estado badge-occupied";
+      badgeTxt.textContent = "Ocupada";
+    }
   }
 
   /* ── Render info card ── */
@@ -514,26 +593,13 @@
     document.getElementById("du-apertura").textContent = mesa ? fmtApertura(mesa.horaApertura) : "—";
     document.getElementById("du-tiempo").textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : "—";
 
-    const badge    = document.getElementById("badge-estado");
-    const badgeTxt = document.getElementById("badge-estado-text");
-    const curE     = (mesa && mesa.estado) || mesaEstado;
-
-    if (curE === "bill_requested") {
-      badge.className = "badge-estado badge-bill";
-      badgeTxt.textContent = "Cuenta solicitada";
-    } else if (curE === "available") {
-      badge.className = "badge-estado badge-available";
-      badgeTxt.textContent = "Disponible";
-    } else {
-      badge.className = "badge-estado badge-occupied";
-      badgeTxt.textContent = "Ocupada";
-    }
-
     // Sync drop-up
     document.getElementById("dropup-zona").textContent     = zText;
     document.getElementById("dropup-personas").textContent = mesa ? (mesa.personas || "—") + " pers." : "—";
     document.getElementById("dropup-apertura").textContent = mesa ? fmtApertura(mesa.horaApertura) : "—";
     document.getElementById("dropup-tiempo").textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : "—";
+
+    renderBadge((mesa && mesa.estado) || mesaEstado);
   }
 
   /* ── Render action bar ── */
@@ -546,6 +612,7 @@
     comandaState    = cs.estado;
     const isEmpty   = cart.length === 0;
 
+    // DISPONIBLE: single coral "Abrir mesa"
     if (curEstado === "available") {
       sec.style.display = "none";
       pri.style.flex = "unset"; pri.style.width = "100%";
@@ -554,10 +621,11 @@
       return;
     }
 
+    // CUENTA SOLICITADA: single coral "Ir a checkout"
     if (curEstado === "bill_requested") {
       sec.style.display = "none";
       pri.style.flex = "unset"; pri.style.width = "100%";
-      pri.className  = "blue";
+      pri.className  = "coral";
       pri.innerHTML  = "Ir a checkout";
       return;
     }
@@ -580,20 +648,23 @@
 
   /* ── Render product list ── */
   function renderList() {
-    const list    = document.getElementById("products-list");
-    const emptyEl = document.getElementById("empty-state");
-    const area    = document.getElementById("products-area");
+    const list       = document.getElementById("products-list");
+    const emptyEl    = document.getElementById("empty-state");
+    const totalsWrap = document.getElementById("totals-wrap");
+    const emptyAgr   = document.getElementById("btn-empty-agregar");
+    const mesa       = DataManager.getMesa(mesaId);
+    const curEstado  = (mesa && mesa.estado) || mesaEstado;
 
     if (!cart.length) {
-      list.style.display         = "none";
-      emptyEl.style.display      = "flex";
-      area.style.alignItems      = "center";
-      area.style.justifyContent  = "center";
+      list.style.display        = "none";
+      emptyEl.style.display     = "flex";
+      totalsWrap.style.display  = "none";
+      // Show "Agregar" CTA only when mesa is open (not disponible)
+      emptyAgr.style.display    = curEstado === "available" ? "none" : "flex";
     } else {
-      list.style.display         = "block";
-      emptyEl.style.display      = "none";
-      area.style.alignItems      = "";
-      area.style.justifyContent  = "";
+      list.style.display        = "block";
+      emptyEl.style.display     = "none";
+      totalsWrap.style.display  = "";
     }
 
     list.innerHTML = cart.map(item => {
@@ -683,6 +754,7 @@
       setMesaBillRequested(mesaId);
       mesaEstado = "bill_requested";
       saveComandaState(mesaId, "sent", cs.hora);
+      renderBadge("bill_requested");
       renderInfoCard(DataManager.getMesa(mesaId));
       renderList();
       return;
@@ -692,9 +764,10 @@
   /* ── Info Drop Up ── */
   function openInfoDropUp()  { document.getElementById("info-dropup-overlay").classList.add("show"); }
   function closeInfoDropUp() { document.getElementById("info-dropup-overlay").classList.remove("show"); }
-  function handleInfoDropUpClick(e) { if (e.target === document.getElementById("info-dropup-overlay")) closeInfoDropUp(); }
-
-  function cambiarMesa() { /* placeholder */ alert("Cambio de mesa — próximamente"); }
+  function handleInfoDropUpClick(e) {
+    if (e.target === document.getElementById("info-dropup-overlay")) closeInfoDropUp();
+  }
+  function cambiarMesa() { alert("Cambio de mesa — próximamente"); }
 
   /* ── Cancel confirm ── */
   function abrirConfirmCancelar() { document.getElementById("confirm-overlay").classList.add("show"); }
@@ -726,6 +799,7 @@
 
     if (estadoParam === "available") {
       mesaEstado = "available";
+      renderBadge("available");
       renderInfoCard(null);
       renderList();
       return;
@@ -734,6 +808,7 @@
     const mesa = DataManager.getMesa(mesaId);
     if (!mesa) {
       mesaEstado = estadoParam;
+      renderBadge(estadoParam);
       renderInfoCard(null);
       renderTotals();
       renderActionBar();

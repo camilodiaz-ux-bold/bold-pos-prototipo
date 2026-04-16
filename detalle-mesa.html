@@ -106,21 +106,6 @@
     }
     .nav-spacer { width: 24px; flex-shrink: 0; }
 
-    #tag-estado {
-      display: inline-flex;
-      align-items: center;
-      background: #FEE2E2;
-      border-radius: 100px;
-      padding: 4px 10px;
-    }
-    #tag-estado span {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--coral-100);
-      line-height: 16px;
-      white-space: nowrap;
-    }
-
     /* ─── Mesa info card ─── */
     #mesa-info-card {
       display: none;
@@ -327,11 +312,49 @@
       line-height: 20px;
     }
 
-    /* ─── Scanner btn ─── */
-    #btn-scan {
+    /* ─── Cart btn (replaces scanner) ─── */
+    #btn-cart {
+      position: relative;
       border: none; background: transparent;
-      padding: 0; cursor: pointer;
-      flex-shrink: 0; line-height: 0;
+      padding: 0; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #cart-badge {
+      display: none;
+      position: absolute;
+      top: -7px; right: -7px;
+      min-width: 18px; height: 18px;
+      border-radius: 9px;
+      background: var(--coral-100);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 10px; font-weight: 700;
+      align-items: center; justify-content: center;
+      padding: 0 4px;
+      box-shadow: 0 1px 4px rgba(255,41,71,.4);
+    }
+
+    /* Pulse dot for cuenta solicitada badge in search row */
+    #tag-estado {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #FEE2E2;
+      border-radius: 100px;
+      padding: 4px 10px;
+    }
+    #tag-estado span { font-size: 12px; font-weight: 600; line-height: 16px; white-space: nowrap; }
+    .tag-pulse-dot {
+      display: none; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .tag-bill .tag-pulse-dot {
+      display: inline-block; background: #c0392b;
+      animation: pulse-dot 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.5); opacity: 0.6; }
     }
 
     /* ─── Scanner overlay ─── */
@@ -867,23 +890,21 @@
             <path d="M4 4l10 10M14 4L4 14" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </button>
-        <button id="btn-scan" onclick="openScanner()" aria-label="Escanear código de barras">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M2 7V5a2 2 0 0 1 2-2h2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M22 7V5a2 2 0 0 0-2-2h-2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M2 17v2a2 2 0 0 0 2 2h2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M22 17v2a2 2 0 0 1-2 2h-2" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-            <line x1="7" y1="8" x2="7" y2="16" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-            <line x1="10" y1="8" x2="10" y2="16" stroke="#606060" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="13" y1="8" x2="13" y2="16" stroke="#606060" stroke-width="2" stroke-linecap="round"/>
-            <line x1="16" y1="8" x2="16" y2="16" stroke="#606060" stroke-width="1.2" stroke-linecap="round"/>
-            <line x1="18.5" y1="8" x2="18.5" y2="16" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+        <button id="btn-cart" onclick="goBackToPedido()" aria-label="Ver pedido">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="#606060" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <line x1="9"  y1="12" x2="15" y2="12"/>
+            <line x1="9"  y1="16" x2="13" y2="16"/>
           </svg>
+          <span id="cart-badge">0</span>
         </button>
       </div>
       <!-- BADGE DE ESTADO -->
       <div id="estado-badge-wrap" onclick="openInfoDropUp()" aria-label="Info y acciones de mesa">
         <div id="tag-estado">
+          <span class="tag-pulse-dot" id="tag-pulse"></span>
           <span id="tag-estado-text">Ocupada</span>
         </div>
         <button id="btn-badge-dots" aria-label="Más acciones" onclick="openInfoDropUp()">
@@ -1377,6 +1398,15 @@ function syncCartBar() {
   document.getElementById("order-total").textContent = fmt(totalAmt);
   // btn-principal is always enabled — it goes back to detalle-pedido
   document.getElementById("btn-principal").disabled = false;
+
+  // Cart badge on clipboard icon
+  const badge = document.getElementById("cart-badge");
+  if (totalQty > 0) {
+    badge.textContent    = totalQty;
+    badge.style.display  = "flex";
+  } else {
+    badge.style.display  = "none";
+  }
 }
 
 function goBackToPedido() {
@@ -1507,13 +1537,15 @@ function updateTagEstado() {
   const tagEl   = document.getElementById("tag-estado");
   const tagSpan = document.getElementById("tag-estado-text");
   if (mesaState === "bill_requested") {
-    tagSpan.textContent    = "Cuen. solicitada";
-    tagEl.style.background = "#FEF9C3";
-    tagSpan.style.color    = "#854F0B";
+    tagEl.className        = "tag-bill";
+    tagEl.style.background = "#fde8e8";
+    tagSpan.style.color    = "#c0392b";
+    tagSpan.textContent    = "Cuenta solicitada";
   } else {
-    tagSpan.textContent    = "Ocupada";
+    tagEl.className        = "";
     tagEl.style.background = "#FEE2E2";
     tagSpan.style.color    = "#FF2947";
+    tagSpan.textContent    = "Ocupada";
   }
 }
 
@@ -1734,15 +1766,20 @@ function handleScanOverlayClick(e) {
   const tagEl   = document.getElementById("tag-estado");
   const tagSpan = document.getElementById("tag-estado-text");
   if (estado === "bill_requested") {
-    tagSpan.textContent    = "Cuen. solicitada";
-    tagEl.style.background = "#FEF9C3";
-    tagSpan.style.color    = "#854F0B";
+    tagEl.className        = "tag-bill";
+    tagEl.style.background = "#fde8e8";
+    tagSpan.style.color    = "#c0392b";
+    tagSpan.textContent    = "Cuenta solicitada";
   } else if (estado === "available") {
-    tagSpan.textContent    = "Disponible";
+    tagEl.className        = "";
     tagEl.style.background = "#D1FAE5";
     tagSpan.style.color    = "#0F6E56";
+    tagSpan.textContent    = "Disponible";
   } else {
-    tagSpan.textContent = "Ocupada";
+    tagEl.className        = "";
+    tagEl.style.background = "#FEE2E2";
+    tagSpan.style.color    = "#FF2947";
+    tagSpan.textContent    = "Ocupada";
   }
 
   // Button label depends on origen
