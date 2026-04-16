@@ -339,29 +339,6 @@
     }
 
     /* ─── Bottom panel ─── */
-    #bottom-panel {
-      background: var(--black-0);
-      border-top: 1px solid #EEF0F8;
-      flex-shrink: 0;
-      padding: 10px 16px 14px;
-    }
-    #legend-chips {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      flex-wrap: nowrap;
-    }
-    #legend-chips::-webkit-scrollbar { display: none; }
-    .legend-chip {
-      flex-shrink: 0;
-      display: flex; align-items: center; gap: 6px;
-      border-radius: 100px;
-      padding: 6px 10px;
-    }
-    .legend-chip.dashed { border-style: dashed !important; }
-    .legend-dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
-    .legend-label { font-size: 11px; font-weight: 600; white-space: nowrap; line-height: 1; }
 
     /* ─── Search input & view toggle ─── */
     #search-input {
@@ -763,27 +740,6 @@
 
   </div><!-- /map-wrapper -->
 
-  <!-- BOTTOM PANEL — legend only -->
-  <div id="bottom-panel">
-    <div id="legend-chips">
-      <div class="legend-chip" style="background:#f0faf5;border:1.5px solid #2e7d5e;">
-        <div class="legend-dot" style="background:#2e7d5e;"></div>
-        <span class="legend-label" style="color:#2e7d5e;">Disponible</span>
-      </div>
-      <div class="legend-chip" style="background:#fde8e8;border:1.5px solid #c0392b;">
-        <div class="legend-dot" style="background:#c0392b;"></div>
-        <span class="legend-label" style="color:#c0392b;">Ocupada</span>
-      </div>
-      <div class="legend-chip" style="background:#fde8e8;border:1.5px solid #c0392b;">
-        <span class="status-pulse-dot"></span>
-        <span class="legend-label" style="color:#c0392b;">Cuenta solicitada</span>
-      </div>
-      <div class="legend-chip dashed" style="background:#f5f5f5;border:1.5px dashed #C0C0C0;">
-        <div class="legend-dot" style="background:#999999;"></div>
-        <span class="legend-label" style="color:#999999;">Inhabilitada</span>
-      </div>
-    </div>
-  </div>
 
   <!-- DROP-UP OVERLAY — solo para mesas disponibles -->
   <div id="dropup-overlay" onclick="handleOverlayClick(event)">
