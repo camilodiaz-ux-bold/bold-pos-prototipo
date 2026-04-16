@@ -395,12 +395,11 @@
     }
     #list-view::-webkit-scrollbar { display: none; }
     .list-card {
-      border-radius: var(--radius-card); /* 16px */
-      padding: 16px;
+      border-radius: 12px;
+      padding: 8px 16px;
       display: flex;
-      align-items: stretch;
-      gap: 16px;
-      box-shadow: var(--shadow-blue-8);
+      align-items: center;
+      gap: 12px;
       cursor: default;
     }
     .list-card.available { cursor: pointer; }
@@ -409,28 +408,30 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 2px;
     }
     .list-card-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 2px;
     }
     .list-card-id {
-      /* [APP]/Body/Bold */
+      /* Montserrat Semibold 14px */
+      flex: 1;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 600;
       line-height: 20px;
     }
     .list-card-status {
+      /* Montserrat Regular 12px — texto plano, sin pill */
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 400;
       line-height: 16px;
-      padding: 2px 8px;
-      border-radius: 20px;
+      white-space: nowrap;
     }
     @keyframes pulse-dot {
       0%, 100% { transform: scale(1); opacity: 1; }
@@ -440,28 +441,26 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #c0392b;
+      background: #ff2947;
       flex-shrink: 0;
       animation: pulse-dot 1.2s ease-in-out infinite;
     }
     .list-card-meta {
-      /* [APP]/Caption/Regular */
+      /* Montserrat Regular 12px */
       font-size: 12px;
       font-weight: 400;
       line-height: 16px;
-      color: var(--black-40);
     }
     .list-card-time {
-      /* [APP]/Caption/Regular */
+      /* Montserrat Regular 12px */
       font-size: 12px;
       font-weight: 400;
       line-height: 16px;
-      color: var(--black-40);
     }
     .list-card-amount {
-      /* [APP]/Body/Semibold */
+      /* Montserrat Medium 14px */
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 500;
       line-height: 20px;
     }
 
@@ -1182,22 +1181,26 @@ const STATUS_LABELS = {
   disabled:       "Inhabilitada",
 };
 const STATUS_TEXT_COLORS = {
-  available:      "#2e7d5e",
-  occupied:       "#c0392b",
-  bill_requested: "#c0392b",
-  disabled:       "#999999",
+  available:      "#1b8959",
+  occupied:       "#ff2947",
+  bill_requested: "#ff2947",
+  disabled:       "#969696",
 };
 const STATUS_CARD_BG = {
-  available:      "#f0faf5",
-  occupied:       "#fde8e8",
-  bill_requested: "#fde8e8",
-  disabled:       "#f5f5f5",
+  available:      "#f4fdf9",
+  occupied:       "#fff2f4",
+  bill_requested: "#fff2f4",
+  disabled:       "#f3f3f3",
 };
-const STATUS_BADGE_BG = {
-  available:      "transparent",
-  occupied:       "#fde8e8",
-  bill_requested: "#fde8e8",
-  disabled:       "transparent",
+const STATUS_META_COLOR = {
+  available:      "#1e1e1e",
+  occupied:       "#1e1e1e",
+  bill_requested: "#1e1e1e",
+  disabled:       "#969696",
+};
+const STATUS_TIME_COLOR = {
+  occupied:       "#606060",
+  bill_requested: "#606060",
 };
 
 function renderListView(zoneKey, query) {
@@ -1210,10 +1213,10 @@ function renderListView(zoneKey, query) {
   zone.tables.forEach(table => {
     if (q && !table.id.toLowerCase().includes(q)) return;
 
-    const tk        = STATUS_TOKENS[table.status];
-    const textColor = STATUS_TEXT_COLORS[table.status] || "#6B7194";
+    const textColor = STATUS_TEXT_COLORS[table.status] || "#969696";
     const cardBg    = STATUS_CARD_BG[table.status]     || "#ffffff";
-    const badgeBg   = STATUS_BADGE_BG[table.status]    || "transparent";
+    const metaColor = STATUS_META_COLOR[table.status]  || "#1e1e1e";
+    const timeColor = STATUS_TIME_COLOR[table.status]  || "#606060";
     const pulseDot  = table.status === "bill_requested"
       ? `<span class="status-pulse-dot"></span>` : "";
 
@@ -1226,14 +1229,14 @@ function renderListView(zoneKey, query) {
       <div class="list-card-indicator"></div>
       <div class="list-card-body">
         <div class="list-card-row">
-          <span class="list-card-id" style="color:${tk.num};">${table.id}</span>
-          <span class="list-card-status" style="color:${textColor};background:${badgeBg};">${pulseDot}${STATUS_LABELS[table.status]}</span>
+          <span class="list-card-id" style="color:${textColor};">${table.id}</span>
+          <span class="list-card-status" style="color:${textColor};">${pulseDot}${STATUS_LABELS[table.status]}</span>
         </div>
         <div class="list-card-row">
-          <span class="list-card-meta">${table.cap} personas · ${zone.label}</span>
-          ${table.time ? `<span class="list-card-time">${table.time}</span>` : ""}
+          <span class="list-card-meta" style="color:${metaColor};">${table.cap} personas · ${zone.label}</span>
+          ${table.time ? `<span class="list-card-time" style="color:${timeColor};">${table.time}</span>` : ""}
         </div>
-        ${table.amount ? `<div class="list-card-row"><span></span><span class="list-card-amount" style="color:${tk.num};">${table.amount}</span></div>` : ""}
+        ${table.amount ? `<div class="list-card-row"><span></span><span class="list-card-amount" style="color:${textColor};">${table.amount}</span></div>` : ""}
       </div>
     `;
 
