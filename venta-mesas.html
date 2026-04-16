@@ -795,16 +795,16 @@ const ZONES_DATA = {
       { id:"S03", shape:"rect",  x:122, y:20,  w:82, h:68, status:"available",      cap:4 },
       { id:"S04", shape:"rect",  x:262, y:20,  w:82, h:68, status:"occupied",       cap:4, time:"2h 20min", amount:"$87.500"  },
       { id:"S05", shape:"rect",  x:392, y:20,  w:82, h:68, status:"bill_requested", cap:4, time:"3h 5min",  amount:"$195.000" },
-      { id:"S15", shape:"round", x:494, y:20,  w:68, h:68, status:"occupied",       cap:2, time:"22min",    amount:"$15.000"  },
+      { id:"S15", shape:"round", x:494, y:20,  w:68, h:68, status:"available",      cap:2 },
       { id:"S16", shape:"round", x:494, y:116, w:68, h:68, status:"available",      cap:2 },
       { id:"S06", shape:"rect",  x:122, y:148, w:82, h:68, status:"occupied",       cap:4, time:"45min",    amount:"$42.000"  },
       { id:"S07", shape:"rect",  x:122, y:266, w:82, h:68, status:"available",      cap:4 },
       { id:"S08", shape:"round", x:270, y:142, w:92, h:92, status:"available",      cap:6 },
-      { id:"S09", shape:"rect",  x:394, y:148, w:82, h:68, status:"occupied",       cap:4, time:"2h 55min", amount:"$134.000" },
+      { id:"S09", shape:"rect",  x:394, y:148, w:82, h:68, status:"disabled",       cap:4 },
       { id:"S10", shape:"rect",  x:394, y:266, w:82, h:68, status:"bill_requested", cap:4, time:"2h 10min", amount:"$215.000" },
-      { id:"S11", shape:"rect",  x:16,  y:372, w:82, h:68, status:"occupied",       cap:4, time:"35min",    amount:"$54.000"  },
+      { id:"S11", shape:"rect",  x:16,  y:372, w:82, h:68, status:"disabled",       cap:4 },
       { id:"S12", shape:"rect",  x:152, y:372, w:82, h:68, status:"available",      cap:4 },
-      { id:"S13", shape:"rect",  x:290, y:372, w:82, h:68, status:"occupied",       cap:4, time:"1h 50min", amount:"$78.000"  },
+      { id:"S13", shape:"rect",  x:290, y:372, w:82, h:68, status:"available",      cap:4 },
       { id:"S14", shape:"rect",  x:424, y:372, w:82, h:68, status:"available",      cap:4 },
     ]
   },
@@ -829,9 +829,10 @@ const ZONES_DATA = {
 };
 
 const STATUS_TOKENS = {
-  available:      { bg:"#EDEEF4", border:"1.5px solid #BABDC8", chair:"#A8ADBE", num:"#6B7194",  sub:"#8A8FA6", shadow:"none" },
-  occupied:       { bg:"#FFF0F1", border:"2px solid #FF2947",   chair:"#FF2947", num:"#FF2947",  sub:"#6B7194", shadow:"0 2px 12px rgba(255,41,71,0.16)" },
-  bill_requested: { bg:"#FFFBE6", border:"2px solid #FFB800",   chair:"#FFB800", num:"#92400E",  sub:"#78350F", shadow:"0 2px 12px rgba(255,184,0,0.16)" },
+  available:      { bg:"#EDEEF4", border:"1.5px solid #BABDC8",       chair:"#A8ADBE", num:"#6B7194", sub:"#8A8FA6", shadow:"none" },
+  occupied:       { bg:"#FFF0F1", border:"2px solid #FF2947",          chair:"#FF2947", num:"#FF2947", sub:"#6B7194", shadow:"0 2px 12px rgba(255,41,71,0.16)" },
+  bill_requested: { bg:"#FFFBE6", border:"2px solid #FFB800",          chair:"#FFB800", num:"#92400E", sub:"#78350F", shadow:"0 2px 12px rgba(255,184,0,0.16)" },
+  disabled:       { bg:"#F3F3F3", border:"1.5px dashed #C0C0C0",       chair:"#C0C0C0", num:"#999999", sub:"#BBBBBB", shadow:"none" },
 };
 
 /* ══════════════════════════════════════════
@@ -1374,6 +1375,7 @@ function showToast(msg) {
 DataManager.init();
 syncFromDataManager();
 renderZone("salon");
+renderListView(activeZone, searchQuery);
 </script>
 </body>
 </html>
