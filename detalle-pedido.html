@@ -30,6 +30,7 @@
       background: #d0d0d0;
       display: flex; justify-content: center; align-items: flex-start;
     }
+    /* Phone shell — flex column, no overflow on shell */
     #app {
       width: 393px; height: 100vh;
       background: var(--background-page);
@@ -58,39 +59,29 @@
       border-radius: 8px; transition: background .12s;
     }
     #btn-back:active { background: var(--blue-10); }
-    /* Title group: mesa name + badge stacked */
     #nav-title-group {
-      flex: 1;
-      display: flex; flex-direction: column;
-      align-items: center; gap: 5px;
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
     }
-    #nav-title {
-      font-size: 16px; font-weight: 700; color: var(--blue-100); line-height: 20px;
-    }
+    #nav-title { font-size: 16px; font-weight: 700; color: var(--blue-100); line-height: 20px; }
     #nav-spacer { width: 32px; flex-shrink: 0; }
 
-    /* ─── Estado badge (in header) ─── */
+    /* ─── Badge de estado (en header) ─── */
     .badge-estado {
       display: inline-flex; align-items: center; gap: 5px;
       border-radius: 100px; padding: 3px 10px; flex-shrink: 0;
     }
-    .badge-estado .badge-text {
-      font-size: 11px; font-weight: 600; line-height: 16px; white-space: nowrap;
-    }
-    .badge-occupied  { background: #FEE2E2; }
-    .badge-occupied .badge-text { color: #FF2947; }
-    .badge-bill      { background: #fde8e8; }
-    .badge-bill .badge-text { color: #c0392b; }
-    .badge-available { background: #D1FAE5; }
-    .badge-available .badge-text { color: #065F46; }
+    .badge-estado .badge-text { font-size: 11px; font-weight: 600; line-height: 16px; white-space: nowrap; }
+    .badge-occupied          { background: #FEE2E2; }
+    .badge-occupied .badge-text   { color: #FF2947; }
+    .badge-bill              { background: #fde8e8; }
+    .badge-bill .badge-text       { color: #c0392b; }
+    .badge-available         { background: #D1FAE5; }
+    .badge-available .badge-text  { color: #065F46; }
 
-    /* Pulse dot for cuenta solicitada */
-    .pulse-dot {
-      display: none; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-    }
+    /* Pulse dot para cuenta solicitada */
+    .pulse-dot { display: none; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .badge-bill .pulse-dot {
-      display: inline-block;
-      background: #c0392b;
+      display: inline-block; background: #c0392b;
       animation: pulse-dot 1.2s ease-in-out infinite;
     }
     @keyframes pulse-dot {
@@ -124,26 +115,27 @@
       color: var(--black-40); letter-spacing: 0.08em; text-transform: uppercase; flex-shrink: 0;
     }
 
-    /* ─── Products area ─── */
+    /* ─── Products area — scrollable ─── */
     #products-area {
-      flex: 1; overflow-y: auto; padding: 12px 16px;
-      scrollbar-width: none; display: flex; flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      scrollbar-width: none;
+      display: flex;
+      flex-direction: column;
+      min-height: 0; /* needed for flex scroll to work in some browsers */
     }
     #products-area::-webkit-scrollbar { display: none; }
 
     /* Empty state */
     #empty-state {
       flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 10px;
-      padding: 24px 32px;
+      align-items: center; justify-content: center; gap: 10px; padding: 24px 32px;
     }
     .empty-icon { color: #CBD5E1; }
-    .empty-label {
-      font-size: 15px; font-weight: 600; color: var(--black-60); text-align: center;
-    }
+    .empty-label { font-size: 15px; font-weight: 600; color: var(--black-60); text-align: center; }
     #btn-empty-agregar {
-      margin-top: 6px;
-      height: 48px; padding: 0 28px;
+      margin-top: 6px; height: 48px; padding: 0 28px;
       border-radius: var(--radius-pill); border: none;
       background: var(--coral-100); color: var(--black-0);
       font-family: var(--font); font-size: 14px; font-weight: 600;
@@ -152,7 +144,7 @@
     }
     #btn-empty-agregar:active { opacity: 0.85; }
 
-    /* Product list card */
+    /* Product list */
     #products-list {
       background: var(--black-0); border-radius: var(--radius-card);
       overflow: hidden; box-shadow: var(--shadow-blue-8); padding: 0 14px;
@@ -176,7 +168,16 @@
       -webkit-tap-highlight-color: transparent; transition: background .12s; padding: 0; line-height: 1;
     }
     .qty-btn:active { background: var(--blue-10); }
-    .qty-num { font-size: 14px; font-weight: 600; color: var(--black-100); min-width: 24px; text-align: center; }
+    .qty-num {
+      font-size: 14px; font-weight: 600; color: var(--black-100);
+      min-width: 24px; text-align: center;
+    }
+    /* Read-only quantity chip (cuenta solicitada) */
+    .qty-readonly {
+      font-size: 13px; font-weight: 600; color: var(--black-60);
+      background: #F3F4F6; border-radius: 6px;
+      padding: 2px 8px; flex-shrink: 0;
+    }
     .btn-delete {
       width: 28px; height: 28px; border: none; background: transparent;
       display: flex; align-items: center; justify-content: center;
@@ -186,7 +187,7 @@
     .btn-delete:active { background: #FEE2E2; }
     .product-row-bottom { font-size: 12px; font-weight: 400; color: var(--black-60); }
 
-    /* ─── Footer ─── */
+    /* ─── Footer — fixed at bottom ─── */
     #footer {
       background: var(--black-0); border-top: 1px solid rgba(0,0,0,0.08);
       padding: 12px 16px 20px; flex-shrink: 0; display: flex; flex-direction: column;
@@ -199,27 +200,46 @@
     .totals-row-total .totals-label { font-size: 15px; font-weight: 700; color: var(--black-100); }
     .totals-row-total .totals-amount { font-size: 18px; font-weight: 700; color: var(--blue-100); }
 
+    /* ─── Status tag (above buttons) ─── */
+    #comanda-status-tag {
+      display: none;
+      align-items: center; gap: 6px;
+      padding: 7px 12px; border-radius: 8px;
+      font-family: var(--font); font-size: 12px; font-weight: 600;
+      margin-top: 10px;
+    }
+    #comanda-status-tag.sent-tag     { display: flex; background: #f0faf5; color: #1a7a4e; }
+    #comanda-status-tag.modified-tag { display: flex; background: #fff8e6; color: #b07d00; }
+
     /* ─── Action bar ─── */
-    #action-bar { margin-top: 12px; display: flex; gap: 10px; }
+    #action-bar { margin-top: 10px; display: flex; gap: 10px; }
     #btn-secondary {
       flex: 1; height: 48px; border-radius: var(--radius-pill);
       border: 1.5px solid rgba(18,30,108,0.2); background: transparent;
       font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--blue-100);
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: background .15s; -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
     }
     #btn-secondary:active { background: var(--blue-10); }
+    /* Red outline variant */
+    #btn-secondary.red {
+      border-color: rgba(255,41,71,0.3);
+      color: #FF2947;
+    }
+    #btn-secondary.red:active { background: #fff0f1; }
+
     #btn-primary {
       flex: 1; height: 48px; border-radius: var(--radius-pill); border: none;
       font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--black-0);
       cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: opacity .15s; -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
     }
     #btn-primary:active:not(.disabled) { opacity: 0.85; }
     #btn-primary.disabled { opacity: 0.38; cursor: not-allowed; }
     #btn-primary.coral  { background: var(--coral-100); }
     #btn-primary.blue   { background: var(--blue-100); }
-    #btn-primary.yellow { background: #D97706; }
 
     .spinner {
       width: 18px; height: 18px;
@@ -239,10 +259,7 @@
       padding: 8px 0 32px; transform: translateY(100%); transition: transform 200ms ease;
     }
     #info-dropup-overlay.show #info-dropup-sheet { transform: translateY(0); }
-    #info-dropup-handle {
-      width: 36px; height: 4px; background: #D1D5DB;
-      border-radius: 2px; margin: 0 auto 16px;
-    }
+    #info-dropup-handle { width: 36px; height: 4px; background: #D1D5DB; border-radius: 2px; margin: 0 auto 16px; }
     #info-dropup-title-row { padding: 0 20px 14px; }
     #info-dropup-heading { font-size: 16px; font-weight: 700; color: var(--blue-100); }
     #info-dropup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 8px; padding: 0 20px 16px; }
@@ -318,7 +335,7 @@
     </div>
   </div>
 
-  <!-- Header: ← [Mesa S05 + badge] [spacer] -->
+  <!-- Header: ← [Mesa + badge] [spacer] -->
   <div id="header">
     <div id="nav-row">
       <button id="btn-back" onclick="goBack()">
@@ -329,7 +346,7 @@
       <div id="nav-title-group">
         <span id="nav-title">Cargando…</span>
         <div class="badge-estado badge-occupied" id="badge-estado">
-          <span class="pulse-dot" id="badge-pulse"></span>
+          <span class="pulse-dot"></span>
           <span class="badge-text" id="badge-estado-text">Ocupada</span>
         </div>
       </div>
@@ -337,7 +354,7 @@
     </div>
   </div>
 
-  <!-- Mesa info card: zona · personas · apertura · tiempo · ⋯ -->
+  <!-- Info card: zona · personas · apertura · tiempo · ⋯ -->
   <div id="mesa-info-card">
     <div class="info-item">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
@@ -385,9 +402,8 @@
   <!-- Section title -->
   <div id="pedido-title">PEDIDO</div>
 
-  <!-- Products area -->
+  <!-- Scrollable products area -->
   <div id="products-area">
-    <!-- Empty state: icon + label + CTA -->
     <div id="empty-state">
       <svg class="empty-icon" width="72" height="72" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
@@ -399,13 +415,11 @@
       <span class="empty-label">Sin productos aún</span>
       <button id="btn-empty-agregar" onclick="goToAgregar()">Agregar productos</button>
     </div>
-    <!-- Product list (shown when cart has items) -->
     <div id="products-list" style="display:none"></div>
   </div>
 
-  <!-- Footer -->
+  <!-- Fixed footer: totals + status tag + buttons -->
   <div id="footer">
-    <!-- Totals (hidden when cart is empty) -->
     <div id="totals-wrap">
       <div class="totals-row">
         <span class="totals-label">Subtotal</span>
@@ -421,10 +435,12 @@
         <span class="totals-amount" id="val-total">$0</span>
       </div>
     </div>
-    <!-- Action bar -->
+    <!-- Comanda status tag (sent / modified) -->
+    <div id="comanda-status-tag"></div>
+    <!-- Action buttons -->
     <div id="action-bar">
-      <button id="btn-secondary" onclick="goToAgregar()">Agregar productos</button>
-      <button id="btn-primary" class="coral" onclick="handlePrimary()">Cargando…</button>
+      <button id="btn-secondary" onclick="onSecondary()">—</button>
+      <button id="btn-primary"   onclick="handlePrimary()">Cargando…</button>
     </div>
   </div>
 
@@ -436,22 +452,10 @@
         <span id="info-dropup-heading">Detalle de mesa</span>
       </div>
       <div id="info-dropup-grid">
-        <div class="du-item">
-          <span class="du-label">Zona</span>
-          <span class="du-val" id="dropup-zona">—</span>
-        </div>
-        <div class="du-item">
-          <span class="du-label">Personas</span>
-          <span class="du-val" id="dropup-personas">—</span>
-        </div>
-        <div class="du-item">
-          <span class="du-label">Hora apertura</span>
-          <span class="du-val" id="dropup-apertura">—</span>
-        </div>
-        <div class="du-item">
-          <span class="du-label">Tiempo en mesa</span>
-          <span class="du-val" id="dropup-tiempo">—</span>
-        </div>
+        <div class="du-item"><span class="du-label">Zona</span><span class="du-val" id="dropup-zona">—</span></div>
+        <div class="du-item"><span class="du-label">Personas</span><span class="du-val" id="dropup-personas">—</span></div>
+        <div class="du-item"><span class="du-label">Hora apertura</span><span class="du-val" id="dropup-apertura">—</span></div>
+        <div class="du-item"><span class="du-label">Tiempo en mesa</span><span class="du-val" id="dropup-tiempo">—</span></div>
       </div>
       <div id="info-dropup-sep"></div>
       <button class="du-action" onclick="closeInfoDropUp(); cambiarMesa();">
@@ -497,336 +501,440 @@
 
 <script src="data-manager.js"></script>
 <script>
-  /* ── URL params ── */
-  const params        = new URLSearchParams(location.search);
-  const mesaId        = params.get("mesa")      || "S05";
-  const zona          = params.get("zona")      || "salon";
-  const estadoParam   = params.get("estado")    || "occupied";
-  const personasParam = parseInt(params.get("personas")) || 2;
+/* ══ URL params ══ */
+const params        = new URLSearchParams(location.search);
+const mesaId        = params.get("mesa")      || "S05";
+const zona          = params.get("zona")      || "salon";
+const estadoParam   = params.get("estado")    || "occupied";
+const personasParam = parseInt(params.get("personas")) || 2;
 
-  /* ── State ── */
-  let cart         = [];  // { id, nombre, precio, cantidad }
-  let comandaState = "pending";
-  let mesaEstado   = estadoParam;
+/* ══ App state ══ */
+let cart         = [];   // { id, nombre, precio, cantidad }
+let comandaState = "pending";  // "pending"|"confirmed"|"sent"|"modified"
+let mesaEstado   = estadoParam;
 
-  /* ── Comanda helpers ── */
-  function loadComandaState(id) {
-    try { return JSON.parse(localStorage.getItem("boldPOS_comanda_" + id)) || { estado:"pending", hora:null }; }
-    catch(e) { return { estado:"pending", hora:null }; }
-  }
-  function saveComandaState(id, estado, hora) {
-    localStorage.setItem("boldPOS_comanda_" + id, JSON.stringify({ estado, hora }));
-  }
+/* Dispatcher for secondary button — set by renderActionBar */
+let secondaryAction = null;
+function onSecondary() { if (secondaryAction) secondaryAction(); }
 
-  /* ── Storage helpers ── */
-  function updateProductQty(mId, productId, newQty) {
-    try {
-      const data = JSON.parse(localStorage.getItem("boldPOS_mesas")) || {};
-      if (data[mId] && data[mId].productos) {
-        if (newQty <= 0) {
-          data[mId].productos = data[mId].productos.filter(p => p.id !== productId);
-        } else {
-          const p = data[mId].productos.find(p => p.id === productId);
-          if (p) p.cantidad = newQty;
-        }
-        data[mId].total = data[mId].productos.reduce((s,p) => s + p.precio * p.cantidad, 0);
-        localStorage.setItem("boldPOS_mesas", JSON.stringify(data));
+/* ══ Comanda helpers ══ */
+function loadComandaState(id) {
+  try { return JSON.parse(localStorage.getItem("boldPOS_comanda_" + id)) || { estado:"pending", hora:null }; }
+  catch(e) { return { estado:"pending", hora:null }; }
+}
+function saveComandaState(id, estado, hora) {
+  localStorage.setItem("boldPOS_comanda_" + id, JSON.stringify({ estado, hora }));
+}
+
+/* ══ Storage helpers ══ */
+function updateProductQty(mId, productId, newQty) {
+  try {
+    const data = JSON.parse(localStorage.getItem("boldPOS_mesas")) || {};
+    if (data[mId] && data[mId].productos) {
+      if (newQty <= 0) {
+        data[mId].productos = data[mId].productos.filter(p => p.id !== productId);
+      } else {
+        const p = data[mId].productos.find(p => p.id === productId);
+        if (p) p.cantidad = newQty;
       }
-    } catch(e) {}
-  }
-
-  function setMesaBillRequested(mId) {
-    try {
-      const data = JSON.parse(localStorage.getItem("boldPOS_mesas")) || {};
-      if (data[mId]) {
-        data[mId].estado = "bill_requested";
-        localStorage.setItem("boldPOS_mesas", JSON.stringify(data));
-      }
-    } catch(e) {}
-  }
-
-  /* ── Formatting ── */
-  function fmtApertura(iso) {
-    if (!iso) return "—";
-    const d = new Date(iso);
-    let h = d.getHours();
-    const min = String(d.getMinutes()).padStart(2,"0");
-    const ampm = h >= 12 ? "p.m." : "a.m.";
-    h = h % 12 || 12;
-    return `${h}:${min} ${ampm}`;
-  }
-  function fmtMoney(n) { return "$" + n.toLocaleString("es-CO"); }
-  function escHtml(s)  { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-
-  /* ── Navigation ── */
-  function goBack() { location.href = "venta-mesas.html"; }
-
-  function goToAgregar() {
-    const p = new URLSearchParams({ mesa: mesaId, zona, estado: mesaEstado, origen: "pedido" });
-    location.href = "detalle-mesa.html?" + p.toString();
-  }
-
-  /* ── Render header badge ── */
-  function renderBadge(curEstado) {
-    const badge    = document.getElementById("badge-estado");
-    const badgeTxt = document.getElementById("badge-estado-text");
-
-    if (curEstado === "bill_requested") {
-      badge.className = "badge-estado badge-bill";
-      badgeTxt.textContent = "Cuenta solicitada";
-    } else if (curEstado === "available") {
-      badge.className = "badge-estado badge-available";
-      badgeTxt.textContent = "Disponible";
-    } else {
-      badge.className = "badge-estado badge-occupied";
-      badgeTxt.textContent = "Ocupada";
+      data[mId].total = data[mId].productos.reduce((s,p) => s + p.precio * p.cantidad, 0);
+      localStorage.setItem("boldPOS_mesas", JSON.stringify(data));
     }
+  } catch(e) {}
+}
+
+function setMesaBillRequested(mId) {
+  try {
+    const data = JSON.parse(localStorage.getItem("boldPOS_mesas")) || {};
+    if (data[mId]) {
+      data[mId].estado = "bill_requested";
+      localStorage.setItem("boldPOS_mesas", JSON.stringify(data));
+    }
+  } catch(e) {}
+}
+
+/* ══ Formatting ══ */
+function fmtApertura(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  let h = d.getHours();
+  const min = String(d.getMinutes()).padStart(2,"0");
+  const ampm = h >= 12 ? "p.m." : "a.m.";
+  h = h % 12 || 12;
+  return `${h}:${min} ${ampm}`;
+}
+function fmtHora(iso) {
+  const d = new Date(iso);
+  return d.getHours().toString().padStart(2,"0") + ":" + d.getMinutes().toString().padStart(2,"0");
+}
+function fmtMoney(n) { return "$" + n.toLocaleString("es-CO"); }
+function escHtml(s)  { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ══ Navigation ══ */
+function goBack() { location.href = "venta-mesas.html"; }
+
+function goToAgregar() {
+  const p = new URLSearchParams({ mesa: mesaId, zona, estado: mesaEstado, origen: "pedido" });
+  location.href = "detalle-mesa.html?" + p.toString();
+}
+
+/* ══ Render header badge ══ */
+function renderBadge(curEstado) {
+  const badge    = document.getElementById("badge-estado");
+  const badgeTxt = document.getElementById("badge-estado-text");
+  if (curEstado === "bill_requested") {
+    badge.className  = "badge-estado badge-bill";
+    badgeTxt.textContent = "Cuenta solicitada";
+  } else if (curEstado === "available") {
+    badge.className  = "badge-estado badge-available";
+    badgeTxt.textContent = "Disponible";
+  } else {
+    badge.className  = "badge-estado badge-occupied";
+    badgeTxt.textContent = "Ocupada";
+  }
+}
+
+/* ══ Render info card ══ */
+function renderInfoCard(mesa) {
+  const zonaLabel = { salon:"Salón", terraza:"Terraza", barra:"Barra" };
+  const zText     = zonaLabel[zona] || zona;
+  document.getElementById("du-zona").textContent     = zText;
+  document.getElementById("du-personas").textContent = mesa ? (mesa.personas || "—") + " pers." : "—";
+  document.getElementById("du-apertura").textContent = mesa ? fmtApertura(mesa.horaApertura) : "—";
+  document.getElementById("du-tiempo").textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : "—";
+  document.getElementById("dropup-zona").textContent     = zText;
+  document.getElementById("dropup-personas").textContent = mesa ? (mesa.personas || "—") + " pers." : "—";
+  document.getElementById("dropup-apertura").textContent = mesa ? fmtApertura(mesa.horaApertura) : "—";
+  document.getElementById("dropup-tiempo").textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : "—";
+  renderBadge((mesa && mesa.estado) || mesaEstado);
+}
+
+/* ══ Render action bar ══
+ *
+ *  States:
+ *  DISPONIBLE       → [Abrir mesa] (coral, full)
+ *  PEDIDO_PENDIENTE → [Confirmar pedido] (coral, full, disabled if empty)
+ *  PEDIDO_CONF.     → [Solicitar cuenta] outline-red  [Enviar comanda] coral
+ *  COMANDA_ENVIADA  → tag ✓  [Reenviar comanda] outline-red  [Solicitar cuenta] coral
+ *  COMANDA_AJUSTES  → tag ⚠  [Solicitar cuenta] outline-red  [Reenviar comanda] coral
+ *  CUENTA_SOL.      → [Reenviar comanda] outline-red  [Cobrar mesa] coral
+ */
+function renderActionBar() {
+  const sec       = document.getElementById("btn-secondary");
+  const pri       = document.getElementById("btn-primary");
+  const statusTag = document.getElementById("comanda-status-tag");
+  const mesa      = DataManager.getMesa(mesaId);
+  const curEstado = (mesa && mesa.estado) || mesaEstado;
+  const cs        = loadComandaState(mesaId);
+  comandaState    = cs.estado;
+  const isEmpty   = cart.length === 0;
+
+  // Reset tag
+  statusTag.className = "";
+  statusTag.innerHTML = "";
+
+  // Helper: configure primary as full-width single button
+  function singleBtn(cls, label) {
+    sec.style.display = "none";
+    pri.style.flex    = "unset";
+    pri.style.width   = "100%";
+    pri.className     = cls;
+    pri.innerHTML     = label;
+    secondaryAction   = null;
   }
 
-  /* ── Render info card ── */
-  function renderInfoCard(mesa) {
-    const zonaLabel = { salon:"Salón", terraza:"Terraza", barra:"Barra" };
-    const zText     = zonaLabel[zona] || zona;
-
-    document.getElementById("du-zona").textContent     = zText;
-    document.getElementById("du-personas").textContent = mesa ? (mesa.personas || "—") + " pers." : "—";
-    document.getElementById("du-apertura").textContent = mesa ? fmtApertura(mesa.horaApertura) : "—";
-    document.getElementById("du-tiempo").textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : "—";
-
-    // Sync drop-up
-    document.getElementById("dropup-zona").textContent     = zText;
-    document.getElementById("dropup-personas").textContent = mesa ? (mesa.personas || "—") + " pers." : "—";
-    document.getElementById("dropup-apertura").textContent = mesa ? fmtApertura(mesa.horaApertura) : "—";
-    document.getElementById("dropup-tiempo").textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : "—";
-
-    renderBadge((mesa && mesa.estado) || mesaEstado);
-  }
-
-  /* ── Render action bar ── */
-  function renderActionBar() {
-    const sec       = document.getElementById("btn-secondary");
-    const pri       = document.getElementById("btn-primary");
-    const mesa      = DataManager.getMesa(mesaId);
-    const curEstado = (mesa && mesa.estado) || mesaEstado;
-    const cs        = loadComandaState(mesaId);
-    comandaState    = cs.estado;
-    const isEmpty   = cart.length === 0;
-
-    // DISPONIBLE: single coral "Abrir mesa"
-    if (curEstado === "available") {
-      sec.style.display = "none";
-      pri.style.flex = "unset"; pri.style.width = "100%";
-      pri.className  = "coral";
-      pri.innerHTML  = "Abrir mesa";
-      return;
-    }
-
-    // CUENTA SOLICITADA: single coral "Ir a checkout"
-    if (curEstado === "bill_requested") {
-      sec.style.display = "none";
-      pri.style.flex = "unset"; pri.style.width = "100%";
-      pri.className  = "coral";
-      pri.innerHTML  = "Ir a checkout";
-      return;
-    }
-
-    // Occupied — two buttons
+  // Helper: configure dual-button layout
+  function dualBtn(secCls, secLabel, secFn, priCls, priLabel) {
     sec.style.display = "flex";
-    pri.style.flex    = "1"; pri.style.width = "";
-
-    if (comandaState === "pending") {
-      pri.className = isEmpty ? "coral disabled" : "coral";
-      pri.innerHTML = "Confirmar pedido";
-    } else if (comandaState === "sent") {
-      pri.className = "coral";
-      pri.innerHTML = "Solicitar cuenta";
-    } else if (comandaState === "modified") {
-      pri.className = "yellow";
-      pri.innerHTML = "Reenviar comanda";
-    }
+    sec.className     = secCls;
+    sec.textContent   = secLabel;
+    secondaryAction   = secFn;
+    pri.style.flex    = "1";
+    pri.style.width   = "";
+    pri.className     = priCls;
+    pri.innerHTML     = priLabel;
   }
 
-  /* ── Render product list ── */
-  function renderList() {
-    const list       = document.getElementById("products-list");
-    const emptyEl    = document.getElementById("empty-state");
-    const totalsWrap = document.getElementById("totals-wrap");
-    const emptyAgr   = document.getElementById("btn-empty-agregar");
-    const mesa       = DataManager.getMesa(mesaId);
-    const curEstado  = (mesa && mesa.estado) || mesaEstado;
+  /* DISPONIBLE */
+  if (curEstado === "available") {
+    singleBtn("coral", "Abrir mesa");
+    return;
+  }
 
-    if (!cart.length) {
-      list.style.display        = "none";
-      emptyEl.style.display     = "flex";
-      totalsWrap.style.display  = "none";
-      // Show "Agregar" CTA only when mesa is open (not disponible)
-      emptyAgr.style.display    = curEstado === "available" ? "none" : "flex";
-    } else {
-      list.style.display        = "block";
-      emptyEl.style.display     = "none";
-      totalsWrap.style.display  = "";
-    }
+  /* CUENTA_SOLICITADA */
+  if (curEstado === "bill_requested") {
+    dualBtn("red", "Reenviar comanda", handleReenviarComanda, "coral", "Cobrar mesa");
+    return;
+  }
 
-    list.innerHTML = cart.map(item => {
-      const sub  = fmtMoney(item.precio * item.cantidad);
-      const unit = fmtMoney(item.precio);
-      return `
-        <div class="product-item">
-          <div class="product-row-top">
-            <span class="product-name">${escHtml(item.nombre)}</span>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
-              <span class="qty-num">${item.cantidad}</span>
-              <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
-            </div>
-            <button class="btn-delete" onclick="deleteItem('${item.id}')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#969696" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-          <div class="product-row-bottom">${unit} × ${item.cantidad} = ${sub}</div>
-        </div>`;
-    }).join("");
+  /* Occupied — dispatch on comanda state */
 
+  /* PEDIDO_PENDIENTE */
+  if (comandaState === "pending") {
+    singleBtn(isEmpty ? "coral disabled" : "coral", "Confirmar pedido");
+    return;
+  }
+
+  /* PEDIDO_CONFIRMADO */
+  if (comandaState === "confirmed") {
+    dualBtn("red", "Solicitar cuenta", handleSolicitarCuenta, "coral", "Enviar comanda");
+    return;
+  }
+
+  /* COMANDA_ENVIADA */
+  if (comandaState === "sent") {
+    statusTag.className = "sent-tag";
+    const hora = cs.hora ? " · " + fmtHora(cs.hora) : "";
+    statusTag.innerHTML = `<span>✓</span><span>Comanda enviada${hora}</span>`;
+    dualBtn("red", "Reenviar comanda", handleReenviarComanda, "coral", "Solicitar cuenta");
+    return;
+  }
+
+  /* COMANDA_CON_AJUSTES */
+  if (comandaState === "modified") {
+    statusTag.className = "modified-tag";
+    statusTag.innerHTML = `<span>⚠</span><span>Cambios pendientes</span>`;
+    dualBtn("red", "Solicitar cuenta", handleSolicitarCuenta, "coral", "Reenviar comanda");
+    return;
+  }
+}
+
+/* ══ Render product list ══ */
+function renderList() {
+  const list       = document.getElementById("products-list");
+  const emptyEl    = document.getElementById("empty-state");
+  const totalsWrap = document.getElementById("totals-wrap");
+  const emptyAgr   = document.getElementById("btn-empty-agregar");
+  const mesa       = DataManager.getMesa(mesaId);
+  const curEstado  = (mesa && mesa.estado) || mesaEstado;
+  const isReadOnly = curEstado === "bill_requested";
+
+  if (!cart.length) {
+    list.style.display       = "none";
+    emptyEl.style.display    = "flex";
+    totalsWrap.style.display = "none";
+    emptyAgr.style.display   = curEstado === "available" ? "none" : "flex";
+  } else {
+    list.style.display       = "block";
+    emptyEl.style.display    = "none";
+    totalsWrap.style.display = "";
+  }
+
+  list.innerHTML = cart.map(item => {
+    const sub  = fmtMoney(item.precio * item.cantidad);
+    const unit = fmtMoney(item.precio);
+
+    const controls = isReadOnly
+      ? `<span class="qty-readonly">× ${item.cantidad}</span>`
+      : `<div class="qty-controls">
+           <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+           <span class="qty-num">${item.cantidad}</span>
+           <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+         </div>
+         <button class="btn-delete" onclick="deleteItem('${item.id}')">
+           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#969696" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>
+         </button>`;
+
+    return `
+      <div class="product-item">
+        <div class="product-row-top">
+          <span class="product-name">${escHtml(item.nombre)}</span>
+          ${controls}
+        </div>
+        <div class="product-row-bottom">${unit} × ${item.cantidad} = ${sub}</div>
+      </div>`;
+  }).join("");
+
+  renderTotals();
+  renderActionBar();
+}
+
+/* ══ Render totals ══ */
+function renderTotals() {
+  const subtotal = cart.reduce((s,p) => s + p.precio * p.cantidad, 0);
+  const iva      = Math.round(subtotal * 0.19);
+  document.getElementById("val-subtotal").textContent = fmtMoney(subtotal);
+  document.getElementById("val-iva").textContent      = fmtMoney(iva);
+  document.getElementById("val-total").textContent    = fmtMoney(subtotal + iva);
+}
+
+/* ══ Quantity controls ══ */
+function changeQty(productId, delta) {
+  const item = cart.find(p => p.id === productId);
+  if (!item) return;
+  const newQty = item.cantidad + delta;
+  if (newQty <= 0) { deleteItem(productId); return; }
+  item.cantidad = newQty;
+  updateProductQty(mesaId, productId, newQty);
+  _markModifiedIfSent();
+  renderList();
+}
+function deleteItem(productId) {
+  cart = cart.filter(p => p.id !== productId);
+  updateProductQty(mesaId, productId, 0);
+  _markModifiedIfSent();
+  renderList();
+}
+function _markModifiedIfSent() {
+  if (comandaState === "sent") {
+    const cs = loadComandaState(mesaId);
+    saveComandaState(mesaId, "modified", cs.hora);
+    comandaState = "modified";
+  }
+}
+
+/* ══ Action handlers ══ */
+
+function handlePrimary() {
+  const pri = document.getElementById("btn-primary");
+  if (pri.classList.contains("disabled")) return;
+
+  const mesa      = DataManager.getMesa(mesaId);
+  const curEstado = (mesa && mesa.estado) || mesaEstado;
+  const cs        = loadComandaState(mesaId);
+
+  /* DISPONIBLE → abrir mesa */
+  if (curEstado === "available") {
+    DataManager.abrirMesa(mesaId, zona, personasParam, personasParam);
+    mesaEstado = "occupied";
+    location.href = `detalle-mesa.html?mesa=${mesaId}&zona=${zona}&estado=occupied&origen=nueva`;
+    return;
+  }
+
+  /* CUENTA_SOLICITADA → cobrar */
+  if (curEstado === "bill_requested") {
+    location.href = `checkout.html?mesa=${mesaId}&zona=${zona}&estado=bill_requested`;
+    return;
+  }
+
+  /* PEDIDO_PENDIENTE → confirmar pedido */
+  if (cs.estado === "pending") {
+    saveComandaState(mesaId, "confirmed", null);
+    comandaState = "confirmed";
+    renderList();
+    return;
+  }
+
+  /* PEDIDO_CONFIRMADO → enviar comanda */
+  if (cs.estado === "confirmed") {
+    handleEnviarComanda();
+    return;
+  }
+
+  /* COMANDA_CON_AJUSTES → reenviar */
+  if (cs.estado === "modified") {
+    handleReenviarComanda();
+    return;
+  }
+
+  /* COMANDA_ENVIADA → solicitar cuenta */
+  if (cs.estado === "sent") {
+    handleSolicitarCuenta();
+    return;
+  }
+}
+
+function handleEnviarComanda() {
+  const pri = document.getElementById("btn-primary");
+  pri.innerHTML = '<div class="spinner"></div>';
+  pri.classList.add("disabled");
+  const sec = document.getElementById("btn-secondary");
+  sec.disabled = true;
+  setTimeout(() => {
+    sec.disabled = false;
+    saveComandaState(mesaId, "sent", new Date().toISOString());
+    comandaState = "sent";
+    renderList();
+  }, 1200);
+}
+
+function handleReenviarComanda() {
+  handleEnviarComanda();
+}
+
+function handleSolicitarCuenta() {
+  const cs = loadComandaState(mesaId);
+  setMesaBillRequested(mesaId);
+  mesaEstado = "bill_requested";
+  // Keep existing hora so comanda timestamp survives
+  saveComandaState(mesaId, "sent", cs.hora);
+  renderBadge("bill_requested");
+  renderInfoCard(DataManager.getMesa(mesaId));
+  renderList();
+}
+
+/* ══ Info Drop Up ══ */
+function openInfoDropUp()  { document.getElementById("info-dropup-overlay").classList.add("show"); }
+function closeInfoDropUp() { document.getElementById("info-dropup-overlay").classList.remove("show"); }
+function handleInfoDropUpClick(e) {
+  if (e.target === document.getElementById("info-dropup-overlay")) closeInfoDropUp();
+}
+function cambiarMesa() { alert("Cambio de mesa — próximamente"); }
+
+/* ══ Cancel confirm ══ */
+function abrirConfirmCancelar() { document.getElementById("confirm-overlay").classList.add("show"); }
+function closeCancelConfirm()   { document.getElementById("confirm-overlay").classList.remove("show"); }
+function ejecutarCancelar() {
+  const btn  = document.getElementById("btn-confirm-cancel-action");
+  const text = document.getElementById("btn-cancelar-text");
+  const spin = document.getElementById("spinner-cancelar");
+  btn.disabled = true; spin.style.display = "block"; text.textContent = "Cancelando…";
+  setTimeout(() => {
+    DataManager.cerrarMesa(mesaId);
+    localStorage.removeItem("boldPOS_comanda_" + mesaId);
+    location.href = "venta-mesas.html";
+  }, 900);
+}
+
+/* ══ Clock ══ */
+function updateClock() {
+  const now = new Date();
+  document.getElementById("sb-time").textContent =
+    now.getHours() + ":" + String(now.getMinutes()).padStart(2,"0");
+}
+updateClock(); setInterval(updateClock, 30000);
+
+/* ══ Init ══ */
+(function init() {
+  DataManager.init();
+  document.getElementById("nav-title").textContent = "Mesa " + mesaId;
+
+  /* DISPONIBLE */
+  if (estadoParam === "available") {
+    mesaEstado = "available";
+    renderBadge("available");
+    renderInfoCard(null);
+    renderList();
+    return;
+  }
+
+  const mesa = DataManager.getMesa(mesaId);
+  if (!mesa) {
+    mesaEstado = estadoParam;
+    renderBadge(estadoParam);
+    renderInfoCard(null);
     renderTotals();
     renderActionBar();
+    return;
   }
 
-  /* ── Render totals ── */
-  function renderTotals() {
-    const subtotal = cart.reduce((s,p) => s + p.precio * p.cantidad, 0);
-    const iva      = Math.round(subtotal * 0.19);
-    document.getElementById("val-subtotal").textContent = fmtMoney(subtotal);
-    document.getElementById("val-iva").textContent      = fmtMoney(iva);
-    document.getElementById("val-total").textContent    = fmtMoney(subtotal + iva);
+  mesaEstado = mesa.estado || estadoParam;
+  cart = (mesa.productos || []).map(p => ({
+    id: p.id, nombre: p.nombre, precio: p.precio, cantidad: p.cantidad
+  }));
+
+  const cs = loadComandaState(mesaId);
+  // If mesa is bill_requested but comanda state is pre-sent, elevate to sent
+  if (mesaEstado === "bill_requested" && (cs.estado === "pending" || cs.estado === "confirmed")) {
+    saveComandaState(mesaId, "sent", new Date().toISOString());
   }
+  comandaState = loadComandaState(mesaId).estado;
 
-  /* ── Quantity controls ── */
-  function changeQty(productId, delta) {
-    const item = cart.find(p => p.id === productId);
-    if (!item) return;
-    const newQty = item.cantidad + delta;
-    if (newQty <= 0) { deleteItem(productId); return; }
-    item.cantidad = newQty;
-    updateProductQty(mesaId, productId, newQty);
-    renderList();
-  }
-  function deleteItem(productId) {
-    cart = cart.filter(p => p.id !== productId);
-    updateProductQty(mesaId, productId, 0);
-    renderList();
-  }
-
-  /* ── Primary action ── */
-  function handlePrimary() {
-    const pri       = document.getElementById("btn-primary");
-    if (pri.classList.contains("disabled")) return;
-
-    const mesa      = DataManager.getMesa(mesaId);
-    const curEstado = (mesa && mesa.estado) || mesaEstado;
-    const cs        = loadComandaState(mesaId);
-
-    if (curEstado === "available") {
-      DataManager.abrirMesa(mesaId, zona, personasParam, personasParam);
-      mesaEstado = "occupied";
-      location.href = `detalle-mesa.html?mesa=${mesaId}&zona=${zona}&estado=occupied&origen=nueva`;
-      return;
-    }
-
-    if (curEstado === "bill_requested") {
-      location.href = `checkout.html?mesa=${mesaId}&zona=${zona}&estado=bill_requested`;
-      return;
-    }
-
-    if (cs.estado === "pending" || cs.estado === "modified") {
-      pri.innerHTML = '<div class="spinner"></div>';
-      pri.classList.add("disabled");
-      setTimeout(() => {
-        saveComandaState(mesaId, "sent", new Date().toISOString());
-        comandaState = "sent";
-        renderList();
-      }, 1200);
-      return;
-    }
-
-    if (cs.estado === "sent") {
-      setMesaBillRequested(mesaId);
-      mesaEstado = "bill_requested";
-      saveComandaState(mesaId, "sent", cs.hora);
-      renderBadge("bill_requested");
-      renderInfoCard(DataManager.getMesa(mesaId));
-      renderList();
-      return;
-    }
-  }
-
-  /* ── Info Drop Up ── */
-  function openInfoDropUp()  { document.getElementById("info-dropup-overlay").classList.add("show"); }
-  function closeInfoDropUp() { document.getElementById("info-dropup-overlay").classList.remove("show"); }
-  function handleInfoDropUpClick(e) {
-    if (e.target === document.getElementById("info-dropup-overlay")) closeInfoDropUp();
-  }
-  function cambiarMesa() { alert("Cambio de mesa — próximamente"); }
-
-  /* ── Cancel confirm ── */
-  function abrirConfirmCancelar() { document.getElementById("confirm-overlay").classList.add("show"); }
-  function closeCancelConfirm()   { document.getElementById("confirm-overlay").classList.remove("show"); }
-  function ejecutarCancelar() {
-    const btn  = document.getElementById("btn-confirm-cancel-action");
-    const text = document.getElementById("btn-cancelar-text");
-    const spin = document.getElementById("spinner-cancelar");
-    btn.disabled = true; spin.style.display = "block"; text.textContent = "Cancelando…";
-    setTimeout(() => {
-      DataManager.cerrarMesa(mesaId);
-      localStorage.removeItem("boldPOS_comanda_" + mesaId);
-      location.href = "venta-mesas.html";
-    }, 900);
-  }
-
-  /* ── Clock ── */
-  function updateClock() {
-    const now = new Date();
-    document.getElementById("sb-time").textContent =
-      now.getHours() + ":" + String(now.getMinutes()).padStart(2,"0");
-  }
-  updateClock(); setInterval(updateClock, 30000);
-
-  /* ── Init ── */
-  (function init() {
-    DataManager.init();
-    document.getElementById("nav-title").textContent = "Mesa " + mesaId;
-
-    if (estadoParam === "available") {
-      mesaEstado = "available";
-      renderBadge("available");
-      renderInfoCard(null);
-      renderList();
-      return;
-    }
-
-    const mesa = DataManager.getMesa(mesaId);
-    if (!mesa) {
-      mesaEstado = estadoParam;
-      renderBadge(estadoParam);
-      renderInfoCard(null);
-      renderTotals();
-      renderActionBar();
-      return;
-    }
-
-    mesaEstado = mesa.estado || estadoParam;
-    cart       = (mesa.productos || []).map(p => ({ id:p.id, nombre:p.nombre, precio:p.precio, cantidad:p.cantidad }));
-
-    const cs = loadComandaState(mesaId);
-    if (mesaEstado === "bill_requested" && cs.estado === "pending") {
-      saveComandaState(mesaId, "sent", new Date().toISOString());
-    }
-    comandaState = loadComandaState(mesaId).estado;
-
-    renderInfoCard(mesa);
-    renderList();
-  })();
+  renderInfoCard(mesa);
+  renderList();
+})();
 </script>
 </body>
 </html>
