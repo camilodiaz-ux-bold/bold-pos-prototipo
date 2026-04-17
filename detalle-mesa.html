@@ -889,14 +889,16 @@
   <div id="search-bar-wrap">
     <div id="search-and-badge">
       <div id="search-bar">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
-          <rect x="2"    y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
-          <rect x="5.5"  y="4" width="3"   height="16" rx="0.5" fill="#606060"/>
-          <rect x="10.5" y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
-          <rect x="14"   y="4" width="2"   height="16" rx="0.5" fill="#606060"/>
-          <rect x="18"   y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
-          <rect x="21"   y="4" width="1"   height="16" rx="0.5" fill="#606060"/>
-        </svg>
+        <button id="btn-scan-trigger" onclick="openScanner()" aria-label="Escanear código" style="border:none;background:transparent;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="2"    y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
+            <rect x="5.5"  y="4" width="3"   height="16" rx="0.5" fill="#606060"/>
+            <rect x="10.5" y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
+            <rect x="14"   y="4" width="2"   height="16" rx="0.5" fill="#606060"/>
+            <rect x="18"   y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
+            <rect x="21"   y="4" width="1"   height="16" rx="0.5" fill="#606060"/>
+          </svg>
+        </button>
         <input id="search-input" type="text" placeholder="Buscar productos" oninput="handleSearch(this.value)" autocomplete="off" />
         <button id="btn-clear" onclick="clearSearch()" aria-label="Limpiar búsqueda">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -1412,13 +1414,40 @@ function syncCartBar() {
   }
 }
 
+/* ── mesa_{ID} persistence helpers ── */
+function loadMsState(id) {
+  try { return JSON.parse(localStorage.getItem('mesa_' + id)) || {}; } catch(e) { return {}; }
+}
+function saveMsState(id, patch) {
+  const s = loadMsState(id);
+  localStorage.setItem('mesa_' + id, JSON.stringify({ ...s, ...patch }));
+}
+
 function goBackToPedido() {
-  const p = new URLSearchParams(location.search);
-  const params = new URLSearchParams({
-    mesa:   currentMesaId || p.get("mesa") || "S03",
-    zona:   p.get("zona")   || "salon",
-    estado: p.get("estado") || mesaState
-  });
+  const p      = new URLSearchParams(location.search);
+  const mesaId = currentMesaId || p.get("mesa") || "S03";
+  const zona   = p.get("zona") || "salon";
+
+  // Compute new comanda estado based on current cart + previous state
+  const ms        = loadMsState(mesaId);
+  const totalQty  = Object.values(cart).reduce((a, b) => a + b, 0);
+  let nuevoEstado = ms.estado || 'SIN_PRODUCTOS';
+
+  if (totalQty > 0) {
+    if (nuevoEstado === 'DISPONIBLE' || nuevoEstado === 'SIN_PRODUCTOS') {
+      nuevoEstado = 'PEDIDO_PENDIENTE';
+    } else if (nuevoEstado === 'COMANDA_ENVIADA') {
+      nuevoEstado = 'COMANDA_CON_AJUSTES';
+    }
+    // PEDIDO_PENDIENTE, PEDIDO_CONFIRMADO, COMANDA_CON_AJUSTES, CUENTA_SOLICITADA stay as-is
+  } else {
+    // No products in cart — revert to SIN_PRODUCTOS unless account already requested
+    if (nuevoEstado !== 'CUENTA_SOLICITADA') nuevoEstado = 'SIN_PRODUCTOS';
+  }
+
+  saveMsState(mesaId, { estado: nuevoEstado });
+
+  const params = new URLSearchParams({ mesa: mesaId, zona });
   location.href = "detalle-pedido.html?" + params.toString();
 }
 
@@ -1710,6 +1739,7 @@ function ejecutarCancelar() {
     if (currentMesaId) {
       DataManager.cerrarMesa(currentMesaId);
       localStorage.removeItem("boldPOS_comanda_" + currentMesaId);
+      localStorage.removeItem("mesa_" + currentMesaId);
     }
     location.href = "venta-mesas.html";
   }, 900);
