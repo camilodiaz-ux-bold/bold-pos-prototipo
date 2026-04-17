@@ -1445,7 +1445,14 @@ function goBackToPedido() {
     if (nuevoEstado !== 'CUENTA_SOLICITADA') nuevoEstado = 'SIN_PRODUCTOS';
   }
 
-  saveMsState(mesaId, { estado: nuevoEstado });
+  // Convert cart dict {id: qty} to products array for mesa_{ID}
+  const productos = Object.entries(cart).map(([id, qty]) => {
+    const p = PRODUCTS.find(x => x.id === id);
+    return p ? { id: p.id, nombre: p.name, precio: p.price, cantidad: qty } : null;
+  }).filter(Boolean);
+
+  // Write full state to mesa_{ID} BEFORE navigating (source of truth)
+  saveMsState(mesaId, { estado: nuevoEstado, productos });
 
   const params = new URLSearchParams({ mesa: mesaId, zona });
   location.href = "detalle-pedido.html?" + params.toString();
