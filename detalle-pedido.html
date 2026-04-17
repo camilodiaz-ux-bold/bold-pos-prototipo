@@ -135,20 +135,30 @@
     .empty-icon { color: #CBD5E1; }
     .empty-label { font-size: 15px; font-weight: 600; color: var(--black-60); text-align: center; }
     #btn-empty-agregar {
-      margin-top: 6px; height: 48px; padding: 0 28px;
-      border-radius: var(--radius-pill); border: none;
-      background: var(--coral-100); color: var(--black-0);
+      margin-top: 6px; height: 44px; padding: 0 28px;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid var(--coral-100); background: transparent;
+      color: var(--coral-100);
       font-family: var(--font); font-size: 14px; font-weight: 600;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: opacity .15s; -webkit-tap-highlight-color: transparent;
     }
-    #btn-empty-agregar:active { opacity: 0.85; }
+    #btn-empty-agregar:active { opacity: 0.7; }
 
-    /* Product list */
-    #products-list {
-      background: var(--black-0); border-radius: var(--radius-card);
-      overflow: hidden; box-shadow: var(--shadow-blue-8); padding: 0 14px;
+    /* "＋ Agregar productos" below product list */
+    #btn-agregar-mas {
+      display: none; margin-top: 12px; height: 44px; width: 100%;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid var(--coral-100); background: transparent;
+      color: var(--coral-100);
+      font-family: var(--font); font-size: 14px; font-weight: 600;
+      cursor: pointer; align-items: center; justify-content: center;
+      transition: opacity .15s; -webkit-tap-highlight-color: transparent;
     }
+    #btn-agregar-mas:active { opacity: 0.7; }
+
+    /* Product list — no card wrapper, items render directly */
+    #products-list { padding: 0; }
     .product-item {
       background: var(--black-0); padding: 12px 0;
       display: flex; flex-direction: column; gap: 4px;
@@ -413,9 +423,10 @@
         <line x1="9"  y1="16" x2="13" y2="16"/>
       </svg>
       <span class="empty-label">Sin productos aún</span>
-      <button id="btn-empty-agregar" onclick="goToAgregar()">Agregar productos</button>
+      <button id="btn-empty-agregar" onclick="goToAgregar()">＋ Agregar productos</button>
     </div>
     <div id="products-list" style="display:none"></div>
+    <button id="btn-agregar-mas" onclick="goToAgregar()">＋ Agregar productos</button>
   </div>
 
   <!-- Fixed footer: totals + status tag + buttons -->
@@ -705,19 +716,23 @@ function renderList() {
   const emptyEl    = document.getElementById("empty-state");
   const totalsWrap = document.getElementById("totals-wrap");
   const emptyAgr   = document.getElementById("btn-empty-agregar");
+  const agrarMas   = document.getElementById("btn-agregar-mas");
   const mesa       = DataManager.getMesa(mesaId);
   const curEstado  = (mesa && mesa.estado) || mesaEstado;
   const isReadOnly = curEstado === "bill_requested";
 
   if (!cart.length) {
-    list.style.display       = "none";
-    emptyEl.style.display    = "flex";
-    totalsWrap.style.display = "none";
-    emptyAgr.style.display   = curEstado === "available" ? "none" : "flex";
+    list.style.display        = "none";
+    emptyEl.style.display     = "flex";
+    totalsWrap.style.display  = "none";
+    emptyAgr.style.display    = isReadOnly ? "none" : "flex";
+    agrarMas.style.display    = "none";
   } else {
-    list.style.display       = "block";
-    emptyEl.style.display    = "none";
-    totalsWrap.style.display = "";
+    list.style.display        = "block";
+    emptyEl.style.display     = "none";
+    totalsWrap.style.display  = "";
+    emptyAgr.style.display    = "none";
+    agrarMas.style.display    = isReadOnly ? "none" : "flex";
   }
 
   list.innerHTML = cart.map(item => {
