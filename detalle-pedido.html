@@ -917,11 +917,11 @@ function ejecutarCancelar() {
     horaComanda = ms.horaComanda || null;
     // Products come from mesa_{ID} first; fall back to DataManager
     if (ms.productos && ms.productos.length > 0) {
-      cart = ms.productos.map(p => ({ id: p.id, nombre: p.nombre, precio: p.precio, cantidad: p.cantidad }));
+      cart = ms.productos.map(p => ({ ...p }));
     } else {
       const dm = DataManager.getMesa(mesaId);
       cart = (dm && dm.productos && dm.productos.length > 0)
-        ? dm.productos.map(p => ({ id: p.id, nombre: p.nombre, precio: p.precio, cantidad: p.cantidad }))
+        ? dm.productos.map(p => ({ ...p }))
         : [];
     }
   } else {
@@ -938,7 +938,7 @@ function ejecutarCancelar() {
       const oldCs = (() => {
         try { return JSON.parse(localStorage.getItem('boldPOS_comanda_' + mesaId)) || {}; } catch(e) { return {}; }
       })();
-      cart = (dm.productos || []).map(p => ({ id: p.id, nombre: p.nombre, precio: p.precio, cantidad: p.cantidad }));
+      cart = (dm.productos || []).map(p => ({ ...p }));
       if (oldCs.estado === 'confirmed') {
         estado = ESTADOS.PEDIDO_CONFIRMADO;
       } else if (oldCs.estado === 'sent') {
@@ -960,6 +960,14 @@ function ejecutarCancelar() {
 
   render();
 })();
+
+window.addEventListener('pageshow', function() {
+  const ms = loadMsState(mesaId);
+  if (ms && ms.productos) {
+    cart = ms.productos.map(p => ({ ...p }));
+  }
+  render();
+});
 
 updateClock(); setInterval(updateClock, 30000);
 </script>
