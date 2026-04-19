@@ -36,108 +36,36 @@ const DataManager = (function () {
     const demos = [
       // ── Salón ────────────────────────────────────────
       {
-        id: "S01", zona: "salon", capacidad: 2, estado: "occupied",
-        personas: 2, horaApertura: new Date(now - 105 * min).toISOString(),
+        id: "S01", zona: "salon", capacidad: 2, estado: "bill_requested",
+        personas: 2, horaApertura: new Date(now - 95 * min).toISOString(),
         productos: [
-          { id: "EF01", nombre: "Carpaccio de Res",    precio: 22000, cantidad: 1, categoria: "entradas-frias" },
-          { id: "BE06", nombre: "Copa de Vino",         precio:  6000, cantidad: 1, categoria: "bebidas" },
+          { id: "EF01", nombre: "Carpaccio de Res", precio: 22000, cantidad: 1, categoria: "entradas-frias" },
+          { id: "BE06", nombre: "Copa de Vino",      precio:  6000, cantidad: 1, categoria: "bebidas" },
+        ],
+      },
+      {
+        id: "S03", zona: "salon", capacidad: 4, estado: "occupied",
+        personas: 3, horaApertura: new Date(now - 40 * min).toISOString(),
+        productos: [
+          { id: "CA04", nombre: "Pollo a la Plancha", precio: 42000, cantidad: 2, categoria: "carnes" },
+          { id: "BE01", nombre: "Limonada de Coco",   precio: 14000, cantidad: 2, categoria: "bebidas" },
         ],
       },
       {
         id: "S04", zona: "salon", capacidad: 4, estado: "occupied",
-        personas: 4, horaApertura: new Date(now - 140 * min).toISOString(),
+        personas: 4, horaApertura: new Date(now - 75 * min).toISOString(),
         productos: [
           { id: "PR01", nombre: "Spaghetti Bolognese", precio: 38000, cantidad: 2, categoria: "pastas" },
-          { id: "CA04", nombre: "Pollo a la Plancha",  precio: 42000, cantidad: 1, categoria: "carnes" },
-          { id: "BE05", nombre: "Cerveza Artesanal",   precio: 16000, cantidad: 1, categoria: "bebidas" },
-        ],
-      },
-      {
-        id: "S05", zona: "salon", capacidad: 4, estado: "bill_requested",
-        personas: 4, horaApertura: new Date(now - 185 * min).toISOString(),
-        productos: [
-          { id: "CA01", nombre: "Lomo al Trapo",       precio: 68000, cantidad: 2, categoria: "carnes" },
-          { id: "PR03", nombre: "Risotto de Hongos",   precio: 42000, cantidad: 1, categoria: "pastas" },
-          { id: "PO01", nombre: "Tiramisú",             precio: 22000, cantidad: 2, categoria: "postres" },
-          { id: "BE06", nombre: "Copa de Vino",         precio: 22000, cantidad: 3, categoria: "bebidas" },
-        ],
-      },
-      {
-        id: "S06", zona: "salon", capacidad: 4, estado: "occupied",
-        personas: 2, horaApertura: new Date(now - 45 * min).toISOString(),
-        productos: [
-          { id: "EF02", nombre: "Ceviche de Camarón",  precio: 32000, cantidad: 1, categoria: "entradas-frias" },
-          { id: "BE01", nombre: "Limonada de Coco",     precio: 14000, cantidad: 1, categoria: "bebidas" },
-        ],
-      },
-      {
-        id: "S09", zona: "salon", capacidad: 4, estado: "occupied",
-        personas: 4, horaApertura: new Date(now - 175 * min).toISOString(),
-        productos: [
-          { id: "PE01", nombre: "Salmón a la Plancha", precio: 62000, cantidad: 2, categoria: "pescados" },
-          { id: "PR06", nombre: "Risotto de Mariscos", precio: 52000, cantidad: 1, categoria: "pastas" },
-          { id: "BE06", nombre: "Copa de Vino",         precio: 22000, cantidad: 2, categoria: "bebidas" },
-        ],
-      },
-      {
-        id: "S10", zona: "salon", capacidad: 4, estado: "bill_requested",
-        personas: 4, horaApertura: new Date(now - 130 * min).toISOString(),
-        productos: [
-          { id: "CA03", nombre: "Filete Mignon",        precio: 78000, cantidad: 2, categoria: "carnes" },
-          { id: "PE04", nombre: "Pulpo a la Gallega",   precio: 68000, cantidad: 1, categoria: "pescados" },
-          { id: "PO03", nombre: "Volcán de Chocolate",  precio: 24000, cantidad: 2, categoria: "postres" },
-          { id: "BE06", nombre: "Copa de Vino",         precio: 22000, cantidad: 2, categoria: "bebidas" },
-        ],
-      },
-      {
-        id: "S11", zona: "salon", capacidad: 4, estado: "occupied",
-        personas: 3, horaApertura: new Date(now - 35 * min).toISOString(),
-        productos: [
-          { id: "EC02", nombre: "Calamares a la Romana", precio: 26000, cantidad: 1, categoria: "entradas-calientes" },
-          { id: "CA02", nombre: "Costilla BBQ",           precio: 58000, cantidad: 1, categoria: "carnes" },
-        ],
-      },
-      {
-        id: "S13", zona: "salon", capacidad: 4, estado: "occupied",
-        personas: 4, horaApertura: new Date(now - 110 * min).toISOString(),
-        productos: [
-          { id: "PR05", nombre: "Lasaña de la Casa",    precio: 40000, cantidad: 2, categoria: "pastas" },
-          { id: "BE05", nombre: "Cerveza Artesanal",    precio: 16000, cantidad: 4, categoria: "bebidas" },
-        ],
-      },
-      {
-        id: "S15", zona: "salon", capacidad: 2, estado: "occupied",
-        personas: 2, horaApertura: new Date(now - 22 * min).toISOString(),
-        productos: [
-          { id: "EF03", nombre: "Ensalada Caprese",     precio: 22000, cantidad: 1, categoria: "entradas-frias" },
-          { id: "BE03", nombre: "Agua Mineral",          precio:  6000, cantidad: 2, categoria: "bebidas" },
+          { id: "BE05", nombre: "Cerveza Artesanal",   precio: 16000, cantidad: 2, categoria: "bebidas" },
         ],
       },
       // ── Terraza ──────────────────────────────────────
       {
-        id: "T03", zona: "terraza", capacidad: 6, estado: "occupied",
-        personas: 4, horaApertura: new Date(now - 35 * min).toISOString(),
-        productos: [
-          { id: "EC04", nombre: "Bruschetta al Pomodoro", precio: 18000, cantidad: 2, categoria: "entradas-calientes" },
-          { id: "CA04", nombre: "Pollo a la Plancha",      precio: 42000, cantidad: 2, categoria: "carnes" },
-        ],
-      },
-      {
         id: "T05", zona: "terraza", capacidad: 2, estado: "bill_requested",
         personas: 2, horaApertura: new Date(now - 55 * min).toISOString(),
         productos: [
-          { id: "PR02", nombre: "Fettuccine Alfredo",   precio: 36000, cantidad: 1, categoria: "pastas" },
-          { id: "BE06", nombre: "Copa de Vino",          precio: 22000, cantidad: 2, categoria: "bebidas" },
-        ],
-      },
-      // ── Barra ────────────────────────────────────────
-      {
-        id: "B01", zona: "barra", capacidad: 7, estado: "occupied",
-        personas: 5, horaApertura: new Date(now - 152 * min).toISOString(),
-        productos: [
-          { id: "BE05", nombre: "Cerveza Artesanal",    precio: 16000, cantidad: 4, categoria: "bebidas" },
-          { id: "EC03", nombre: "Croquetas de Jamón",   precio: 20000, cantidad: 2, categoria: "entradas-calientes" },
-          { id: "EC06", nombre: "Patacones con Hogao",  precio: 16000, cantidad: 2, categoria: "entradas-calientes" },
+          { id: "PR02", nombre: "Fettuccine Alfredo", precio: 36000, cantidad: 1, categoria: "pastas" },
+          { id: "BE06", nombre: "Copa de Vino",        precio: 22000, cantidad: 2, categoria: "bebidas" },
         ],
       },
     ];
@@ -222,6 +150,24 @@ const DataManager = (function () {
     save(data);
   }
 
+  function liberarMesa(mesaId) {
+    cerrarMesa(mesaId);
+  }
+
+  function actualizarEstadoMesa(mesaId, estadoDM, productos) {
+    const data = load();
+    if (!data[mesaId]) return;
+    data[mesaId].estado = estadoDM;
+    if (productos && productos.length > 0) {
+      data[mesaId].productos = productos.map(p => ({
+        id: p.id, nombre: p.nombre, precio: p.precio,
+        cantidad: p.cantidad, categoria: p.categoria || ''
+      }));
+      data[mesaId].total = productos.reduce((s, p) => s + p.precio * p.cantidad, 0);
+    }
+    save(data);
+  }
+
   function getTotal(mesaId) {
     const mesa = getMesa(mesaId);
     if (!mesa) return 0;
@@ -229,6 +175,10 @@ const DataManager = (function () {
   }
 
   function reset() {
+    // Clear comanda/mesa state keys alongside main key
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('mesa_') || k.startsWith('boldPOS_comanda_'))
+      .forEach(k => localStorage.removeItem(k));
     localStorage.removeItem(KEY);
     init();
     location.reload();
@@ -243,6 +193,8 @@ const DataManager = (function () {
     quitarProducto,
     solicitarCuenta,
     cerrarMesa,
+    liberarMesa,
+    actualizarEstadoMesa,
     getTotal,
     calcTime,
     fmtAmount,

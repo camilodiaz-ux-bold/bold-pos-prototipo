@@ -721,6 +721,17 @@ function render() {
 function transicion(nuevoEstado, patch) {
   estado = nuevoEstado;
   saveMsState(mesaId, { estado, horaComanda, productos: cart, ...patch });
+
+  // Sync DataManager (boldPOS_mesas) so venta-mesas.html shows the right status
+  if (nuevoEstado === ESTADOS.DISPONIBLE) {
+    DataManager.liberarMesa(mesaId);
+  } else if (nuevoEstado === ESTADOS.CUENTA_SOLICITADA) {
+    DataManager.actualizarEstadoMesa(mesaId, 'bill_requested', cart);
+  } else {
+    // SIN_PRODUCTOS, PEDIDO_PENDIENTE, PEDIDO_CONFIRMADO, COMANDA_ENVIADA, COMANDA_CON_AJUSTES
+    DataManager.actualizarEstadoMesa(mesaId, 'occupied', cart);
+  }
+
   render();
 }
 

@@ -1454,6 +1454,9 @@ function goBackToPedido() {
   // Write full state to mesa_{ID} BEFORE navigating (source of truth)
   saveMsState(mesaId, { estado: nuevoEstado, productos });
 
+  // Sync DataManager so venta-mesas.html reflects the updated products
+  DataManager.actualizarEstadoMesa(mesaId, 'occupied', productos);
+
   const params = new URLSearchParams({ mesa: mesaId, zona });
   location.href = "detalle-pedido.html?" + params.toString();
 }
