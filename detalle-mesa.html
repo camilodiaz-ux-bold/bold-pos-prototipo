@@ -93,13 +93,13 @@
       gap: 0;
     }
     .nav-title-sub {
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--black-60);
-      line-height: 13px;
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--blue-100);
+      line-height: 20px;
     }
     .nav-title-main {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--blue-100);
       line-height: 20px;
@@ -169,18 +169,42 @@
     #estado-badge-wrap {
       display: inline-flex;
       align-items: center;
-      gap: 2px;
       flex-shrink: 0;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
-    #btn-badge-dots {
-      width: 28px; height: 28px;
-      border: none; background: transparent;
-      cursor: pointer; padding: 0;
-      display: flex; align-items: center; justify-content: center;
+    #tag-chevron {
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: transform 200ms ease; flex-shrink: 0;
+    }
+    #estado-badge-wrap.open #tag-chevron { transform: rotate(180deg); }
+
+    /* ─── Inline info panel ─── */
+    #info-panel {
+      display: none;
+      margin: 8px 16px 0;
+      background: var(--black-0);
+      border-radius: 12px;
+      padding: 12px 14px;
+      flex-direction: column;
+      gap: 8px;
       flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
+    }
+    #info-panel.show { display: flex; }
+    .info-panel-row {
+      display: flex;
+      align-items: center;
+      height: 16px;
+      gap: 8px;
+    }
+    .info-panel-label {
+      flex: 1;
+      font-size: 12px; font-weight: 400; color: var(--black-100); line-height: 16px;
+    }
+    .info-panel-val {
+      flex: 1;
+      font-size: 12px; font-weight: 500; color: var(--black-100);
+      line-height: 16px; text-align: right; white-space: nowrap;
     }
     #search-input {
       flex: 1;
@@ -906,20 +930,38 @@
           </svg>
         </button>
       </div>
-      <!-- BADGE DE ESTADO -->
-      <div id="estado-badge-wrap" onclick="openInfoDropUp()" aria-label="Info y acciones de mesa">
+      <!-- BADGE DE ESTADO con chevron -->
+      <div id="estado-badge-wrap" onclick="toggleInfoPanel()" aria-label="Info de mesa">
         <div id="tag-estado">
           <span class="tag-pulse-dot" id="tag-pulse"></span>
           <span id="tag-estado-text">Ocupada</span>
+          <span id="tag-chevron">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="#FF2947" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </div>
-        <button id="btn-badge-dots" aria-label="Más acciones" onclick="openInfoDropUp()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <circle cx="5"  cy="12" r="1.5" fill="#606060"/>
-            <circle cx="12" cy="12" r="1.5" fill="#606060"/>
-            <circle cx="19" cy="12" r="1.5" fill="#606060"/>
-          </svg>
-        </button>
       </div>
+    </div>
+  </div>
+
+  <!-- INLINE INFO PANEL -->
+  <div id="info-panel">
+    <div class="info-panel-row">
+      <span class="info-panel-label">Zona</span>
+      <span class="info-panel-val" id="panel-zona">—</span>
+    </div>
+    <div class="info-panel-row">
+      <span class="info-panel-label">Personas en mesa</span>
+      <span class="info-panel-val" id="panel-personas">—</span>
+    </div>
+    <div class="info-panel-row">
+      <span class="info-panel-label">Hora apertura</span>
+      <span class="info-panel-val" id="panel-apertura">—</span>
+    </div>
+    <div class="info-panel-row">
+      <span class="info-panel-label">Tiempo en mesa</span>
+      <span class="info-panel-val" id="panel-tiempo">—</span>
     </div>
   </div>
 
@@ -1662,6 +1704,21 @@ function _pagar() {
 /* ══════════════════════════════════════════
    INFO DROP UP (badge)
 ══════════════════════════════════════════ */
+function toggleInfoPanel() {
+  const wrap  = document.getElementById('estado-badge-wrap');
+  const panel = document.getElementById('info-panel');
+  const isOpen = wrap.classList.toggle('open');
+  panel.classList.toggle('show', isOpen);
+  if (isOpen) {
+    const zonaLabel = { salon:'Salón', terraza:'Terraza', barra:'Barra' };
+    const mesa = DataManager.getMesa(mesaId);
+    document.getElementById('panel-zona').textContent      = zonaLabel[zona] || zona;
+    document.getElementById('panel-personas').textContent  = mesa ? (mesa.personas || '—') + ' pers.' : '—';
+    document.getElementById('panel-apertura').textContent  = mesa ? fmtHora(mesa.horaApertura) : '—';
+    document.getElementById('panel-tiempo').textContent    = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : '—';
+  }
+}
+
 function openInfoDropUp() {
   // Sync info from existing info-card spans
   document.getElementById("du-zona").textContent     = document.getElementById("info-zona").textContent;
