@@ -46,8 +46,8 @@
       border-radius: 8px; transition: background .12s;
     }
     #btn-back:active { background: var(--blue-10); }
-    #nav-title-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-    #nav-title { font-size: 16px; font-weight: 700; color: var(--blue-100); line-height: 20px; }
+    #nav-title-group { flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
+    #nav-title { font-size: 16px; font-weight: 700; color: var(--blue-100); line-height: 20px; white-space: nowrap; }
     #nav-spacer { width: 32px; flex-shrink: 0; }
 
     /* ─── Badge de estado ─── */
@@ -265,16 +265,22 @@
     #info-dropup-sheet { width: 100%; background: var(--black-0); border-radius: 24px 24px 0 0; padding: 8px 0 32px; transform: translateY(100%); transition: transform 200ms ease; }
     #info-dropup-overlay.show #info-dropup-sheet { transform: translateY(0); }
     #info-dropup-handle { width: 36px; height: 4px; background: #D1D5DB; border-radius: 2px; margin: 0 auto 16px; }
-    #info-dropup-title-row { padding: 0 20px 14px; }
+    #info-dropup-title-row { padding: 0 20px 14px; display: flex; align-items: center; justify-content: space-between; }
     #info-dropup-heading { font-size: 16px; font-weight: 700; color: var(--blue-100); }
-    #info-dropup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 8px; padding: 0 20px 16px; }
+    #btn-dropup-close { width: 28px; height: 28px; border: none; background: var(--black-10); border-radius: 100px; font-size: 14px; font-weight: 600; color: var(--black-60); cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background .12s; }
+    #btn-dropup-close:active { background: #e0e0e0; }
+    #info-dropup-mesa-name { text-align: center; font-size: 24px; font-weight: 700; color: var(--blue-100); line-height: 32px; padding: 0 20px 4px; }
+    #info-dropup-zona-label { text-align: center; font-size: 13px; font-weight: 400; color: var(--black-60); line-height: 20px; padding: 0 20px 20px; }
+    #info-dropup-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px 8px; padding: 0 20px 20px; }
     .du-item { display: flex; flex-direction: column; gap: 2px; }
     .du-label { font-size: 11px; font-weight: 400; color: var(--black-40); line-height: 14px; }
     .du-val   { font-size: 13px; font-weight: 600; color: var(--black-100); line-height: 18px; }
-    #info-dropup-sep { height: 1px; background: rgba(0,0,0,.07); margin: 0 20px 8px; }
-    .du-action { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 20px; border: none; background: transparent; font-family: var(--font); font-size: 15px; font-weight: 500; color: var(--black-100); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; }
-    .du-action:active { background: var(--blue-10); }
-    .du-action.du-action-red { color: #FF2947; }
+    #info-dropup-sep { height: 1px; background: rgba(0,0,0,.07); margin: 0 20px 20px; }
+    #info-dropup-actions { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+    #du-btn-primary { width: 100%; height: 48px; border-radius: var(--radius-pill); border: none; background: var(--coral-100); color: var(--black-0); font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(255,41,71,.25); transition: opacity .15s; -webkit-tap-highlight-color: transparent; }
+    #du-btn-primary:active { opacity: 0.85; }
+    #du-btn-liberar { width: 100%; height: 44px; border: none; background: transparent; font-family: var(--font); font-size: 14px; font-weight: 600; color: #E8194B; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; -webkit-tap-highlight-color: transparent; transition: opacity .15s; }
+    #du-btn-liberar:active { opacity: 0.7; }
 
     /* ─── Confirm modal ─── */
     #confirm-overlay { display: none; position: absolute; inset: 0; z-index: 350; background: rgba(0,0,0,.5); align-items: center; justify-content: center; padding: 24px; }
@@ -443,29 +449,21 @@
     <div id="info-dropup-sheet">
       <div id="info-dropup-handle"></div>
       <div id="info-dropup-title-row">
-        <span id="info-dropup-heading">Detalle de mesa</span>
+        <span id="info-dropup-heading">Detalle de la mesa</span>
+        <button id="btn-dropup-close" onclick="closeInfoDropUp()" aria-label="Cerrar">✕</button>
       </div>
+      <div id="info-dropup-mesa-name">—</div>
+      <div id="info-dropup-zona-label">—</div>
       <div id="info-dropup-grid">
-        <div class="du-item"><span class="du-label">Zona</span><span class="du-val" id="dropup-zona">—</span></div>
         <div class="du-item"><span class="du-label">Personas</span><span class="du-val" id="dropup-personas">—</span></div>
         <div class="du-item"><span class="du-label">Hora apertura</span><span class="du-val" id="dropup-apertura">—</span></div>
         <div class="du-item"><span class="du-label">Tiempo en mesa</span><span class="du-val" id="dropup-tiempo">—</span></div>
       </div>
       <div id="info-dropup-sep"></div>
-      <button class="du-action" onclick="closeInfoDropUp(); cambiarMesa();">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M5 12h14M15 6l6 6-6 6" stroke="#1e1e1e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Cambiar mesa
-      </button>
-      <button class="du-action du-action-red" onclick="closeInfoDropUp(); abrirConfirmCancelar();">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <polyline points="3 6 5 6 21 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M10 11v6M14 11v6" stroke="#FF2947" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-        Cancelar y liberar mesa
-      </button>
+      <div id="info-dropup-actions">
+        <button id="du-btn-primary" onclick="handleDuPrimary()">Cambiar a otra mesa</button>
+        <button id="du-btn-liberar" onclick="closeInfoDropUp(); abrirConfirmCancelar();">Cancelar y liberar mesa</button>
+      </div>
     </div>
   </div>
 
@@ -616,7 +614,9 @@ function renderInfoCard() {
   document.getElementById('du-personas').textContent = mesa ? (mesa.personas || '—') + ' pers.' : '—';
   document.getElementById('du-apertura').textContent = mesa ? fmtApertura(mesa.horaApertura) : '—';
   document.getElementById('du-tiempo').textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : '—';
-  document.getElementById('dropup-zona').textContent     = zonaLabel[zona] || zona;
+  // Drop Up fields
+  document.getElementById('info-dropup-mesa-name').textContent  = 'Mesa ' + mesaId;
+  document.getElementById('info-dropup-zona-label').textContent = 'Zona: ' + (zonaLabel[zona] || zona);
   document.getElementById('dropup-personas').textContent = mesa ? (mesa.personas || '—') + ' pers.' : '—';
   document.getElementById('dropup-apertura').textContent = mesa ? fmtApertura(mesa.horaApertura) : '—';
   document.getElementById('dropup-tiempo').textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : '—';
@@ -898,10 +898,26 @@ function markModifiedIfSent() {
 }
 
 /* ══ Info Drop Up ══ */
-function openInfoDropUp()  { el('info-dropup-overlay').classList.add('show'); }
+function openInfoDropUp() {
+  const btn = el('du-btn-primary');
+  if (estado === ESTADOS.CUENTA_SOLICITADA) {
+    btn.textContent = 'Volver a ocupada';
+  } else {
+    btn.textContent = 'Cambiar a otra mesa';
+  }
+  el('info-dropup-overlay').classList.add('show');
+}
 function closeInfoDropUp() { el('info-dropup-overlay').classList.remove('show'); }
 function handleInfoDropUpClick(e) { if (e.target === el('info-dropup-overlay')) closeInfoDropUp(); }
-function cambiarMesa() { alert('Cambio de mesa — próximamente'); }
+function handleDuPrimary() {
+  if (estado === ESTADOS.CUENTA_SOLICITADA) {
+    closeInfoDropUp();
+    transicion(ESTADOS.COMANDA_ENVIADA);
+  } else {
+    closeInfoDropUp();
+    alert('Cambio de mesa — próximamente');
+  }
+}
 
 /* ══ Cancel confirm ══ */
 function abrirConfirmCancelar() { el('confirm-overlay').classList.add('show'); }
