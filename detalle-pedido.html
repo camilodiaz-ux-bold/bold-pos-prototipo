@@ -199,15 +199,6 @@
 
     .product-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     .product-card-price { flex: 1; font-size: 14px; font-weight: 500; color: var(--black-100); line-height: 20px; min-width: 0; }
-    .product-card-nota {
-      font-size: 12px; font-weight: 600; color: var(--coral-100);
-      text-decoration: underline; text-underline-offset: 2px;
-      white-space: nowrap; line-height: 16px; flex-shrink: 0;
-      max-width: 130px; overflow: hidden; text-overflow: ellipsis;
-    }
-    .product-card-nota.has-nota {
-      color: var(--black-60); font-weight: 400; text-decoration: none;
-    }
 
     /* ─── Footer ─── */
     #footer {
@@ -639,9 +630,10 @@ function renderProductList(readOnly) {
         </div>`;
     }
 
-    const hasNota  = item.nota && item.nota.trim().length > 0;
-    const notaText = hasNota ? escHtml(item.nota.trim()) : '＋ Agregar nota';
-    const notaClass = hasNota ? 'product-card-nota has-nota' : 'product-card-nota';
+    const hasNota = item.nota && item.nota.trim().length > 0;
+    const notaHtml = hasNota
+      ? `<span style="color:#606060;font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;">${escHtml(item.nota.trim())}</span><span style="color:#c0392b;font-size:12px;text-decoration:underline;cursor:pointer;margin-left:6px;flex-shrink:0;">Editar</span>`
+      : `<span style="color:#c0392b;font-size:12px;text-decoration:underline;cursor:pointer;">+ Agregar nota</span>`;
     return `
       <div class="product-card" onclick="goToEditarProducto('${item.id}')">
         <div class="product-card-top">
@@ -669,7 +661,7 @@ function renderProductList(readOnly) {
         </div>
         <div class="product-card-bottom">
           <span class="product-card-price">${unit} × ${item.cantidad} = ${sub}</span>
-          <span class="${notaClass}">${notaText}</span>
+          ${notaHtml}
         </div>
       </div>`;
   }).join('');
