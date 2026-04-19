@@ -365,26 +365,33 @@
 
     /* Body */
     #dropup-body { display: flex; flex-direction: column; gap: 36px; align-items: center; width: 100%; }
-    #dropup-summary { display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; width: 100%; }
-    #dropup-mesa-title { font-size: 24px; font-weight: 600; color: var(--black-100); line-height: 28px; width: 100%; text-align: center; }
-    #dropup-mesa-subtitle { font-size: 12px; font-weight: 400; color: var(--black-40); line-height: 16px; width: 100%; text-align: center; }
+
+    /* Info group */
+    #dropup-info-group { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    .du-info-row { display: flex; gap: 8px; height: 16px; align-items: center; width: 100%; }
+    .du-info-label { flex: 1; font-size: 12px; font-weight: 400; color: var(--black-100); line-height: 16px; }
+    .du-info-value { flex: 1; font-size: 12px; font-weight: 500; color: var(--black-100); line-height: 16px; text-align: right; white-space: nowrap; }
 
     /* Counter */
-    #dropup-counter-section { display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; }
-    #dropup-personas-label { font-size: 16px; font-weight: 700; color: var(--black-100); line-height: 22px; text-align: center; }
+    #dropup-counter-section { display: flex; flex-direction: column; gap: 8px; align-items: center; }
     #picker-row {
       display: flex; align-items: center; justify-content: center;
       background: var(--background-page); border-radius: 100px;
-      padding: 8px 16px; gap: 16px; height: 56px;
+      padding: 8px 24px; gap: 28px;
     }
     .picker-btn {
-      width: 36px; height: 36px; border-radius: 100px; border: none;
+      width: 24px; height: 24px; border: none;
       background: transparent; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      -webkit-tap-highlight-color: transparent; transition: background .12s;
+      -webkit-tap-highlight-color: transparent; transition: opacity .12s;
     }
-    .picker-btn:active { background: rgba(18,30,108,.08); }
-    #picker-count { font-size: 32px; font-weight: 700; color: var(--blue-100); min-width: 64px; text-align: center; line-height: 1; }
+    .picker-btn:active { opacity: 0.6; }
+    #picker-count {
+      font-size: 24px; font-weight: 400; color: var(--blue-100);
+      width: 48px; height: 48px; text-align: center; line-height: 28px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #dropup-personas-label { font-size: 12px; font-weight: 400; color: var(--black-40); line-height: 16px; text-align: center; }
 
     /* Actions */
     #dropup-actions { display: flex; flex-direction: column; gap: 8px; align-items: center; padding-top: 8px; width: 100%; }
@@ -393,14 +400,14 @@
       background: var(--coral-100); color: var(--black-0);
       font-family: var(--font); font-size: 14px; font-weight: 700; line-height: 20px;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 16px rgba(255,41,71,.3);
       transition: opacity .15s; -webkit-tap-highlight-color: transparent;
     }
     #btn-confirm-dropup:active { opacity: 0.85; }
     #btn-cancel-dropup {
       display: flex; align-items: center; justify-content: center;
       padding: 12px 0; width: 100%; border: none; background: transparent;
-      font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--black-60);
+      font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--coral-100);
+      text-decoration: underline;
       cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity .15s;
     }
     #btn-cancel-dropup:active { opacity: 0.7; }
@@ -538,10 +545,10 @@
   <div id="dropup-overlay" onclick="handleOverlayClick(event)">
     <div id="dropup-sheet">
 
-      <!-- Header -->
+      <!-- Header: nombre de mesa + ✕ -->
       <div id="dropup-title-row">
         <div id="dropup-title-spacer"></div>
-        <span id="dropup-sheet-title">Abrir mesa</span>
+        <span id="dropup-sheet-title">Mesa S03</span>
         <button id="btn-close-dropup" onclick="closeDropUp()" aria-label="Cerrar">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M18 6L6 18M6 6l12 12" stroke="#1e1e1e" stroke-width="1.8" stroke-linecap="round"/>
@@ -549,14 +556,19 @@
         </button>
       </div>
 
-      <!-- Body: mesa name + zona + counter -->
+      <!-- Body: info rows + counter -->
       <div id="dropup-body">
-        <div id="dropup-summary">
-          <span id="dropup-mesa-title">Mesa S03</span>
-          <span id="dropup-mesa-subtitle">Zona: Salón · Capacidad para 4</span>
+        <div id="dropup-info-group">
+          <div class="du-info-row">
+            <span class="du-info-label">Zona</span>
+            <span class="du-info-value" id="dropup-info-zona">Salón</span>
+          </div>
+          <div class="du-info-row">
+            <span class="du-info-label">Capacidad de la mesa</span>
+            <span class="du-info-value" id="dropup-info-cap">4 Personas</span>
+          </div>
         </div>
         <div id="dropup-counter-section">
-          <div id="dropup-personas-label">¿Cuántas personas?</div>
           <div id="picker-row">
             <button class="picker-btn" onclick="changePerson(-1)">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -570,6 +582,7 @@
               </svg>
             </button>
           </div>
+          <span id="dropup-personas-label">¿Cuántas personas?</span>
         </div>
       </div>
 
@@ -810,9 +823,10 @@ function openDropUp(table) {
   selectedTable = table;
   personCount   = Math.min(2, table.cap);
   const zone = LIST_ZONES_DATA[activeZone];
-  document.getElementById("dropup-mesa-title").textContent    = `Mesa ${table.id}`;
-  document.getElementById("dropup-mesa-subtitle").textContent = `Zona: ${zone.label} · Capacidad para ${table.cap}`;
-  document.getElementById("picker-count").textContent         = personCount;
+  document.getElementById("dropup-sheet-title").textContent = `Mesa ${table.id}`;
+  document.getElementById("dropup-info-zona").textContent   = zone.label;
+  document.getElementById("dropup-info-cap").textContent    = `${table.cap} Personas`;
+  document.getElementById("picker-count").textContent       = personCount;
   document.getElementById("dropup-overlay").classList.add("show");
 }
 
