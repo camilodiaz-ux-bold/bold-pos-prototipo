@@ -156,7 +156,17 @@ const DataManager = (function () {
 
   function actualizarEstadoMesa(mesaId, estadoDM, productos) {
     const data = load();
-    if (!data[mesaId]) return;
+    if (!data[mesaId]) {
+      data[mesaId] = {
+        id: mesaId,
+        zona: '',
+        capacidad: 4,
+        estado: estadoDM,
+        personas: 0,
+        horaApertura: new Date().toISOString(),
+        productos: [],
+      };
+    }
     data[mesaId].estado = estadoDM;
     if (productos && productos.length > 0) {
       data[mesaId].productos = productos.map(p => ({
