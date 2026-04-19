@@ -157,7 +157,7 @@
     /* Product card — Figma 26620-2838 */
     .product-card {
       background: var(--black-0); border-radius: 16px; padding: 12px;
-      display: flex; flex-direction: column; gap: 4px;
+      min-height: 110px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
       transition: opacity .12s;
     }
@@ -177,11 +177,13 @@
     .product-card-nota-text {
       font-size: 12px; font-weight: 400; color: var(--black-60);
       line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      min-height: 16px;
     }
     .product-card-agregar-nota {
       font-size: 12px; font-weight: 600; color: var(--black-60);
       line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       text-decoration: underline; text-underline-offset: 2px;
+      min-height: 16px;
     }
     .product-card-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 
@@ -643,7 +645,7 @@ function renderProductList(readOnly) {
             <span class="qty-readonly">× ${item.cantidad}</span>
           </div>
           <div class="product-card-bottom">
-            <span class="product-card-price">${unit} × ${item.cantidad} = ${sub}</span>
+            <span class="product-card-price">${sub}</span>
           </div>
         </div>`;
     }
@@ -681,7 +683,7 @@ function renderProductList(readOnly) {
           </div>
         </div>
         <div class="product-card-bottom">
-          <span class="product-card-price">${unit} × ${item.cantidad} = ${sub}</span>
+          <span class="product-card-price">${sub}</span>
           <span class="product-card-editar">Editar</span>
         </div>
       </div>`;
