@@ -701,24 +701,35 @@ const LIST_ZONES_DATA = {
 };
 
 function renderListView(zoneKey, query) {
-  const zone = LIST_ZONES_DATA[zoneKey];
+  const zone     = LIST_ZONES_DATA[zoneKey];
   const listView = document.getElementById("list-view");
   listView.innerHTML = "";
+
+  // Always read fresh state from localStorage — never use a cached variable
+  const mesas = DataManager.getMesas();
 
   const q = (query || "").trim().toLowerCase();
 
   zone.tables.forEach(table => {
     if (q && !table.id.toLowerCase().includes(q)) return;
 
-    const textColor = STATUS_TEXT_COLORS[table.status] || "#969696";
-    const cardBg    = STATUS_CARD_BG[table.status]     || "#ffffff";
-    const metaColor = STATUS_META_COLOR[table.status]  || "#1e1e1e";
-    const timeColor = STATUS_TIME_COLOR[table.status]  || "#606060";
-    const pulseDot  = table.status === "bill_requested"
+    // Merge live DataManager state over the static template
+    const stored = mesas[table.id];
+    const status = stored ? stored.estado : 'available';
+    const time   = (stored && stored.estado !== 'available' && stored.horaApertura)
+                   ? DataManager.calcTime(stored.horaApertura) : null;
+    const amount = (stored && stored.estado !== 'available' && stored.productos && stored.productos.length)
+                   ? DataManager.fmtAmount(DataManager.getTotal(table.id)) : null;
+
+    const textColor = STATUS_TEXT_COLORS[status] || "#969696";
+    const cardBg    = STATUS_CARD_BG[status]     || "#ffffff";
+    const metaColor = STATUS_META_COLOR[status]  || "#1e1e1e";
+    const timeColor = STATUS_TIME_COLOR[status]  || "#606060";
+    const pulseDot  = status === "bill_requested"
       ? `<span class="status-pulse-dot"></span>` : "";
 
     const card = document.createElement("div");
-    card.className = "list-card" + (table.status === "available" ? " available" : "");
+    card.className = "list-card" + (status === "available" ? " available" : "");
     card.dataset.id = table.id;
     card.style.background = cardBg;
 
@@ -727,17 +738,17 @@ function renderListView(zoneKey, query) {
       <div class="list-card-body">
         <div class="list-card-row">
           <span class="list-card-id" style="color:${textColor};">${table.id}</span>
-          <span class="list-card-status" style="color:${textColor};">${pulseDot}${STATUS_LABELS[table.status]}</span>
+          <span class="list-card-status" style="color:${textColor};">${pulseDot}${STATUS_LABELS[status]}</span>
         </div>
         <div class="list-card-row">
           <span class="list-card-meta" style="color:${metaColor};">${table.cap} personas · ${zone.label}</span>
-          ${table.time ? `<span class="list-card-time" style="color:${timeColor};">${table.time}</span>` : ""}
+          ${time ? `<span class="list-card-time" style="color:${timeColor};">${time}</span>` : ""}
         </div>
-        ${table.amount ? `<div class="list-card-row"><span></span><span class="list-card-amount" style="color:${textColor};">${table.amount}</span></div>` : ""}
+        ${amount ? `<div class="list-card-row"><span></span><span class="list-card-amount" style="color:${textColor};">${amount}</span></div>` : ""}
       </div>
     `;
 
-    card.addEventListener("click", () => handleTableTap(table));
+    card.addEventListener("click", () => handleTableTap({ ...table, status }));
 
     listView.appendChild(card);
   });

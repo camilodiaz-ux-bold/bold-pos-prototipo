@@ -527,7 +527,7 @@ function fmtMoney(n) { return '$' + n.toLocaleString('es-CO'); }
 function escHtml(s)  { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ══ Navigation ══ */
-function goBack() { location.href = 'venta-mesas.html?zona=' + encodeURIComponent(zona); }
+function goBack() { history.back(); }
 function goToAgregar() {
   const p = new URLSearchParams({ mesa: mesaId, zona, estado: _dmEstado() });
   location.href = 'detalle-mesa.html?' + p.toString();
