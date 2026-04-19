@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>BoldPOS — Editar Producto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Tokens ─── */
+    :root {
+      --blue-100:        #121e6c;
+      --blue-10:         #f1f2f6;
+      --coral-100:       #ff2947;
+      --black-0:         #ffffff;
+      --black-10:        #f3f3f3;
+      --black-40:        #969696;
+      --black-60:        #606060;
+      --black-100:       #1e1e1e;
+      --background-page: #f7f8fb;
+      --font:            'Montserrat', sans-serif;
+      --radius-pill:     100px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: var(--font); background: #d0d0d0; display: flex; justify-content: center; align-items: flex-start; }
+
+    /* ─── Phone shell ─── */
+    #app { width: 393px; height: 100vh; background: var(--background-page); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+    /* ─── Status bar ─── */
+    #status-bar { background: transparent; display: flex; align-items: center; padding: 8px 8px 0; flex-shrink: 0; }
+    .sb-left  { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--black-100); }
+    .sb-right { margin-left:auto; display:flex; align-items:center; }
+
+    /* ─── Header ─── */
+    #header { background: transparent; flex-shrink: 0; margin-top: 12px; }
+    #nav-row { height: 52px; display: flex; align-items: center; padding: 0 16px; gap: 0; }
+    #btn-back {
+      width: 32px; height: 32px; border: none; background: transparent;
+      cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; -webkit-tap-highlight-color: transparent;
+      border-radius: 8px; transition: background .12s;
+    }
+    #btn-back:active { background: var(--blue-10); }
+    #nav-title {
+      flex: 1; font-size: 16px; font-weight: 700; color: var(--blue-100);
+      text-align: center; line-height: 20px;
+    }
+    #btn-trash-header {
+      width: 32px; height: 32px; border: none; background: transparent;
+      cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; -webkit-tap-highlight-color: transparent;
+      border-radius: 8px; transition: background .12s;
+    }
+    #btn-trash-header:active { background: #FEE2E2; }
+
+    /* ─── Scrollable content ─── */
+    #scroll-area {
+      flex: 1; overflow-y: auto; min-height: 0;
+      padding: 16px 16px 0;
+      display: flex; flex-direction: column; gap: 12px;
+      scrollbar-width: none;
+    }
+    #scroll-area::-webkit-scrollbar { display: none; }
+
+    /* ─── Info card ─── */
+    #info-card {
+      background: var(--black-0); border-radius: 16px; padding: 16px;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      flex-shrink: 0;
+    }
+    #product-name {
+      font-size: 12px; font-weight: 400; color: var(--black-100);
+      line-height: 16px; text-align: center;
+    }
+    #price-row {
+      display: flex; align-items: baseline; gap: 8px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    #product-total {
+      font-size: 24px; font-weight: 400; color: var(--black-100);
+      line-height: 32px;
+    }
+    #product-units {
+      font-size: 14px; font-weight: 400; color: var(--black-60);
+      line-height: 20px;
+    }
+
+    /* ─── Large quantity counter (Figma 26621-4115) ─── */
+    #qty-wrap {
+      display: flex; justify-content: center; flex-shrink: 0;
+    }
+    #qty-counter-large {
+      background: var(--black-0); border-radius: 100px;
+      padding: 8px 16px; display: flex; align-items: center; gap: 28px;
+      height: 53px;
+    }
+    .qty-lg-btn {
+      width: 32px; height: 32px; border: none; background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 0; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent; border-radius: 100px;
+      transition: background .12s;
+    }
+    .qty-lg-btn:active { background: var(--blue-10); }
+    #qty-num {
+      font-size: 24px; font-weight: 400; color: var(--blue-100);
+      width: 48px; text-align: center; line-height: 32px;
+    }
+
+    /* ─── Fields ─── */
+    .field-group { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+    .field-label {
+      font-size: 14px; font-weight: 600; color: var(--blue-100);
+      line-height: 20px;
+    }
+    .field-input {
+      background: var(--black-0); border-radius: 12px;
+      border: none; outline: none;
+      padding: 10px 12px; width: 100%;
+      font-family: var(--font); font-size: 14px; font-weight: 400;
+      color: var(--black-100); line-height: 20px;
+    }
+    .field-input::placeholder { color: var(--black-60); font-weight: 300; }
+    textarea.field-input {
+      resize: none; min-height: 88px;
+    }
+    .field-hint { font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; }
+
+    /* ─── Footer ─── */
+    #footer {
+      background: transparent; padding: 12px 16px 24px;
+      flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
+    }
+    #btn-guardar {
+      width: 100%; height: 48px; border-radius: var(--radius-pill); border: none;
+      background: var(--coral-100); color: var(--black-0);
+      font-family: var(--font); font-size: 16px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(255,41,71,.3);
+      transition: opacity .15s; -webkit-tap-highlight-color: transparent;
+    }
+    #btn-guardar:active { opacity: 0.85; }
+    #btn-eliminar {
+      width: 100%; height: 48px; border-radius: var(--radius-pill);
+      border: 1.5px solid var(--coral-100); background: transparent;
+      font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--coral-100);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .15s; -webkit-tap-highlight-color: transparent;
+    }
+    #btn-eliminar:active { background: rgba(255,41,71,.06); }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Status bar -->
+  <div id="status-bar">
+    <div class="sb-left"><span id="sb-time">9:41</span></div>
+    <div class="sb-right">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0" y="8" width="3" height="4" rx="1" fill="#1e1e1e"/>
+        <rect x="4.5" y="5.5" width="3" height="6.5" rx="1" fill="#1e1e1e"/>
+        <rect x="9" y="3" width="3" height="9" rx="1" fill="#1e1e1e"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1e1e1e"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style="margin-left:5px">
+        <path d="M8 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z" fill="#1e1e1e"/>
+        <path d="M8 6.5C9.66 6.5 11.16 7.17 12.25 8.25L13.31 7.19A7 7 0 0 0 8 5a7 7 0 0 0-5.31 2.19l1.06 1.06A5 5 0 0 1 8 6.5z" fill="#1e1e1e"/>
+        <path d="M8 3.5c2.48 0 4.73 1 6.36 2.63l1.06-1.06A9.95 9.95 0 0 0 8 2a9.95 9.95 0 0 0-7.42 3.07L1.64 6.13A8 8 0 0 1 8 3.5z" fill="#1e1e1e"/>
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none" style="margin-left:5px">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1e1e1e" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="16" height="8" rx="2" fill="#1e1e1e"/>
+        <path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1e1e1e" fill-opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div id="header">
+    <div id="nav-row">
+      <button id="btn-back" onclick="goBack()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M15 18l-6-6 6-6" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span id="nav-title">Editar producto</span>
+      <button id="btn-trash-header" onclick="confirmarEliminar()" aria-label="Eliminar producto">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#ff2947" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Scrollable content -->
+  <div id="scroll-area">
+
+    <!-- Info card -->
+    <div id="info-card">
+      <span id="product-name">—</span>
+      <div id="price-row">
+        <span id="product-total">$0</span>
+        <span id="product-units">(1 un)</span>
+      </div>
+    </div>
+
+    <!-- Large counter -->
+    <div id="qty-wrap">
+      <div id="qty-counter-large">
+        <button class="qty-lg-btn" onclick="changeCantidad(-1)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h14" stroke="#121e6c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <span id="qty-num">1</span>
+        <button class="qty-lg-btn" onclick="changeCantidad(1)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="#121e6c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Nota field -->
+    <div class="field-group">
+      <label class="field-label" for="nota-input">Nota</label>
+      <textarea id="nota-input" class="field-input" placeholder="Instrucciones especiales, alergias, preferencias…" rows="3"></textarea>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div id="footer">
+    <button id="btn-guardar" onclick="guardar()">Guardar cambios</button>
+    <button id="btn-eliminar" onclick="confirmarEliminar()">Eliminar producto</button>
+  </div>
+
+</div><!-- /app -->
+
+<script src="data-manager.js"></script>
+<script>
+/* ══ URL params ══ */
+const params     = new URLSearchParams(location.search);
+const mesaId     = params.get('mesa')      || 'S05';
+const productoId = params.get('producto')  || '';
+const zona       = params.get('zona')      || 'salon';
+
+/* ══ State ══ */
+let producto = null;
+let cantidad = 1;
+
+/* ══ Persistence helpers ══ */
+function loadMsState(id) {
+  try { return JSON.parse(localStorage.getItem('mesa_' + id)) || {}; }
+  catch(e) { return {}; }
+}
+function saveMsState(id, patch) {
+  const s = loadMsState(id);
+  localStorage.setItem('mesa_' + id, JSON.stringify({ ...s, ...patch }));
+}
+function estadoToDM(e) {
+  if (e === 'CUENTA_SOLICITADA') return 'bill_requested';
+  if (e === 'DISPONIBLE')        return 'available';
+  return 'occupied';
+}
+
+/* ══ Formatting ══ */
+function fmtMoney(n) { return '$' + n.toLocaleString('es-CO'); }
+
+/* ══ Render ══ */
+function renderInfo() {
+  document.getElementById('product-total').textContent = fmtMoney(producto.precio * cantidad);
+  document.getElementById('product-units').textContent = `(${cantidad} un)`;
+  document.getElementById('qty-num').textContent = cantidad;
+}
+
+/* ══ Counter ══ */
+function changeCantidad(delta) {
+  const next = cantidad + delta;
+  if (next < 1) return;
+  cantidad = next;
+  renderInfo();
+}
+
+/* ══ Save ══ */
+function guardar() {
+  const ms       = loadMsState(mesaId);
+  const productos = ms.productos || [];
+  const idx      = productos.findIndex(p => p.id === productoId);
+  if (idx === -1) { goBack(); return; }
+
+  const notaVal = document.getElementById('nota-input').value.trim();
+  productos[idx] = {
+    ...productos[idx],
+    cantidad,
+    nota: notaVal || undefined,
+  };
+
+  const estadoDM = estadoToDM(ms.estado);
+  saveMsState(mesaId, { productos });
+  DataManager.actualizarEstadoMesa(mesaId, estadoDM, productos);
+
+  goBack();
+}
+
+/* ══ Delete ══ */
+function confirmarEliminar() {
+  if (!confirm(`¿Eliminar ${producto ? producto.nombre : 'este producto'}?`)) return;
+  eliminar();
+}
+
+function eliminar() {
+  const ms       = loadMsState(mesaId);
+  const productos = (ms.productos || []).filter(p => p.id !== productoId);
+  const nuevoEstado = productos.length > 0 ? (ms.estado || 'PEDIDO_PENDIENTE') : 'SIN_PRODUCTOS';
+  const estadoDM    = estadoToDM(nuevoEstado);
+
+  saveMsState(mesaId, { productos, estado: nuevoEstado });
+  DataManager.actualizarEstadoMesa(mesaId, estadoDM, productos);
+
+  goBack();
+}
+
+/* ══ Navigation ══ */
+function goBack() {
+  const p = new URLSearchParams({ mesa: mesaId, zona });
+  location.href = 'detalle-pedido.html?' + p.toString();
+}
+
+/* ══ Clock ══ */
+function updateClock() {
+  const now = new Date();
+  const el = document.getElementById('sb-time');
+  if (el) el.textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+}
+
+/* ══ Init ══ */
+(function init() {
+  DataManager.init();
+  updateClock();
+  setInterval(updateClock, 30000);
+
+  if (!productoId) { goBack(); return; }
+
+  const ms       = loadMsState(mesaId);
+  const productos = ms.productos || [];
+  producto       = productos.find(p => p.id === productoId);
+
+  if (!producto) { goBack(); return; }
+
+  cantidad = producto.cantidad;
+
+  document.getElementById('product-name').textContent = producto.nombre;
+  renderInfo();
+
+  if (producto.nota) {
+    document.getElementById('nota-input').value = producto.nota;
+  }
+})();
+</script>
+</body>
+</html>

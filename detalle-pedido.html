@@ -152,31 +152,59 @@
     #status-alert.alert-modified { display: block; background: #fff8e6; color: #b07d00; }
 
     /* ─── Product list ─── */
-    #products-list { padding: 12px 16px 16px; display: none; flex-direction: column; }
+    #products-list { padding: 12px 16px 16px; display: none; flex-direction: column; gap: 8px; }
 
-    .product-item { background: var(--black-0); padding: 12px 0; display: flex; flex-direction: column; gap: 4px; }
-    .product-item + .product-item { border-top: 1px solid #EEF0F8; }
-    .product-row-top { display: flex; align-items: center; gap: 8px; }
-    .product-name { font-size: 14px; font-weight: 600; color: var(--black-100); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .qty-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .qty-btn {
-      width: 28px; height: 28px; border-radius: 100px;
-      border: 1.5px solid #E8E9F0; background: transparent;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 16px; font-weight: 600; color: var(--black-100);
-      -webkit-tap-highlight-color: transparent; transition: background .12s; padding: 0; line-height: 1;
+    /* Product card — Figma 26620-2838 */
+    .product-card {
+      background: var(--black-0); border-radius: 16px; padding: 12px;
+      display: flex; flex-direction: column; gap: 24px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: opacity .12s;
     }
-    .qty-btn:active { background: var(--blue-10); }
-    .qty-num { font-size: 14px; font-weight: 600; color: var(--black-100); min-width: 24px; text-align: center; }
+    .product-card:active { opacity: 0.88; }
+    .product-card.readonly { cursor: default; }
+    .product-card.readonly:active { opacity: 1; }
+
+    .product-card-top { display: flex; align-items: center; gap: 12px; }
+    .product-card-name {
+      flex: 1; font-size: 14px; font-weight: 400; color: var(--black-100);
+      line-height: 20px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .product-card-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+    .qty-counter {
+      background: var(--background-page); border-radius: 100px;
+      padding: 8px; display: flex; align-items: center; gap: 2px; height: 40px;
+    }
+    .qty-counter-btn {
+      width: 24px; height: 24px; border: none; background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 0; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent; border-radius: 4px; transition: background .12s;
+    }
+    .qty-counter-btn:active { background: rgba(18,30,108,.08); }
+    .qty-counter-num {
+      font-size: 16px; font-weight: 500; color: var(--blue-100);
+      width: 48px; text-align: center; line-height: 20px;
+    }
     .qty-readonly { font-size: 13px; font-weight: 600; color: var(--black-60); background: #F3F4F6; border-radius: 6px; padding: 2px 8px; flex-shrink: 0; }
-    .btn-delete {
-      width: 28px; height: 28px; border: none; background: transparent;
+
+    .btn-trash {
+      width: 24px; height: 24px; border: none; background: transparent;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; padding: 0; -webkit-tap-highlight-color: transparent;
-      border-radius: 8px; transition: background .12s; flex-shrink: 0;
+      cursor: pointer; padding: 0; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent; border-radius: 4px; transition: background .12s;
     }
-    .btn-delete:active { background: #FEE2E2; }
-    .product-row-bottom { font-size: 12px; font-weight: 400; color: var(--black-60); }
+    .btn-trash:active { background: #FEE2E2; }
+
+    .product-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .product-card-price { flex: 1; font-size: 14px; font-weight: 500; color: var(--black-100); line-height: 20px; min-width: 0; }
+    .product-card-nota {
+      font-size: 12px; font-weight: 600; color: var(--coral-100);
+      text-decoration: underline; text-underline-offset: 2px;
+      white-space: nowrap; line-height: 16px; flex-shrink: 0;
+      max-width: 130px; overflow: hidden; text-overflow: ellipsis;
+    }
 
     /* ─── Footer ─── */
     #footer {
@@ -589,32 +617,63 @@ function renderTotals() {
 
 /* ══ Render product list ══ */
 function renderProductList(readOnly) {
-  const el = document.getElementById('products-list');
-  el.style.display = 'flex';
-  el.innerHTML = cart.map(item => {
-    const sub  = fmtMoney(item.precio * item.cantidad);
+  const listEl = document.getElementById('products-list');
+  listEl.style.display = 'flex';
+  listEl.innerHTML = cart.map(item => {
     const unit = fmtMoney(item.precio);
-    const controls = readOnly
-      ? `<span class="qty-readonly">× ${item.cantidad}</span>`
-      : `<div class="qty-controls">
-           <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
-           <span class="qty-num">${item.cantidad}</span>
-           <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
-         </div>
-         <button class="btn-delete" onclick="deleteItem('${item.id}')">
-           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#969696" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-           </svg>
-         </button>`;
+    const sub  = fmtMoney(item.precio * item.cantidad);
+
+    if (readOnly) {
+      return `
+        <div class="product-card readonly">
+          <div class="product-card-top">
+            <span class="product-card-name">${escHtml(item.nombre)}</span>
+            <span class="qty-readonly">× ${item.cantidad}</span>
+          </div>
+          <div class="product-card-bottom">
+            <span class="product-card-price">${unit} × ${item.cantidad} = ${sub}</span>
+          </div>
+        </div>`;
+    }
+
+    const notaText = item.nota ? escHtml(item.nota) : 'Agregar nota';
     return `
-      <div class="product-item">
-        <div class="product-row-top">
-          <span class="product-name">${escHtml(item.nombre)}</span>
-          ${controls}
+      <div class="product-card" onclick="goToEditarProducto('${item.id}')">
+        <div class="product-card-top">
+          <span class="product-card-name">${escHtml(item.nombre)}</span>
+          <div class="product-card-controls" onclick="event.stopPropagation()">
+            <div class="qty-counter">
+              <button class="qty-counter-btn" onclick="changeQty('${item.id}',-1)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12h14" stroke="#121e6c" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <span class="qty-counter-num">${item.cantidad}</span>
+              <button class="qty-counter-btn" onclick="changeQty('${item.id}',1)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5v14M5 12h14" stroke="#121e6c" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <button class="btn-trash" onclick="deleteItem('${item.id}')">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#969696" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div class="product-row-bottom">${unit} × ${item.cantidad} = ${sub}</div>
+        <div class="product-card-bottom">
+          <span class="product-card-price">${unit} × ${item.cantidad} = ${sub}</span>
+          <span class="product-card-nota">${notaText}</span>
+        </div>
       </div>`;
   }).join('');
+}
+
+/* ══ Navigate to edit product ══ */
+function goToEditarProducto(productId) {
+  const p = new URLSearchParams({ mesa: mesaId, producto: productId, zona });
+  location.href = 'editar-producto.html?' + p.toString();
 }
 
 /* ══ Show/hide helpers ══ */
