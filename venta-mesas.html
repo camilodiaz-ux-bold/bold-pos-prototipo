@@ -847,7 +847,25 @@ function showToast(msg) {
    INIT
 ══════════════════════════════════════════ */
 DataManager.init();
+
+// Restore active zone from URL param (passed back by detalle-pedido)
+const _zonaParam = new URLSearchParams(location.search).get('zona');
+if (_zonaParam && LIST_ZONES_DATA[_zonaParam]) {
+  activeZone = _zonaParam;
+  document.querySelectorAll('.zone-text-tab').forEach(c =>
+    c.classList.toggle('active', c.dataset.zone === activeZone)
+  );
+}
+
 renderListView(activeZone, searchQuery);
+
+// Refresh list whenever the user navigates back to this page
+window.addEventListener('pageshow', () => {
+  renderListView(activeZone, searchQuery);
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) renderListView(activeZone, searchQuery);
+});
 </script>
 </body>
 </html>
