@@ -861,12 +861,11 @@
         <!-- Escáner / barcode (derecha) -->
         <button id="btn-scan-trigger" onclick="openScanner()" aria-label="Escanear código" style="border:none;background:transparent;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="2"    y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
-            <rect x="5.5"  y="4" width="3"   height="16" rx="0.5" fill="#606060"/>
-            <rect x="10.5" y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
-            <rect x="14"   y="4" width="2"   height="16" rx="0.5" fill="#606060"/>
-            <rect x="18"   y="4" width="1.5" height="16" rx="0.5" fill="#606060"/>
-            <rect x="21"   y="4" width="1"   height="16" rx="0.5" fill="#606060"/>
+            <path d="M3 9V6a1 1 0 0 1 1-1h3" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M21 9V6a1 1 0 0 0-1-1h-3" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M3 15v3a1 1 0 0 0 1 1h3" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M21 15v3a1 1 0 0 1-1 1h-3" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="3" y1="12" x2="21" y2="12" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </button>
         <button id="btn-clear" onclick="clearSearch()" aria-label="Limpiar búsqueda">
