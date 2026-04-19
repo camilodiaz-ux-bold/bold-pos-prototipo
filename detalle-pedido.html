@@ -38,17 +38,17 @@
 
     /* ─── Header ─── */
     #header { background: transparent; flex-shrink: 0; margin-top: 12px; }
-    #nav-row { height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+    #nav-row { height: 52px; display: flex; align-items: center; padding: 0 16px; position: relative; }
     #btn-back {
       width: 32px; height: 32px; border: none; background: transparent;
       cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; -webkit-tap-highlight-color: transparent;
-      border-radius: 8px; transition: background .12s;
+      border-radius: 8px; transition: background .12s; z-index: 1;
     }
     #btn-back:active { background: var(--blue-10); }
-    #nav-title-group { flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
+    #nav-title-group { position: absolute; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; }
     #nav-title { font-size: 16px; font-weight: 700; color: var(--blue-100); line-height: 20px; white-space: nowrap; }
-    #nav-spacer { width: 32px; flex-shrink: 0; }
+    #nav-badge-right { margin-left: auto; flex-shrink: 0; z-index: 1; }
 
     /* ─── Badge de estado ─── */
     .badge-estado { display: inline-flex; align-items: center; gap: 5px; border-radius: 100px; padding: 3px 10px; flex-shrink: 0; }
@@ -347,12 +347,13 @@
       </button>
       <div id="nav-title-group">
         <span id="nav-title">Cargando…</span>
+      </div>
+      <div id="nav-badge-right">
         <div class="badge-estado badge-occupied" id="badge-estado">
           <span class="pulse-dot"></span>
           <span class="badge-text" id="badge-estado-text">Ocupada</span>
         </div>
       </div>
-      <div id="nav-spacer"></div>
     </div>
   </div>
 
@@ -482,7 +483,7 @@
         </div>
         <div id="info-dropup-info-group">
           <div class="du-row">
-            <span class="du-row-label">Personas</span>
+            <span class="du-row-label">Personas en mesa</span>
             <span class="du-row-val" id="dropup-personas">—</span>
           </div>
           <div class="du-row">
