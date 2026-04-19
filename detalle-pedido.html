@@ -736,7 +736,10 @@ function transicion(nuevoEstado, patch) {
 }
 
 function handleIniciarPedido() {
+  localStorage.removeItem('mesa_' + mesaId);
   DataManager.abrirMesa(mesaId, zona, personasParam, personasParam);
+  cart = [];
+  horaComanda = null;
   transicion(ESTADOS.SIN_PRODUCTOS);
 }
 
@@ -832,7 +835,13 @@ function ejecutarCancelar() {
   DataManager.init();
   el('nav-title').textContent = 'Mesa ' + mesaId;
 
-  // ── Step 1: Read mesa_{ID} from localStorage (source of truth) ──
+  // ── If DataManager says available, mesa_{ID} may be stale — wipe it ──
+  const dmCheck = DataManager.getMesa(mesaId);
+  if (!dmCheck || dmCheck.estado === 'available') {
+    localStorage.removeItem('mesa_' + mesaId);
+  }
+
+  // ── Read mesa_{ID} (source of truth for comanda state) ──
   const ms = loadMsState(mesaId);
 
   if (ms.estado) {
