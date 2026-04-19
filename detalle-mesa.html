@@ -166,39 +166,6 @@
       padding: 0 12px;
       box-shadow: var(--shadow-blue-8);
     }
-    #estado-badge-wrap {
-      display: inline-flex;
-      align-items: center;
-      flex-shrink: 0;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #tag-chevron {
-      display: inline-flex; align-items: center; justify-content: center;
-      transition: transform 200ms ease; flex-shrink: 0;
-    }
-    #estado-badge-wrap.open #tag-chevron { transform: rotate(180deg); }
-
-    /* ─── Inline info panel (horizontal compact card) ─── */
-    #info-panel {
-      overflow: hidden;
-      max-height: 0;
-      margin: 0 16px;
-      background: var(--black-0);
-      border: 1px solid #E8E9F0;
-      border-radius: 12px;
-      padding: 0 12px;
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-      transition: max-height 200ms ease, margin-top 200ms ease, padding-top 200ms ease, padding-bottom 200ms ease;
-    }
-    #info-panel.show {
-      max-height: 60px;
-      margin-top: 8px;
-      padding-top: 10px;
-      padding-bottom: 10px;
-    }
     #search-input {
       flex: 1;
       border: none; outline: none;
@@ -352,27 +319,6 @@
       box-shadow: 0 1px 4px rgba(255,41,71,.4);
     }
 
-    /* Pulse dot for cuenta solicitada badge in search row */
-    #tag-estado {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: #FEE2E2;
-      border-radius: 100px;
-      padding: 4px 10px;
-    }
-    #tag-estado span { font-size: 12px; font-weight: 600; line-height: 16px; white-space: nowrap; }
-    .tag-pulse-dot {
-      display: none; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-    }
-    .tag-bill .tag-pulse-dot {
-      display: inline-block; background: #c0392b;
-      animation: pulse-dot 1.2s ease-in-out infinite;
-    }
-    @keyframes pulse-dot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50%       { transform: scale(1.5); opacity: 0.6; }
-    }
 
     /* ─── Scanner overlay ─── */
     #scanner-overlay {
@@ -929,66 +875,9 @@
           </svg>
         </button>
       </div>
-      <!-- BADGE DE ESTADO con chevron -->
-      <div id="estado-badge-wrap" onclick="toggleInfoPanel()" aria-label="Info de mesa">
-        <div id="tag-estado">
-          <span class="tag-pulse-dot" id="tag-pulse"></span>
-          <span id="tag-estado-text">Ocupada</span>
-          <span id="tag-chevron">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M6 9l6 6 6-6" stroke="#FF2947" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-        </div>
-      </div>
     </div>
   </div>
 
-  <!-- INLINE INFO PANEL (horizontal compact card) -->
-  <div id="info-panel">
-    <div class="info-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#606060" stroke-width="1.6"/>
-        <circle cx="12" cy="9" r="2.5" stroke="#606060" stroke-width="1.6"/>
-      </svg>
-      <span class="info-val" id="panel-zona">—</span>
-    </div>
-    <div class="info-sep"></div>
-    <div class="info-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-        <circle cx="9" cy="7" r="3" stroke="#606060" stroke-width="1.6"/>
-        <path d="M3 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M21 21v-1a4 4 0 0 0-3-3.85" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-      <span class="info-val" id="panel-personas">—</span>
-    </div>
-    <div class="info-sep"></div>
-    <div class="info-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-        <circle cx="12" cy="12" r="9" stroke="#606060" stroke-width="1.6"/>
-        <path d="M12 7v5l3 3" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-      <span class="info-val" id="panel-apertura">—</span>
-    </div>
-    <div class="info-sep"></div>
-    <div class="info-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-        <circle cx="12" cy="13" r="8" stroke="#606060" stroke-width="1.6"/>
-        <path d="M12 9v4l2.5 2.5" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M9 2h6M12 2v3" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-      <span class="info-val" id="panel-tiempo">—</span>
-    </div>
-    <div class="info-sep"></div>
-    <div style="display:flex;align-items:center;flex-shrink:0;padding-left:2px;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <circle cx="5"  cy="12" r="1.5" fill="#606060"/>
-        <circle cx="12" cy="12" r="1.5" fill="#606060"/>
-        <circle cx="19" cy="12" r="1.5" fill="#606060"/>
-      </svg>
-    </div>
-  </div>
 
   <!-- SCANNER OVERLAY -->
   <div id="scanner-overlay" onclick="handleScanOverlayClick(event)">
@@ -1642,21 +1531,7 @@ function setMesaState(newState) {
   updateTagEstado();
 }
 
-function updateTagEstado() {
-  const tagEl   = document.getElementById("tag-estado");
-  const tagSpan = document.getElementById("tag-estado-text");
-  if (mesaState === "bill_requested") {
-    tagEl.className        = "tag-bill";
-    tagEl.style.background = "#fde8e8";
-    tagSpan.style.color    = "#c0392b";
-    tagSpan.textContent    = "Cuenta solicitada";
-  } else {
-    tagEl.className        = "";
-    tagEl.style.background = "#FEE2E2";
-    tagSpan.style.color    = "#FF2947";
-    tagSpan.textContent    = "Ocupada";
-  }
-}
+function updateTagEstado() { /* badge removed */ }
 
 function fmtApertura(iso) {
   if (!iso) return "—";
@@ -1887,24 +1762,8 @@ function handleScanOverlayClick(e) {
   // Two-line header
   document.getElementById("nav-mesa-label").textContent = "Mesa " + mesaId;
 
-  // Badge label in search bar
-  const tagEl   = document.getElementById("tag-estado");
-  const tagSpan = document.getElementById("tag-estado-text");
-  if (estado === "bill_requested") {
-    tagEl.className        = "tag-bill";
-    tagEl.style.background = "#fde8e8";
-    tagSpan.style.color    = "#c0392b";
-    tagSpan.textContent    = "Cuenta solicitada";
-  } else if (estado === "available") {
-    tagEl.className        = "";
-    tagEl.style.background = "#D1FAE5";
-    tagSpan.style.color    = "#0F6E56";
-    tagSpan.textContent    = "Disponible";
-  } else {
-    tagEl.className        = "";
-    tagEl.style.background = "#FEE2E2";
-    tagSpan.style.color    = "#FF2947";
-    tagSpan.textContent    = "Ocupada";
+  // Badge removed — no search-bar badge update needed
+  if (false) {
   }
 
   // Button label depends on origen
