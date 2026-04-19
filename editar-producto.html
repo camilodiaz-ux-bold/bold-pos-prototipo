@@ -124,8 +124,17 @@
       color: var(--black-100); line-height: 20px;
     }
     .field-input::placeholder { color: var(--black-60); font-weight: 300; }
+    .field-input[readonly] { color: var(--black-60); }
     textarea.field-input {
       resize: none; min-height: 88px;
+    }
+    select.field-input {
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%23606060' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
     }
     .field-hint { font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; }
 
@@ -225,10 +234,39 @@
       </div>
     </div>
 
-    <!-- Nota field -->
+    <!-- Precio unitario -->
     <div class="field-group">
-      <label class="field-label" for="nota-input">Nota</label>
-      <textarea id="nota-input" class="field-input" placeholder="Instrucciones especiales, alergias, preferencias…" rows="3"></textarea>
+      <label class="field-label" for="precio-input">Precio unitario *</label>
+      <input id="precio-input" type="text" class="field-input" readonly />
+      <span class="field-hint">IVA (19%) incluido en el precio unitario</span>
+    </div>
+
+    <!-- Descuento -->
+    <div class="field-group">
+      <label class="field-label" for="descuento-select">Descuento</label>
+      <select id="descuento-select" class="field-input">
+        <option value="0">Sin descuento</option>
+        <option value="5">5%</option>
+        <option value="10">10%</option>
+        <option value="15">15%</option>
+        <option value="20">20%</option>
+      </select>
+    </div>
+
+    <!-- Impuesto -->
+    <div class="field-group">
+      <label class="field-label" for="impuesto-select">Impuesto</label>
+      <select id="impuesto-select" class="field-input">
+        <option value="0">Sin impuesto</option>
+        <option value="iva5">IVA 5%</option>
+        <option value="iva19">IVA 19%</option>
+      </select>
+    </div>
+
+    <!-- Nota para cocina -->
+    <div class="field-group">
+      <label class="field-label" for="nota-input">Nota para cocina</label>
+      <textarea id="nota-input" class="field-input" placeholder="Ej: sin sal, término medio, sin cebolla…" rows="3"></textarea>
     </div>
 
   </div>
@@ -293,11 +331,15 @@ function guardar() {
   const idx      = productos.findIndex(p => p.id === productoId);
   if (idx === -1) { goBack(); return; }
 
-  const notaVal = document.getElementById('nota-input').value.trim();
+  const notaVal      = document.getElementById('nota-input').value.trim();
+  const descuentoVal = document.getElementById('descuento-select').value;
+  const impuestoVal  = document.getElementById('impuesto-select').value;
   productos[idx] = {
     ...productos[idx],
     cantidad,
-    nota: notaVal || undefined,
+    nota:      notaVal      || undefined,
+    descuento: descuentoVal !== '0'   ? descuentoVal : undefined,
+    impuesto:  impuestoVal  !== '0'   ? impuestoVal  : undefined,
   };
 
   const estadoDM = estadoToDM(ms.estado);
@@ -355,8 +397,15 @@ function updateClock() {
   cantidad = producto.cantidad;
 
   document.getElementById('product-name').textContent = producto.nombre;
+  document.getElementById('precio-input').value = fmtMoney(producto.precio);
   renderInfo();
 
+  if (producto.descuento) {
+    document.getElementById('descuento-select').value = producto.descuento;
+  }
+  if (producto.impuesto) {
+    document.getElementById('impuesto-select').value = producto.impuesto;
+  }
   if (producto.nota) {
     document.getElementById('nota-input').value = producto.nota;
   }
