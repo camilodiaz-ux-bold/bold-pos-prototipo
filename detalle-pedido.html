@@ -205,6 +205,9 @@
       white-space: nowrap; line-height: 16px; flex-shrink: 0;
       max-width: 130px; overflow: hidden; text-overflow: ellipsis;
     }
+    .product-card-nota.has-nota {
+      color: var(--black-60); font-weight: 400; text-decoration: none;
+    }
 
     /* ─── Footer ─── */
     #footer {
@@ -636,7 +639,9 @@ function renderProductList(readOnly) {
         </div>`;
     }
 
-    const notaText = item.nota ? escHtml(item.nota) : 'Agregar nota';
+    const hasNota  = item.nota && item.nota.trim().length > 0;
+    const notaText = hasNota ? escHtml(item.nota.trim()) : '＋ Agregar nota';
+    const notaClass = hasNota ? 'product-card-nota has-nota' : 'product-card-nota';
     return `
       <div class="product-card" onclick="goToEditarProducto('${item.id}')">
         <div class="product-card-top">
@@ -664,7 +669,7 @@ function renderProductList(readOnly) {
         </div>
         <div class="product-card-bottom">
           <span class="product-card-price">${unit} × ${item.cantidad} = ${sub}</span>
-          <span class="product-card-nota">${notaText}</span>
+          <span class="${notaClass}">${notaText}</span>
         </div>
       </div>`;
   }).join('');
