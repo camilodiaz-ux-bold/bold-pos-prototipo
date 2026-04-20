@@ -151,7 +151,7 @@
       color: var(--black-100); line-height: 16px;
     }
     #status-alert svg { flex-shrink: 0; }
-    #status-alert.alert-sent     { display: flex; background: #f4fdf9; border: 1px solid #1b8959; }
+    #status-alert.alert-sent     { display: flex; background: #f4fdf9; border: 1px solid #6CDCAB; }
     #status-alert.alert-modified { display: flex; background: #fff3d1; border: 1px solid #ffc217; }
 
     /* ─── Product list ─── */
@@ -775,7 +775,7 @@ function setDualBtn(secLabel, secFn, priLabel) {
 function showAlert(msg, type) {
   const a = el('status-alert');
   const icons = {
-    sent:     `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1b8959"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    sent:     `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#6CDCAB"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     modified: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#ffc217"/><line x1="12" y1="7" x2="12" y2="14" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="white"/></svg>`,
   };
   a.className = 'alert-' + type;
