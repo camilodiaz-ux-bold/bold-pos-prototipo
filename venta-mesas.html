@@ -933,6 +933,26 @@ renderListView(activeZone, searchQuery);
 window.addEventListener('pageshow', function() {
   renderListView(activeZone, searchQuery);
 });
+
+/* ══════════════════════════════════════════
+   SWIPE ENTRE ZONAS
+══════════════════════════════════════════ */
+(function() {
+  const ZONE_ORDER = ['salon', 'terraza', 'barra'];
+  const threshold  = 50;
+  let startX = 0;
+  const el = document.getElementById('list-view');
+  el.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  el.addEventListener('touchend', function(e) {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) < threshold) return;
+    const idx = ZONE_ORDER.indexOf(activeZone);
+    const next = diff > 0 ? ZONE_ORDER[idx + 1] : ZONE_ORDER[idx - 1];
+    if (next) switchZone(next);
+  }, { passive: true });
+})();
 </script>
 </body>
 </html>

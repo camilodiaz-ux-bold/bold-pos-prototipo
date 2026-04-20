@@ -1791,6 +1791,26 @@ setInterval(updateInfoCard, 60000);
 renderCategories();
 renderProducts();
 
+/* ══════════════════════════════════════════
+   SWIPE ENTRE CATEGORÍAS
+══════════════════════════════════════════ */
+(function() {
+  const threshold = 50;
+  let startX = 0;
+  const el = document.getElementById('products-area');
+  el.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  el.addEventListener('touchend', function(e) {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) < threshold) return;
+    const ids = CATEGORIES.map(c => c.id);
+    const idx = ids.indexOf(activeCategory);
+    const next = diff > 0 ? ids[idx + 1] : ids[idx - 1];
+    if (next) switchCategory(next);
+  }, { passive: true });
+})();
+
 // Order summary is non-interactive in catalog mode
 document.getElementById("order-summary").style.cursor = "default";
 </script>
