@@ -830,7 +830,7 @@ function render() {
 
     case ESTADOS.COMANDA_ENVIADA:
       flex('section-header', true); flex('btn-agregar-header', true);
-      showAlert('✓ Comanda enviada · ' + (horaComanda || ''), 'sent');
+      showAlert('Comanda enviada · ' + (horaComanda || ''), 'sent');
       renderProductList(false);
       renderTotals();
       show('totals-wrap', true);
@@ -840,7 +840,7 @@ function render() {
 
     case ESTADOS.COMANDA_CON_AJUSTES:
       flex('section-header', true); flex('btn-agregar-header', true);
-      showAlert('⚠ Hay cambios pendientes por reenviar', 'modified');
+      showAlert('Hay cambios pendientes por reenviar', 'modified');
       renderProductList(false);
       renderTotals();
       show('totals-wrap', true);
