@@ -668,45 +668,30 @@ const STATUS_TIME_COLOR = {
   bill_requested: "#606060",
 };
 
-/* Datos mock exclusivos de la vista lista — no afectan el mapa */
+/* Datos de estructura de zonas — estado siempre desde DataManager */
 const LIST_ZONES_DATA = {
   salon: {
     label: "Salón",
     tables: [
-      { id:"S01", cap:2, status:"bill_requested", time:"2h 10min", amount:"$215.000" },
-      { id:"S02", cap:2, status:"occupied",       time:"1h 45min", amount:"$28.000"  },
-      { id:"S03", cap:4, status:"occupied",       time:"45min",    amount:"$42.000"  },
-      { id:"S04", cap:4, status:"occupied",       time:"2h 20min", amount:"$87.500"  },
-      { id:"S05", cap:4, status:"bill_requested", time:"3h 5min",  amount:"$195.000" },
-      { id:"S06", cap:4, status:"available" },
-      { id:"S07", cap:4, status:"available" },
-      { id:"S08", cap:6, status:"available" },
-      { id:"S09", cap:4, status:"available" },
-      { id:"S10", cap:4, status:"available" },
-      { id:"S11", cap:4, status:"available" },
-      { id:"S12", cap:4, status:"available" },
-      { id:"S13", cap:4, status:"available" },
-      { id:"S14", cap:4, status:"available" },
-      { id:"S15", cap:2, status:"disabled" },
-      { id:"S16", cap:2, status:"disabled" },
+      { id:"S01", cap:2  }, { id:"S02", cap:2  }, { id:"S03", cap:4  },
+      { id:"S04", cap:4  }, { id:"S05", cap:4  }, { id:"S06", cap:4  },
+      { id:"S07", cap:4  }, { id:"S08", cap:6  }, { id:"S09", cap:4  },
+      { id:"S10", cap:4  }, { id:"S11", cap:4  }, { id:"S12", cap:4  },
+      { id:"S13", cap:4  }, { id:"S14", cap:4  }, { id:"S15", cap:2  },
+      { id:"S16", cap:2  },
     ]
   },
   terraza: {
     label: "Terraza",
     tables: [
-      { id:"T01", cap:4, status:"available" },
-      { id:"T02", cap:4, status:"available" },
-      { id:"T03", cap:6, status:"occupied",       time:"35min",    amount:"$75.000"  },
-      { id:"T04", cap:4, status:"available" },
-      { id:"T05", cap:2, status:"bill_requested", time:"55min",    amount:"$65.000"  },
-      { id:"T06", cap:6, status:"occupied",       time:"1h 20min", amount:"$112.000" },
+      { id:"T01", cap:4 }, { id:"T02", cap:4 }, { id:"T03", cap:4 },
+      { id:"T04", cap:4 }, { id:"T05", cap:2 }, { id:"T06", cap:6 },
     ]
   },
   barra: {
     label: "Barra",
     tables: [
-      { id:"B01", cap:7, status:"available" },
-      { id:"B02", cap:5, status:"occupied",       time:"2h 32min", amount:"$74.500"  },
+      { id:"B01", cap:7 }, { id:"B02", cap:5 },
     ]
   }
 };
@@ -813,6 +798,7 @@ function goToDetalle(table, estado, personas) {
    DROP-UP (solo mesas disponibles)
 ══════════════════════════════════════════ */
 function handleTableTap(table) {
+  if (table.status === "disabled") return;
   if (table.status === "available") {
     openDropUp(table);
   } else {
@@ -867,9 +853,65 @@ function showToast(msg) {
 }
 
 /* ══════════════════════════════════════════
+   MOCK SEED — claves mesa_{ID} para mesas activas
+══════════════════════════════════════════ */
+function seedComandaKeys() {
+  const now = Date.now();
+  const min = 60000;
+  const seed = [
+    { id:'S02', estado:'COMANDA_ENVIADA',
+      horaApertura: new Date(now -  45*min).toISOString(),
+      horaComanda:  new Date(now -  20*min).toISOString(),
+      productos: [
+        {id:"EF01", nombre:"Carpaccio de Res", precio:22000, cantidad:1, categoria:"entradas-frias"},
+        {id:"BE06", nombre:"Copa de Vino",     precio: 6000, cantidad:2, categoria:"bebidas"},
+      ]},
+    { id:'S04', estado:'COMANDA_ENVIADA',
+      horaApertura: new Date(now -  80*min).toISOString(),
+      horaComanda:  new Date(now -  50*min).toISOString(),
+      productos: [
+        {id:"CA02", nombre:"Lomo al Trapo",    precio:58000, cantidad:2, categoria:"carnes"},
+        {id:"BE01", nombre:"Limonada de Coco", precio:14000, cantidad:2, categoria:"bebidas"},
+      ]},
+    { id:'S06', estado:'CUENTA_SOLICITADA',
+      horaApertura: new Date(now - 130*min).toISOString(),
+      horaComanda:  new Date(now -  60*min).toISOString(),
+      productos: [
+        {id:"EF02", nombre:"Ceviche de Camarón", precio:32000, cantidad:1, categoria:"entradas-frias"},
+        {id:"EF03", nombre:"Tabla de Quesos",    precio:26000, cantidad:1, categoria:"entradas-frias"},
+      ]},
+    { id:'T03', estado:'COMANDA_ENVIADA',
+      horaApertura: new Date(now -  55*min).toISOString(),
+      horaComanda:  new Date(now -  30*min).toISOString(),
+      productos: [
+        {id:"EN01", nombre:"Ensalada Caprese", precio:18000, cantidad:2, categoria:"ensaladas"},
+        {id:"SO01", nombre:"Gazpacho",         precio:16000, cantidad:1, categoria:"sopas"},
+      ]},
+  ];
+  seed.forEach(s => {
+    localStorage.setItem('mesa_' + s.id, JSON.stringify({
+      mesaId: s.id, estado: s.estado,
+      horaApertura: s.horaApertura, horaComanda: s.horaComanda,
+      productos: s.productos,
+    }));
+  });
+}
+
+/* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
-DataManager.init();
+function fullReset() {
+  // Limpiar TODO el localStorage relacionado con el prototipo
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('mesa_') || k.startsWith('boldPOS_'))
+    .forEach(k => localStorage.removeItem(k));
+  // Reconstruir DataManager con buildDemoData limpio
+  DataManager.init();
+  // Crear claves mesa_{ID} para mesas activas
+  seedComandaKeys();
+}
+
+fullReset();
 
 // Restore active zone from URL param (passed back by detalle-pedido)
 const _zonaParam = new URLSearchParams(location.search).get('zona');
@@ -882,12 +924,12 @@ if (_zonaParam && LIST_ZONES_DATA[_zonaParam]) {
 
 renderListView(activeZone, searchQuery);
 
-// Refresh list whenever the user navigates back to this page
-window.addEventListener('pageshow', () => {
-  renderListView(activeZone, searchQuery);
-});
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) renderListView(activeZone, searchQuery);
+// Reset completo también al volver con back-button (bfcache)
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    fullReset();
+    renderListView(activeZone, searchQuery);
+  }
 });
 </script>
 </body>

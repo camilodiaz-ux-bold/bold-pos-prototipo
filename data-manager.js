@@ -34,38 +34,41 @@ const DataManager = (function () {
     const min = 60000;
 
     const demos = [
-      // ── Salón ────────────────────────────────────────
+      // ── Salón — activas ──────────────────────────────
       {
-        id: "S01", zona: "salon", capacidad: 2, estado: "bill_requested",
-        personas: 2, horaApertura: new Date(now - 95 * min).toISOString(),
+        id: "S02", zona: "salon", capacidad: 2, estado: "occupied",
+        personas: 2, horaApertura: new Date(now - 45 * min).toISOString(),
         productos: [
           { id: "EF01", nombre: "Carpaccio de Res", precio: 22000, cantidad: 1, categoria: "entradas-frias" },
-          { id: "BE06", nombre: "Copa de Vino",      precio:  6000, cantidad: 1, categoria: "bebidas" },
-        ],
-      },
-      {
-        id: "S03", zona: "salon", capacidad: 4, estado: "occupied",
-        personas: 3, horaApertura: new Date(now - 40 * min).toISOString(),
-        productos: [
-          { id: "CA04", nombre: "Pollo a la Plancha", precio: 42000, cantidad: 2, categoria: "carnes" },
-          { id: "BE01", nombre: "Limonada de Coco",   precio: 14000, cantidad: 2, categoria: "bebidas" },
+          { id: "BE06", nombre: "Copa de Vino",     precio:  6000, cantidad: 2, categoria: "bebidas" },
         ],
       },
       {
         id: "S04", zona: "salon", capacidad: 4, estado: "occupied",
-        personas: 4, horaApertura: new Date(now - 75 * min).toISOString(),
+        personas: 4, horaApertura: new Date(now - 80 * min).toISOString(),
         productos: [
-          { id: "PR01", nombre: "Spaghetti Bolognese", precio: 38000, cantidad: 2, categoria: "pastas" },
-          { id: "BE05", nombre: "Cerveza Artesanal",   precio: 16000, cantidad: 2, categoria: "bebidas" },
+          { id: "CA02", nombre: "Lomo al Trapo",    precio: 58000, cantidad: 2, categoria: "carnes" },
+          { id: "BE01", nombre: "Limonada de Coco", precio: 14000, cantidad: 2, categoria: "bebidas" },
         ],
       },
-      // ── Terraza ──────────────────────────────────────
       {
-        id: "T05", zona: "terraza", capacidad: 2, estado: "bill_requested",
-        personas: 2, horaApertura: new Date(now - 55 * min).toISOString(),
+        id: "S06", zona: "salon", capacidad: 4, estado: "bill_requested",
+        personas: 3, horaApertura: new Date(now - 130 * min).toISOString(),
         productos: [
-          { id: "PR02", nombre: "Fettuccine Alfredo", precio: 36000, cantidad: 1, categoria: "pastas" },
-          { id: "BE06", nombre: "Copa de Vino",        precio: 22000, cantidad: 2, categoria: "bebidas" },
+          { id: "EF02", nombre: "Ceviche de Camarón", precio: 32000, cantidad: 1, categoria: "entradas-frias" },
+          { id: "EF03", nombre: "Tabla de Quesos",    precio: 26000, cantidad: 1, categoria: "entradas-frias" },
+        ],
+      },
+      // ── Salón — inhabilitadas ────────────────────────
+      { id: "S09", zona: "salon", capacidad: 4, estado: "disabled", personas: 0, horaApertura: null, productos: [] },
+      { id: "S11", zona: "salon", capacidad: 4, estado: "disabled", personas: 0, horaApertura: null, productos: [] },
+      // ── Terraza — activas ────────────────────────────
+      {
+        id: "T03", zona: "terraza", capacidad: 4, estado: "occupied",
+        personas: 4, horaApertura: new Date(now - 55 * min).toISOString(),
+        productos: [
+          { id: "EN01", nombre: "Ensalada Caprese", precio: 18000, cantidad: 2, categoria: "ensaladas" },
+          { id: "SO01", nombre: "Gazpacho",         precio: 16000, cantidad: 1, categoria: "sopas" },
         ],
       },
     ];
