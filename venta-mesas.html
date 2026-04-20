@@ -905,9 +905,14 @@ function fullReset() {
   DataManager.init();
   // Crear claves mesa_{ID} para mesas activas
   seedComandaKeys();
+  // Permitir que un reset manual posterior vuelva a correr
+  sessionStorage.removeItem('posInitialized');
 }
 
-fullReset();
+if (!sessionStorage.getItem('posInitialized')) {
+  fullReset();
+  sessionStorage.setItem('posInitialized', 'true');
+}
 
 // Restore active zone from URL param (passed back by detalle-pedido)
 const _zonaParam = new URLSearchParams(location.search).get('zona');
