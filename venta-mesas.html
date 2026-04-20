@@ -745,8 +745,8 @@ function renderListView(zoneKey, query) {
               ? `${stored.personas} personas en mesa`
               : `${table.cap} personas`
           }</span>
-          ${time ? `<span class="list-card-time" style="color:${timeColor};">${time}</span>` : ""}
         </div>
+        ${time ? `<div class="list-card-row"><span class="list-card-time" style="color:${timeColor};">${time}</span></div>` : ""}
         ${amount ? `<div class="list-card-row"><span></span><span class="list-card-amount" style="color:${textColor};">${amount}</span></div>` : ""}
       </div>
     `;
