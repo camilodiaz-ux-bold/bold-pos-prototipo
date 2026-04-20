@@ -144,8 +144,8 @@
 
     /* ─── Status alert ─── */
     #status-alert {
-      display: none; width: 100%; height: 44px;
-      border-radius: 16px; padding: 0 12px;
+      display: none; margin: 12px 16px 0;
+      height: 44px; border-radius: 16px; padding: 0 12px;
       flex-shrink: 0; align-items: center; gap: 12px;
       font-family: var(--font); font-size: 12px; font-weight: 400;
       color: var(--black-100); line-height: 16px;
@@ -437,15 +437,16 @@
       <button id="btn-agregar-empty" onclick="goToAgregar()">Agregar productos</button>
     </div>
 
+    <!-- Status alert (COMANDA_ENVIADA / COMANDA_CON_AJUSTES) -->
+    <div id="status-alert"></div>
+
     <!-- Product list -->
     <div id="products-list"></div>
 
   </div>
 
-  <!-- Footer: alert + totals + action bar -->
+  <!-- Footer: totals + action bar -->
   <div id="footer">
-    <!-- Status alert (COMANDA_ENVIADA / COMANDA_CON_AJUSTES) -->
-    <div id="status-alert"></div>
     <div id="totals-wrap">
       <div class="totals-row">
         <span class="totals-label">Subtotal</span>
@@ -774,8 +775,8 @@ function setDualBtn(secLabel, secFn, priLabel) {
 function showAlert(msg, type) {
   const a = el('status-alert');
   const icons = {
-    sent: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f4fdf9" stroke="#1b8959" stroke-width="1.5"/><path d="M7.5 12l3 3 6-6" stroke="#1b8959" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    modified: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="#fff3d1" stroke="#ffc217" stroke-width="1.5" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="#ffc217" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1" fill="#ffc217"/></svg>`,
+    sent:     `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1b8959"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    modified: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#ffc217"/><line x1="12" y1="7" x2="12" y2="14" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="white"/></svg>`,
   };
   a.className = 'alert-' + type;
   a.innerHTML = (icons[type] || '') + `<span>${msg}</span>`;
