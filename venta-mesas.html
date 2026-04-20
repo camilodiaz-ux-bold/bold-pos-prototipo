@@ -921,11 +921,8 @@ if (_zonaParam && LIST_ZONES_DATA[_zonaParam]) {
 renderListView(activeZone, searchQuery);
 
 // Reset completo también al volver con back-button (bfcache)
-window.addEventListener('pageshow', (e) => {
-  if (e.persisted) {
-    fullReset();
-    renderListView(activeZone, searchQuery);
-  }
+window.addEventListener('pageshow', function() {
+  renderListView(activeZone, searchQuery);
 });
 </script>
 </body>
