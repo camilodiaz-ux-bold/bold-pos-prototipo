@@ -144,13 +144,15 @@
 
     /* ─── Status alert ─── */
     #status-alert {
-      display: none; margin: 12px 16px 0;
-      padding: 8px 12px; border-radius: 8px;
-      font-family: var(--font); font-size: 12px; font-weight: 600;
-      flex-shrink: 0;
+      display: none; width: 100%; height: 44px;
+      border-radius: 16px; padding: 0 12px;
+      flex-shrink: 0; align-items: center; gap: 12px;
+      font-family: var(--font); font-size: 12px; font-weight: 400;
+      color: var(--black-100); line-height: 16px;
     }
-    #status-alert.alert-sent     { display: block; background: #f0faf5; color: #2e7d5e; }
-    #status-alert.alert-modified { display: block; background: #fff8e6; color: #b07d00; }
+    #status-alert svg { flex-shrink: 0; }
+    #status-alert.alert-sent     { display: flex; background: #f4fdf9; border: 1px solid #1b8959; }
+    #status-alert.alert-modified { display: flex; background: #fff3d1; border: 1px solid #ffc217; }
 
     /* ─── Product list ─── */
     #products-list { padding: 12px 16px 16px; display: none; flex-direction: column; gap: 8px; }
@@ -226,7 +228,7 @@
     /* ─── Footer ─── */
     #footer {
       background: var(--black-0); border-top: 1px solid rgba(0,0,0,0.08);
-      padding: 12px 16px 20px; flex-shrink: 0; display: flex; flex-direction: column;
+      padding: 12px 16px 20px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px;
     }
     #totals-wrap { display: flex; flex-direction: column; }
     .totals-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
@@ -237,7 +239,7 @@
     .totals-row-total .totals-amount { font-size: 18px; font-weight: 700; color: var(--blue-100); }
 
     /* ─── Action bar ─── */
-    #action-bar { margin-top: 10px; display: flex; gap: 10px; }
+    #action-bar { display: flex; gap: 10px; }
     #btn-secondary {
       flex: 1; height: 48px; border-radius: var(--radius-pill);
       border: 1.5px solid var(--coral-100); background: transparent;
@@ -435,16 +437,15 @@
       <button id="btn-agregar-empty" onclick="goToAgregar()">Agregar productos</button>
     </div>
 
-    <!-- Status alert (COMANDA_ENVIADA / COMANDA_CON_AJUSTES) -->
-    <div id="status-alert"></div>
-
     <!-- Product list -->
     <div id="products-list"></div>
 
   </div>
 
-  <!-- Footer: totals + action bar -->
+  <!-- Footer: alert + totals + action bar -->
   <div id="footer">
+    <!-- Status alert (COMANDA_ENVIADA / COMANDA_CON_AJUSTES) -->
+    <div id="status-alert"></div>
     <div id="totals-wrap">
       <div class="totals-row">
         <span class="totals-label">Subtotal</span>
@@ -772,11 +773,17 @@ function setDualBtn(secLabel, secFn, priLabel) {
 }
 function showAlert(msg, type) {
   const a = el('status-alert');
+  const icons = {
+    sent: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f4fdf9" stroke="#1b8959" stroke-width="1.5"/><path d="M7.5 12l3 3 6-6" stroke="#1b8959" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    modified: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="#fff3d1" stroke="#ffc217" stroke-width="1.5" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="#ffc217" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1" fill="#ffc217"/></svg>`,
+  };
   a.className = 'alert-' + type;
-  a.textContent = msg;
+  a.innerHTML = (icons[type] || '') + `<span>${msg}</span>`;
 }
 function clearAlert() {
-  el('status-alert').className = '';
+  const a = el('status-alert');
+  a.className = '';
+  a.innerHTML = '';
 }
 
 /* ══ Master render ══ */
