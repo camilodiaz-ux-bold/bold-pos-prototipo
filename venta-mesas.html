@@ -558,18 +558,8 @@
         </button>
       </div>
 
-      <!-- Body: info rows + counter -->
+      <!-- Body: counter + info rows -->
       <div id="dropup-body">
-        <div id="dropup-info-group">
-          <div class="du-info-row">
-            <span class="du-info-label">Zona</span>
-            <span class="du-info-value" id="dropup-info-zona">Salón</span>
-          </div>
-          <div class="du-info-row">
-            <span class="du-info-label">Capacidad de la mesa</span>
-            <span class="du-info-value" id="dropup-info-cap">4 Personas</span>
-          </div>
-        </div>
         <div id="dropup-counter-section">
           <div id="picker-row">
             <button class="picker-btn" onclick="changePerson(-1)">
@@ -585,6 +575,16 @@
             </button>
           </div>
           <span id="dropup-personas-label">¿Cuántas personas?</span>
+        </div>
+        <div id="dropup-info-group">
+          <div class="du-info-row">
+            <span class="du-info-label">Zona</span>
+            <span class="du-info-value" id="dropup-info-zona">Salón</span>
+          </div>
+          <div class="du-info-row">
+            <span class="du-info-label">Capacidad de la mesa</span>
+            <span class="du-info-value" id="dropup-info-cap">4 Personas</span>
+          </div>
         </div>
       </div>
 
@@ -822,7 +822,7 @@ function openDropUp(table) {
 
 function changePerson(delta) {
   if (!selectedTable) return;
-  personCount = Math.min(Math.max(personCount + delta, 1), selectedTable.cap);
+  personCount = Math.max(personCount + delta, 1);
   document.getElementById("picker-count").textContent = personCount;
 }
 
