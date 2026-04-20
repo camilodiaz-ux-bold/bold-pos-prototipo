@@ -266,28 +266,16 @@
     #list-view::-webkit-scrollbar { display: none; }
     .list-card {
       border-radius: 12px;
-      padding: 8px 16px;
+      padding: 12px 16px;
       min-height: 76px;
       display: flex;
-      align-items: center;
-      gap: 12px;
+      flex-direction: column;
+      justify-content: space-between;
       cursor: default;
       border: 1px solid rgba(0, 0, 0, 0.08);
     }
     .list-card.available { cursor: pointer; }
     .list-card.disabled  { border: none; }
-    .list-card-indicator { display: none; }
-    .list-card-body {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-    }
-    .list-card-text-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
     .list-card-row {
       display: flex;
       align-items: flex-start;
@@ -737,25 +725,21 @@ function renderListView(zoneKey, query) {
     card.dataset.id = table.id;
     card.style.background = cardBg;
 
+    const personasText = (status === 'occupied' || status === 'bill_requested') && stored && stored.personas
+      ? `${stored.personas} personas en mesa`
+      : `${table.cap} personas`;
     card.innerHTML = `
-      <div class="list-card-indicator"></div>
-      <div class="list-card-body">
-        <div class="list-card-text-col">
-          <div class="list-card-row">
-            <span class="list-card-id" style="color:${textColor};">${table.id}</span>
-            <span class="list-card-status" style="color:${textColor};">${pulseDot}${STATUS_LABELS[status]}</span>
-          </div>
-          <div class="list-card-row">
-            <span class="list-card-meta" style="color:${metaColor};">${
-              (status === 'occupied' || status === 'bill_requested') && stored && stored.personas
-                ? `${stored.personas} personas en mesa`
-                : `${table.cap} personas`
-            }</span>
-          </div>
-          ${time ? `<div class="list-card-row"><span class="list-card-time" style="color:${timeColor};">${time}</span></div>` : ""}
-        </div>
-        ${amount ? `<span class="list-card-amount" style="color:${textColor};">${amount}</span>` : ""}
+      <div class="list-card-row">
+        <span class="list-card-id" style="color:${textColor};">${table.id}</span>
+        <span class="list-card-status" style="color:${textColor};">${pulseDot}${STATUS_LABELS[status]}</span>
       </div>
+      <div class="list-card-row">
+        <span class="list-card-meta" style="color:${metaColor};">${personasText}</span>
+      </div>
+      ${(time || amount) ? `<div class="list-card-row">
+        <span class="list-card-time" style="color:${timeColor};">${time || ""}</span>
+        ${amount ? `<span class="list-card-amount" style="color:${textColor};">${amount}</span>` : ""}
+      </div>` : ""}
     `;
 
     card.addEventListener("click", () => handleTableTap({ ...table, status }));
