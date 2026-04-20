@@ -275,6 +275,7 @@
       border: 1px solid rgba(0, 0, 0, 0.08);
     }
     .list-card.available { cursor: pointer; }
+    .list-card.disabled  { border: none; }
     .list-card-indicator { display: none; }
     .list-card-body {
       flex: 1;
@@ -725,7 +726,9 @@ function renderListView(zoneKey, query) {
       ? `<span class="status-pulse-dot"></span>` : "";
 
     const card = document.createElement("div");
-    card.className = "list-card" + (status === "available" ? " available" : "");
+    card.className = "list-card" +
+      (status === "available" ? " available" : "") +
+      (status === "disabled"  ? " disabled"  : "");
     card.dataset.id = table.id;
     card.style.background = cardBg;
 
@@ -872,13 +875,6 @@ function seedComandaKeys() {
       productos: [
         {id:"CA02", nombre:"Lomo al Trapo",    precio:58000, cantidad:2, categoria:"carnes"},
         {id:"BE01", nombre:"Limonada de Coco", precio:14000, cantidad:2, categoria:"bebidas"},
-      ]},
-    { id:'S06', estado:'CUENTA_SOLICITADA',
-      horaApertura: new Date(now - 130*min).toISOString(),
-      horaComanda:  new Date(now -  60*min).toISOString(),
-      productos: [
-        {id:"EF02", nombre:"Ceviche de Camarón", precio:32000, cantidad:1, categoria:"entradas-frias"},
-        {id:"EF03", nombre:"Tabla de Quesos",    precio:26000, cantidad:1, categoria:"entradas-frias"},
       ]},
     { id:'T03', estado:'COMANDA_ENVIADA',
       horaApertura: new Date(now -  55*min).toISOString(),

@@ -51,17 +51,13 @@ const DataManager = (function () {
           { id: "BE01", nombre: "Limonada de Coco", precio: 14000, cantidad: 2, categoria: "bebidas" },
         ],
       },
-      {
-        id: "S06", zona: "salon", capacidad: 4, estado: "bill_requested",
-        personas: 3, horaApertura: new Date(now - 130 * min).toISOString(),
-        productos: [
-          { id: "EF02", nombre: "Ceviche de Camarón", precio: 32000, cantidad: 1, categoria: "entradas-frias" },
-          { id: "EF03", nombre: "Tabla de Quesos",    precio: 26000, cantidad: 1, categoria: "entradas-frias" },
-        ],
-      },
       // ── Salón — inhabilitadas ────────────────────────
+      { id: "S06", zona: "salon", capacidad: 4, estado: "disabled", personas: 0, horaApertura: null, productos: [] },
       { id: "S09", zona: "salon", capacidad: 4, estado: "disabled", personas: 0, horaApertura: null, productos: [] },
+      { id: "S10", zona: "salon", capacidad: 4, estado: "disabled", personas: 0, horaApertura: null, productos: [] },
       { id: "S11", zona: "salon", capacidad: 4, estado: "disabled", personas: 0, horaApertura: null, productos: [] },
+      // ── Terraza — inhabilitadas ──────────────────────
+      { id: "T04", zona: "terraza", capacidad: 4, estado: "disabled", personas: 0, horaApertura: null, productos: [] },
       // ── Terraza — activas ────────────────────────────
       {
         id: "T03", zona: "terraza", capacidad: 4, estado: "occupied",
@@ -71,6 +67,8 @@ const DataManager = (function () {
           { id: "SO01", nombre: "Gazpacho",         precio: 16000, cantidad: 1, categoria: "sopas" },
         ],
       },
+      // ── Barra — inhabilitadas ────────────────────────
+      { id: "B02", zona: "barra",   capacidad: 5, estado: "disabled", personas: 0, horaApertura: null, productos: [] },
     ];
 
     const data = {};
