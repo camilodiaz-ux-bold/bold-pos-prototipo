@@ -1792,22 +1792,73 @@ renderCategories();
 renderProducts();
 
 /* ══════════════════════════════════════════
-   SWIPE ENTRE CATEGORÍAS
+   SWIPE ENTRE CATEGORÍAS (slide animado)
 ══════════════════════════════════════════ */
 (function() {
-  const threshold = 50;
-  let startX = 0;
+  const THRESHOLD = 50;
+  let startX    = 0;
+  let animating = false;
+
+  function slideCategory(nextId, direction) {
+    if (animating) return;
+    animating = true;
+
+    const area = document.getElementById('products-area');
+    const rect = area.getBoundingClientRect();
+
+    // Snapshot fijo del contenido visible actual
+    const snap = area.cloneNode(true);
+    Object.assign(snap.style, {
+      position: 'fixed', top: rect.top + 'px', left: rect.left + 'px',
+      width: rect.width + 'px', height: rect.height + 'px',
+      overflow: 'hidden', zIndex: '100', margin: '0',
+      transform: 'translateX(0)', transition: 'transform 200ms ease-out',
+      pointerEvents: 'none',
+    });
+    document.body.appendChild(snap);
+
+    // Re-renderizar nueva categoría (sin actualizar chip aún)
+    activeCategory = nextId;
+    renderProducts();
+    area.scrollTop = 0;
+
+    // Nueva categoría entra desde el lado opuesto
+    const enterFrom = direction === 'left' ? '100%' : '-100%';
+    const exitTo    = direction === 'left' ? '-100%' : '100%';
+    area.style.transition = 'none';
+    area.style.transform  = `translateX(${enterFrom})`;
+    area.offsetHeight; // forzar reflow
+
+    requestAnimationFrame(() => {
+      area.style.transition = 'transform 200ms ease-out';
+      area.style.transform  = 'translateX(0)';
+      snap.style.transform  = `translateX(${exitTo})`;
+    });
+
+    // Cleanup + actualizar chip al final de la animación
+    setTimeout(() => {
+      snap.remove();
+      area.style.transform  = '';
+      area.style.transition = '';
+      renderCategories();
+      document.querySelector('.cat-chip.active')?.scrollIntoView({
+        behavior: 'smooth', inline: 'center', block: 'nearest'
+      });
+      animating = false;
+    }, 220);
+  }
+
   const el = document.getElementById('products-area');
   el.addEventListener('touchstart', function(e) {
     startX = e.touches[0].clientX;
   }, { passive: true });
   el.addEventListener('touchend', function(e) {
     const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) < threshold) return;
-    const ids = CATEGORIES.map(c => c.id);
-    const idx = ids.indexOf(activeCategory);
+    if (Math.abs(diff) < THRESHOLD) return;
+    const ids  = CATEGORIES.map(c => c.id);
+    const idx  = ids.indexOf(activeCategory);
     const next = diff > 0 ? ids[idx + 1] : ids[idx - 1];
-    if (next) switchCategory(next);
+    if (next) slideCategory(next, diff > 0 ? 'left' : 'right');
   }, { passive: true });
 })();
 

@@ -935,22 +935,72 @@ window.addEventListener('pageshow', function() {
 });
 
 /* ══════════════════════════════════════════
-   SWIPE ENTRE ZONAS
+   SWIPE ENTRE ZONAS (slide animado)
 ══════════════════════════════════════════ */
 (function() {
   const ZONE_ORDER = ['salon', 'terraza', 'barra'];
-  const threshold  = 50;
-  let startX = 0;
+  const THRESHOLD  = 50;
+  let startX    = 0;
+  let animating = false;
+
+  function slideZone(nextZone, direction) {
+    if (animating) return;
+    animating = true;
+
+    const listView = document.getElementById('list-view');
+    const rect     = listView.getBoundingClientRect();
+
+    // Snapshot fijo del contenido actual
+    const snap = listView.cloneNode(true);
+    Object.assign(snap.style, {
+      position: 'fixed', top: rect.top + 'px', left: rect.left + 'px',
+      width: rect.width + 'px', height: rect.height + 'px',
+      overflow: 'hidden', zIndex: '100', margin: '0',
+      transform: 'translateX(0)', transition: 'transform 200ms ease-out',
+      pointerEvents: 'none',
+    });
+    document.body.appendChild(snap);
+
+    // Re-renderizar zona nueva (sin actualizar tab aún)
+    renderListView(nextZone, searchQuery);
+    listView.scrollTop = 0;
+
+    // Nueva zona entra desde el lado opuesto
+    const enterFrom = direction === 'left' ? '100%' : '-100%';
+    const exitTo    = direction === 'left' ? '-100%' : '100%';
+    listView.style.transition = 'none';
+    listView.style.transform  = `translateX(${enterFrom})`;
+    listView.offsetHeight; // forzar reflow
+
+    requestAnimationFrame(() => {
+      listView.style.transition = 'transform 200ms ease-out';
+      listView.style.transform  = 'translateX(0)';
+      snap.style.transform      = `translateX(${exitTo})`;
+    });
+
+    // Cleanup + actualizar tab al final de la animación
+    setTimeout(() => {
+      snap.remove();
+      listView.style.transform  = '';
+      listView.style.transition = '';
+      activeZone = nextZone;
+      document.querySelectorAll('.zone-text-tab').forEach(c =>
+        c.classList.toggle('active', c.dataset.zone === nextZone)
+      );
+      animating = false;
+    }, 220);
+  }
+
   const el = document.getElementById('list-view');
   el.addEventListener('touchstart', function(e) {
     startX = e.touches[0].clientX;
   }, { passive: true });
   el.addEventListener('touchend', function(e) {
     const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) < threshold) return;
-    const idx = ZONE_ORDER.indexOf(activeZone);
+    if (Math.abs(diff) < THRESHOLD) return;
+    const idx  = ZONE_ORDER.indexOf(activeZone);
     const next = diff > 0 ? ZONE_ORDER[idx + 1] : ZONE_ORDER[idx - 1];
-    if (next) switchZone(next);
+    if (next) slideZone(next, diff > 0 ? 'left' : 'right');
   }, { passive: true });
 })();
 </script>
