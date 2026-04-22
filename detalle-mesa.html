@@ -296,6 +296,49 @@
       line-height: 20px;
     }
 
+    /* ─── Bill items (cuenta solicitada, read-only) ─── */
+    #bill-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 16px;
+    }
+    .bill-item-card {
+      background: var(--black-0, white);
+      border-radius: 12px;
+      box-shadow: 0px 2px 8px rgba(18,30,108,0.06);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .bill-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .bill-item-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--black-100);
+      line-height: 20px;
+      flex: 1;
+    }
+    .bill-item-price {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--black-100);
+      line-height: 20px;
+      white-space: nowrap;
+    }
+    .bill-item-nota {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--black-40, #969696);
+      line-height: 16px;
+    }
+
     /* ─── Cart btn (replaces scanner) ─── */
     #btn-cart {
       position: relative;
@@ -903,6 +946,7 @@
       <small>Intenta con otro nombre o categoría</small>
     </div>
     <div id="products-grid"><!-- JS --></div>
+    <div id="bill-items-list" style="display:none"></div>
   </div>
 
   <!-- BOTTOM BAR -->
@@ -1258,7 +1302,37 @@ function getVisible() {
   return list;
 }
 
+function renderBillItems() {
+  const container = document.getElementById('bill-items-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // Group cart lines by product id, summing quantities
+  const groups = {};
+  cart.forEach(line => {
+    if (!groups[line.id]) {
+      groups[line.id] = { nombre: line.nombre, precio: line.precio, cantidad: 0, nota: '' };
+    }
+    groups[line.id].cantidad += (line.cantidad || 1);
+    if (!groups[line.id].nota && line.nota) groups[line.id].nota = line.nota;
+  });
+
+  Object.values(groups).forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'bill-item-card';
+    card.innerHTML = `
+      <div class="bill-item-row">
+        <span class="bill-item-name">${item.nombre} × ${item.cantidad}</span>
+        <span class="bill-item-price">${fmt(item.precio * item.cantidad)}</span>
+      </div>
+      ${item.nota ? `<span class="bill-item-nota">${item.nota}</span>` : ''}
+    `;
+    container.appendChild(card);
+  });
+}
+
 function renderProducts() {
+  if (mesaState === "bill_requested") return;
   const grid  = document.getElementById("products-grid");
   const empty = document.getElementById("empty-state");
   const list  = getVisible();
@@ -1795,6 +1869,15 @@ function handleScanOverlayClick(e) {
   comandaState = stored.estado || "pending";
 
   syncCartBar();
+
+  if (mesaState === "bill_requested") {
+    document.getElementById('search-bar-wrap').style.display = 'none';
+    document.getElementById('cats-wrap').style.display = 'none';
+    document.getElementById('products-grid').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('bill-items-list').style.display = 'flex';
+    renderBillItems();
+  }
 })();
 
 updateClock();
