@@ -1149,7 +1149,7 @@ const PRODUCTS = [
 let activeCategory = "entradas-frias";
 let searchQuery    = "";
 let favorites      = new Set();
-let cart           = {}; // productId → qty
+let cart           = []; // [{ lineId, id, nombre, precio, cantidad, nota, categoria }]
 let currentMesaId  = null;
 // 'pending' | 'sent' | 'modified'
 let comandaState   = "pending";
@@ -1275,7 +1275,7 @@ function renderProducts() {
 
   list.forEach(product => {
     const cat = catById(product.cat) || CATEGORIES[1];
-    const qty = cart[product.id] || 0;
+    const qty = cart.filter(l => l.id === product.id).length;
     const fav = favorites.has(product.id);
 
     const card = document.createElement("div");
@@ -1326,18 +1326,17 @@ function toggleFavorite(id) {
    CART
 ══════════════════════════════════════════ */
 function addToCart(id) {
-  cart[id] = (cart[id] || 0) + 1;
-  if (currentMesaId) {
-    const product = PRODUCTS.find(p => p.id === id);
-    if (product) {
-      DataManager.agregarProducto(currentMesaId, {
-        id: product.id,
-        nombre: product.name,
-        precio: product.price,
-        categoria: product.cat,
-      });
-    }
-  }
+  const product = PRODUCTS.find(p => p.id === id);
+  if (!product) return;
+  cart.push({
+    lineId:    Date.now() + '-' + Math.floor(Math.random() * 1e6),
+    id:        product.id,
+    nombre:    product.name,
+    precio:    product.price,
+    cantidad:  1,
+    nota:      '',
+    categoria: product.cat,
+  });
   // Si la comanda ya fue enviada, marcarla como modificada
   if (comandaState === "sent") {
     setComandaState("modified");
@@ -1347,11 +1346,8 @@ function addToCart(id) {
 }
 
 function syncCartBar() {
-  const totalQty = Object.values(cart).reduce((a, b) => a + b, 0);
-  const totalAmt = Object.entries(cart).reduce((sum, [id, qty]) => {
-    const p = PRODUCTS.find(x => x.id === id);
-    return sum + (p ? p.price * qty : 0);
-  }, 0);
+  const totalQty = cart.length;
+  const totalAmt = cart.reduce((sum, l) => sum + l.precio * l.cantidad, 0);
 
   document.getElementById("order-count").textContent =
     totalQty === 0 ? "0 productos" : `${totalQty} producto${totalQty !== 1 ? "s" : ""}`;
@@ -1385,7 +1381,7 @@ function goBackToPedido() {
 
   // Compute new comanda estado based on current cart + previous state
   const ms        = loadMsState(mesaId);
-  const totalQty  = Object.values(cart).reduce((a, b) => a + b, 0);
+  const totalQty  = cart.length;
   let nuevoEstado = ms.estado || 'SIN_PRODUCTOS';
 
   if (totalQty > 0) {
@@ -1400,17 +1396,12 @@ function goBackToPedido() {
     if (nuevoEstado !== 'CUENTA_SOLICITADA') nuevoEstado = 'SIN_PRODUCTOS';
   }
 
-  // Convert cart dict {id: qty} to products array for mesa_{ID}
-  const productos = Object.entries(cart).map(([id, qty]) => {
-    const p = PRODUCTS.find(x => x.id === id);
-    return p ? { id: p.id, nombre: p.name, precio: p.price, cantidad: qty } : null;
-  }).filter(Boolean);
-
+  // cart is already an array of lines with lineId
   // Write full state to mesa_{ID} BEFORE navigating (source of truth)
-  saveMsState(mesaId, { estado: nuevoEstado, productos });
+  saveMsState(mesaId, { estado: nuevoEstado, productos: cart });
 
   // Sync DataManager so venta-mesas.html reflects the updated products
-  DataManager.actualizarEstadoMesa(mesaId, 'occupied', productos);
+  DataManager.actualizarEstadoMesa(mesaId, 'occupied', cart);
 
   const params = new URLSearchParams({ mesa: mesaId, zona });
   location.href = "detalle-pedido.html?" + params.toString();
@@ -1772,10 +1763,31 @@ function handleScanOverlayClick(e) {
   // Mesa state
   mesaState = (estado === "bill_requested") ? "bill_requested" : "occupied";
 
-  // Load existing products
-  const mesa = DataManager.getMesa(mesaId);
-  if (mesa && mesa.productos && mesa.productos.length > 0) {
-    mesa.productos.forEach(prod => { cart[prod.id] = prod.cantidad; });
+  // Load existing products (lines with lineId from mesa_{ID})
+  const storedMs = loadMsState(mesaId);
+  if (storedMs.productos && storedMs.productos.length > 0) {
+    cart = storedMs.productos.map(p => ({
+      lineId:    p.lineId || (Date.now() + '-' + Math.floor(Math.random() * 1e6)),
+      id:        p.id,
+      nombre:    p.nombre || p.name || '',
+      precio:    p.precio || p.price || 0,
+      cantidad:  p.cantidad || 1,
+      nota:      p.nota || '',
+      categoria: p.categoria || '',
+    }));
+  } else {
+    const mesa = DataManager.getMesa(mesaId);
+    if (mesa && mesa.productos && mesa.productos.length > 0) {
+      cart = mesa.productos.map(p => ({
+        lineId:    Date.now() + '-' + Math.floor(Math.random() * 1e6),
+        id:        p.id,
+        nombre:    p.nombre || '',
+        precio:    p.precio || 0,
+        cantidad:  p.cantidad || 1,
+        nota:      '',
+        categoria: p.categoria || '',
+      }));
+    }
   }
 
   // Restore comanda state (needed for "modified" tracking)

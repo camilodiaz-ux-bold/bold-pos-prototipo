@@ -282,10 +282,10 @@
 <script src="data-manager.js"></script>
 <script>
 /* ══ URL params ══ */
-const params     = new URLSearchParams(location.search);
-const mesaId     = params.get('mesa')      || 'S05';
-const productoId = params.get('producto')  || '';
-const zona       = params.get('zona')      || 'salon';
+const params  = new URLSearchParams(location.search);
+const mesaId  = params.get('mesa')  || 'S05';
+const lineId  = params.get('linea') || '';
+const zona    = params.get('zona')  || 'salon';
 
 /* ══ State ══ */
 let producto = null;
@@ -328,7 +328,7 @@ function changeCantidad(delta) {
 function guardar() {
   const ms       = loadMsState(mesaId);
   const productos = ms.productos || [];
-  const idx      = productos.findIndex(p => p.id === productoId);
+  const idx      = productos.findIndex(p => p.lineId === lineId);
   if (idx === -1) { goBack(); return; }
 
   const notaVal      = document.getElementById('nota-input').value.trim();
@@ -357,7 +357,7 @@ function confirmarEliminar() {
 
 function eliminar() {
   const ms       = loadMsState(mesaId);
-  const productos = (ms.productos || []).filter(p => p.id !== productoId);
+  const productos = (ms.productos || []).filter(p => p.lineId !== lineId);
   const nuevoEstado = productos.length > 0 ? (ms.estado || 'PEDIDO_PENDIENTE') : 'SIN_PRODUCTOS';
   const estadoDM    = estadoToDM(nuevoEstado);
 
@@ -386,11 +386,11 @@ function updateClock() {
   updateClock();
   setInterval(updateClock, 30000);
 
-  if (!productoId) { goBack(); return; }
+  if (!lineId) { goBack(); return; }
 
   const ms       = loadMsState(mesaId);
   const productos = ms.productos || [];
-  producto       = productos.find(p => p.id === productoId);
+  producto       = productos.find(p => p.lineId === lineId);
 
   if (!producto) { goBack(); return; }
 

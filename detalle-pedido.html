@@ -709,7 +709,7 @@ function renderProductList(readOnly) {
       ? `<span class="product-card-nota-text">${escHtml(item.nota.trim())}</span>`
       : `<span class="product-card-agregar-nota">Agregar nota</span>`;
     return `
-      <div class="product-card" onclick="goToEditarProducto('${item.id}')">
+      <div class="product-card" onclick="goToEditarProducto('${item.lineId}')">
         <div class="product-card-top">
           <div class="product-card-name-col">
             <span class="product-card-name">${escHtml(item.nombre)}</span>
@@ -717,19 +717,19 @@ function renderProductList(readOnly) {
           </div>
           <div class="product-card-controls" onclick="event.stopPropagation()">
             <div class="qty-counter">
-              <button class="qty-counter-btn" onclick="changeQty('${item.id}',-1)">
+              <button class="qty-counter-btn" onclick="changeQty('${item.lineId}',-1)">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M5 12h14" stroke="#121e6c" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </button>
               <span class="qty-counter-num">${item.cantidad}</span>
-              <button class="qty-counter-btn" onclick="changeQty('${item.id}',1)">
+              <button class="qty-counter-btn" onclick="changeQty('${item.lineId}',1)">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M12 5v14M5 12h14" stroke="#121e6c" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </button>
             </div>
-            <button class="btn-trash" onclick="deleteItem('${item.id}')">
+            <button class="btn-trash" onclick="deleteItem('${item.lineId}')">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#969696" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -745,8 +745,8 @@ function renderProductList(readOnly) {
 }
 
 /* ══ Navigate to edit product ══ */
-function goToEditarProducto(productId) {
-  const p = new URLSearchParams({ mesa: mesaId, producto: productId, zona });
+function goToEditarProducto(lineId) {
+  const p = new URLSearchParams({ mesa: mesaId, linea: lineId, zona });
   location.href = 'editar-producto.html?' + p.toString();
 }
 
@@ -923,18 +923,18 @@ function handleSolicitarCuenta() {
 }
 
 /* ══ Qty controls ══ */
-function changeQty(productId, delta) {
-  const item = cart.find(p => p.id === productId);
+function changeQty(lineId, delta) {
+  const item = cart.find(p => p.lineId === lineId);
   if (!item) return;
   const newQty = item.cantidad + delta;
-  if (newQty <= 0) { deleteItem(productId); return; }
+  if (newQty <= 0) { deleteItem(lineId); return; }
   item.cantidad = newQty;
   persistProducts();
   markModifiedIfSent();
   render();
 }
-function deleteItem(productId) {
-  cart = cart.filter(p => p.id !== productId);
+function deleteItem(lineId) {
+  cart = cart.filter(p => p.lineId !== lineId);
   persistProducts();
   markModifiedIfSent();
   if (cart.length === 0) {
@@ -1008,11 +1008,11 @@ function ejecutarCancelar() {
     horaComanda = ms.horaComanda || null;
     // Products come from mesa_{ID} first; fall back to DataManager
     if (ms.productos && ms.productos.length > 0) {
-      cart = ms.productos.map(p => ({ ...p }));
+      cart = ms.productos.map(p => ({ lineId: p.lineId || (Date.now() + '-' + Math.floor(Math.random() * 1e6)), ...p }));
     } else {
       const dm = DataManager.getMesa(mesaId);
       cart = (dm && dm.productos && dm.productos.length > 0)
-        ? dm.productos.map(p => ({ ...p }))
+        ? dm.productos.map(p => ({ lineId: p.lineId || (Date.now() + '-' + Math.floor(Math.random() * 1e6)), ...p }))
         : [];
     }
   } else {
@@ -1023,13 +1023,13 @@ function ejecutarCancelar() {
       cart   = [];
     } else if (dm.estado === 'bill_requested') {
       estado = ESTADOS.CUENTA_SOLICITADA;
-      cart   = dm.productos.map(p => ({ id: p.id, nombre: p.nombre, precio: p.precio, cantidad: p.cantidad }));
+      cart   = dm.productos.map(p => ({ lineId: p.lineId || (Date.now() + '-' + Math.floor(Math.random() * 1e6)), id: p.id, nombre: p.nombre, precio: p.precio, cantidad: p.cantidad }));
     } else {
       // occupied — try migrating old comanda state
       const oldCs = (() => {
         try { return JSON.parse(localStorage.getItem('boldPOS_comanda_' + mesaId)) || {}; } catch(e) { return {}; }
       })();
-      cart = (dm.productos || []).map(p => ({ ...p }));
+      cart = (dm.productos || []).map(p => ({ lineId: p.lineId || (Date.now() + '-' + Math.floor(Math.random() * 1e6)), ...p }));
       if (oldCs.estado === 'confirmed') {
         estado = ESTADOS.PEDIDO_CONFIRMADO;
       } else if (oldCs.estado === 'sent') {
