@@ -72,13 +72,8 @@
     .info-item { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
     .info-val { font-size: 12px; font-weight: 500; color: var(--black-100); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .info-sep { width: 1px; height: 20px; background: #E8E9F0; flex-shrink: 0; margin: 0 5px; }
-    #btn-dots-info {
-      width: 28px; height: 28px; border: none; background: transparent;
-      cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-left: 4px; -webkit-tap-highlight-color: transparent;
-      border-radius: 6px; transition: background .12s;
-    }
-    #btn-dots-info:active { background: var(--blue-10); }
+    #mesa-info-card { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    #mesa-info-card:active { opacity: 0.75; }
 
     /* ─── Section header: PEDIDO + ＋ Agregar ─── */
     #section-header {
@@ -361,16 +356,8 @@
   </div>
 
   <!-- Mesa info card -->
-  <div id="mesa-info-card">
-    <div class="info-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#606060" stroke-width="1.6"/>
-        <circle cx="12" cy="9" r="2.5" stroke="#606060" stroke-width="1.6"/>
-      </svg>
-      <span class="info-val" id="du-zona">—</span>
-    </div>
-    <div class="info-sep"></div>
-    <div class="info-item">
+  <div id="mesa-info-card" onclick="openInfoDropUp()" role="button" aria-label="Ver detalles de mesa">
+    <div class="info-item" style="flex:0 0 auto;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
         <circle cx="9" cy="7" r="3" stroke="#606060" stroke-width="1.6"/>
         <path d="M3 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
@@ -380,15 +367,7 @@
       <span class="info-val" id="du-personas">—</span>
     </div>
     <div class="info-sep"></div>
-    <div class="info-item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-        <circle cx="12" cy="12" r="9" stroke="#606060" stroke-width="1.6"/>
-        <path d="M12 7v5l3 3" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-      <span class="info-val" id="du-apertura">—</span>
-    </div>
-    <div class="info-sep"></div>
-    <div class="info-item">
+    <div class="info-item" style="flex:0 0 auto;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
         <circle cx="12" cy="13" r="8" stroke="#606060" stroke-width="1.6"/>
         <path d="M12 9v4l2.5 2.5" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
@@ -396,13 +375,9 @@
       </svg>
       <span class="info-val" id="du-tiempo">—</span>
     </div>
-    <button id="btn-dots-info" onclick="openInfoDropUp()" aria-label="Más acciones">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <circle cx="5"  cy="12" r="1.5" fill="#606060"/>
-        <circle cx="12" cy="12" r="1.5" fill="#606060"/>
-        <circle cx="19" cy="12" r="1.5" fill="#606060"/>
-      </svg>
-    </button>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-left:auto;" aria-hidden="true">
+      <path d="M6 15l6-6 6 6" stroke="#606060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
   </div>
 
   <!-- Section header: PEDIDO + ＋ Agregar -->
@@ -656,10 +631,8 @@ function renderInfoCard() {
   if (estado === ESTADOS.DISPONIBLE) { card.style.display = 'none'; return; }
   card.style.display = '';
   const zonaLabel = { salon:'Salón', terraza:'Terraza', barra:'Barra' };
-  document.getElementById('du-zona').textContent = zonaLabel[zona] || zona;
   const mesa = DataManager.getMesa(mesaId);
   document.getElementById('du-personas').textContent = mesa ? (mesa.personas || '—') + ' pers.' : '—';
-  document.getElementById('du-apertura').textContent = mesa ? fmtApertura(mesa.horaApertura) : '—';
   document.getElementById('du-tiempo').textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : '—';
   // Drop Up fields
   document.getElementById('info-dropup-mesa-name').textContent  = 'Mesa ' + mesaId;
