@@ -63,22 +63,26 @@
     .badge-bill .pulse-dot { display: inline-block; background: #c0392b; animation: pulse-dot 1.2s ease-in-out infinite; }
     @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.5);opacity:0.6;} }
 
-    /* ─── Mesa info card ─── */
+    /* ─── Mesa info bar ─── */
     #mesa-info-card {
-      margin: 8px 16px 0; background: transparent;
-      padding: 4px 0; display: flex; align-items: center; flex-shrink: 0; gap: 8px;
+      margin: 8px 16px 0; background: #f3f3f3;
+      border-radius: 8px; padding: 10px 16px;
+      display: flex; align-items: center; flex-shrink: 0; gap: 0;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
     #mesa-info-card:active { opacity: 0.75; }
-    .info-chip {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: #f0f0f0; border-radius: 20px; padding: 4px 10px;
-      flex-shrink: 0;
+    .info-bar-content {
+      flex: 1; display: flex; align-items: center; gap: 4px;
+      min-width: 0; overflow: hidden;
     }
-    .info-chip svg { flex-shrink: 0; }
-    .info-chip-val {
+    .info-bar-item { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .info-bar-val {
       font-size: 13px; font-weight: 400; color: var(--black-100);
       white-space: nowrap; line-height: 18px;
+    }
+    .info-bar-sep {
+      font-size: 13px; font-weight: 400; color: var(--black-60);
+      margin: 0 8px; flex-shrink: 0; line-height: 18px;
     }
 
     /* ─── Section header: PEDIDO + ＋ Agregar ─── */
@@ -363,24 +367,27 @@
 
   <!-- Mesa info card -->
   <div id="mesa-info-card" onclick="openInfoDropUp()" role="button" aria-label="Ver detalles de mesa">
-    <div class="info-chip">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="9" cy="7" r="3" stroke="#606060" stroke-width="1.6"/>
-        <path d="M3 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M21 21v-1a4 4 0 0 0-3-3.85" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-      <span class="info-chip-val" id="du-chip-personas">—</span>
+    <div class="info-bar-content">
+      <div class="info-bar-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="9" cy="7" r="3" stroke="#606060" stroke-width="1.6"/>
+          <path d="M3 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M21 21v-1a4 4 0 0 0-3-3.85" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="info-bar-val" id="du-chip-personas">—</span>
+      </div>
+      <span class="info-bar-sep">·</span>
+      <div class="info-bar-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="13" r="8" stroke="#606060" stroke-width="1.6"/>
+          <path d="M12 9v4l2.5 2.5" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M9 2h6M12 2v3" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="info-bar-val" id="du-chip-tiempo">—</span>
+      </div>
     </div>
-    <div class="info-chip">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="13" r="8" stroke="#606060" stroke-width="1.6"/>
-        <path d="M12 9v4l2.5 2.5" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M9 2h6M12 2v3" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-      <span class="info-chip-val" id="du-chip-tiempo">—</span>
-    </div>
-    <svg id="info-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-left:auto;" aria-hidden="true">
+    <svg id="info-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;" aria-hidden="true">
       <path d="M6 9l6 6 6-6" stroke="#606060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
