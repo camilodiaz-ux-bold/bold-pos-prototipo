@@ -252,52 +252,67 @@
       flex-shrink: 0;
       line-height: 0;
     }
-    /* ─── List view ─── */
+    /* ─── Grid view — Figma 26607-2769 ─── */
     #list-view {
       flex: 1;
       overflow-y: auto;
       padding: 12px 16px 16px;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
       background: #FFFFFF;
+      align-content: start;
       scrollbar-width: none;
     }
     #list-view::-webkit-scrollbar { display: none; }
     .list-card {
       border-radius: 12px;
-      padding: 12px 16px;
-      min-height: 76px;
+      height: 138px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       cursor: default;
-      border: 1px solid rgba(0, 0, 0, 0.08);
     }
     .list-card.available { cursor: pointer; }
-    .list-card.disabled  { border: none; }
-    .list-card-row {
+    /* Info 1 — top section */
+    .gc-info1 {
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 2px;
+      flex-direction: column;
+      gap: 4px;
     }
-    .list-card-id {
-      /* Montserrat Semibold 14px */
-      flex: 1;
+    .gc-id {
       font-size: 14px;
       font-weight: 600;
       line-height: 20px;
     }
-    .list-card-status {
-      /* Montserrat Regular 12px — texto plano, sin pill */
-      display: inline-flex;
+    .gc-status-row {
+      display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
+    }
+    .gc-status {
       font-size: 12px;
       font-weight: 400;
       line-height: 16px;
-      white-space: nowrap;
+    }
+    .gc-meta {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+    }
+    .gc-time {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+      color: var(--black-100);
+    }
+    /* Info 2 — bottom section (occupied / bill_requested only) */
+    .gc-info2 { display: flex; flex-direction: column; }
+    .gc-amount {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 20px;
+      color: var(--black-100);
     }
     @keyframes pulse-dot {
       0%, 100% { transform: scale(1); opacity: 1; }
@@ -310,24 +325,6 @@
       background: #ff2947;
       flex-shrink: 0;
       animation: pulse-dot 1.2s ease-in-out infinite;
-    }
-    .list-card-meta {
-      /* Montserrat Regular 12px */
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 16px;
-    }
-    .list-card-time {
-      /* Montserrat Regular 12px */
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 16px;
-    }
-    .list-card-amount {
-      /* Montserrat Medium 14px */
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 20px;
     }
 
     /* ─── Drop-up overlay ─── */
@@ -658,8 +655,8 @@ const STATUS_META_COLOR = {
   disabled:       "#969696",
 };
 const STATUS_TIME_COLOR = {
-  occupied:       "#606060",
-  bill_requested: "#606060",
+  occupied:       "#1e1e1e",
+  bill_requested: "#1e1e1e",
 };
 
 /* Datos de estructura de zonas — estado siempre desde DataManager */
@@ -724,22 +721,22 @@ function renderListView(zoneKey, query) {
       (status === "disabled"  ? " disabled"  : "");
     card.dataset.id = table.id;
     card.style.background = cardBg;
+    card.style.padding = (status === 'occupied' || status === 'bill_requested') ? '12px 16px' : '12px';
 
     const personasText = (status === 'occupied' || status === 'bill_requested') && stored && stored.personas
       ? `${stored.personas} personas en mesa`
       : `${table.cap} personas`;
     card.innerHTML = `
-      <div class="list-card-row">
-        <span class="list-card-id" style="color:${textColor};">${table.id}</span>
-        <span class="list-card-status" style="color:${textColor};">${pulseDot}${STATUS_LABELS[status]}</span>
+      <div class="gc-info1">
+        <span class="gc-id" style="color:${textColor};">${table.id}</span>
+        <div class="gc-status-row">
+          ${pulseDot}
+          <span class="gc-status" style="color:${textColor};">${STATUS_LABELS[status]}</span>
+        </div>
+        <span class="gc-meta" style="color:${metaColor};">${personasText}</span>
+        ${time ? `<span class="gc-time" style="color:${timeColor};">${time}</span>` : ""}
       </div>
-      <div class="list-card-row">
-        <span class="list-card-meta" style="color:${metaColor};">${personasText}</span>
-      </div>
-      ${(time || amount) ? `<div class="list-card-row">
-        <span class="list-card-time" style="color:${timeColor};">${time || ""}</span>
-        ${amount ? `<span class="list-card-amount" style="color:${textColor};">${amount}</span>` : ""}
-      </div>` : ""}
+      ${amount ? `<div class="gc-info2"><span class="gc-amount">${amount}</span></div>` : ""}
     `;
 
     card.addEventListener("click", () => handleTableTap({ ...table, status }));
