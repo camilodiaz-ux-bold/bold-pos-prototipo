@@ -65,9 +65,8 @@
 
     /* ─── Mesa info card ─── */
     #mesa-info-card {
-      margin: 8px 16px 0; background: var(--black-0);
-      border: 1px solid #E8E9F0; border-radius: 12px;
-      padding: 10px 12px; display: flex; align-items: center; flex-shrink: 0;
+      margin: 8px 16px 0; background: transparent;
+      padding: 4px 0; display: flex; align-items: center; flex-shrink: 0; gap: 6px;
     }
     .info-item { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
     .info-val { font-size: 12px; font-weight: 500; color: var(--black-100); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -357,14 +356,8 @@
 
   <!-- Mesa info card -->
   <div id="mesa-info-card" onclick="openInfoDropUp()" role="button" aria-label="Ver detalles de mesa">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-      <circle cx="9" cy="7" r="3" stroke="#606060" stroke-width="1.6"/>
-      <path d="M3 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M21 21v-1a4 4 0 0 0-3-3.85" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>
     <span class="info-val" id="du-info-text" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
-    <svg id="info-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-left:4px;" aria-hidden="true">
+    <svg id="info-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;" aria-hidden="true">
       <path d="M6 9l6 6 6-6" stroke="#606060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
@@ -623,7 +616,7 @@ function renderInfoCard() {
   const mesa    = DataManager.getMesa(mesaId);
   const personas = mesa && mesa.personas ? mesa.personas : null;
   const tiempo   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : null;
-  let infoText   = personas ? `${personas} persona${personas !== 1 ? 's' : ''}` : '—';
+  let infoText   = personas ? `${personas} persona${personas !== 1 ? 's' : ''} en mesa` : '—';
   if (tiempo) infoText += ` · Abierta hace ${tiempo}`;
   document.getElementById('du-info-text').textContent = infoText;
   // Drop Up fields
