@@ -266,16 +266,33 @@
 
     /* ─── Toast ─── */
     #toast {
-      position: absolute; bottom: 84px; left: 16px; right: 16px;
-      padding: 12px 16px; border-radius: 12px; z-index: 400;
-      font-family: var(--font); font-size: 13px; font-weight: 500;
-      display: flex; align-items: center; gap: 10px;
-      opacity: 0; transform: translateY(8px); pointer-events: none;
-      transition: opacity .2s, transform .2s;
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      width: calc(100% - 32px);
+      max-width: 361px;
+      background: var(--black-100);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
     }
-    #toast.show { opacity: 1; transform: translateY(0); }
-    #toast.toast-success { background: #10B981; color: #fff; }
-    #toast.toast-warning { background: #FFC217; color: #1e1e1e; }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    #toast-text {
+      color: var(--black-0);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+    }
 
     /* ─── Info Drop Up — Figma 26630-10680 ─── */
     #info-dropup-overlay { display: none; position: absolute; inset: 0; z-index: 300; background: rgba(0,0,0,.45); align-items: flex-end; }
@@ -471,7 +488,13 @@
   </div>
 
   <!-- Toast -->
-  <div id="toast"></div>
+  <div id="toast">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
+      <circle cx="12" cy="12" r="10" fill="#10B981"/>
+      <path d="M7 12l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span id="toast-text"></span>
+  </div>
 
   <!-- Info Drop Up — Figma 26630-10680 -->
   <div id="info-dropup-overlay" onclick="handleInfoDropUpClick(event)">
@@ -832,7 +855,6 @@ function render() {
 
     case ESTADOS.PEDIDO_CONFIRMADO_CON_CAMBIOS:
       flex('section-header', true); flex('btn-agregar-header', true);
-      showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
       renderProductList(false);
       renderTotals();
       show('totals-wrap', true);
@@ -852,7 +874,6 @@ function render() {
 
     case ESTADOS.COMANDA_CON_AJUSTES:
       flex('section-header', true); flex('btn-agregar-header', true);
-      showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
       renderProductList(false);
       renderTotals();
       show('totals-wrap', true);
@@ -862,7 +883,6 @@ function render() {
 
     case ESTADOS.CAMBIOS_GUARDADOS:
       flex('section-header', true); flex('btn-agregar-header', true);
-      showAlert('Cambios guardados — pendiente reenviar comanda a cocina', 'modified');
       renderProductList(false);
       renderTotals();
       show('totals-wrap', true);
@@ -971,16 +991,18 @@ function markModifiedIfSent() {
   if (estado === ESTADOS.COMANDA_ENVIADA || estado === ESTADOS.CAMBIOS_GUARDADOS) {
     estado = ESTADOS.COMANDA_CON_AJUSTES;
     saveMsState(mesaId, { estado, horaComanda });
+    showToast('Cambios pendientes de confirmar en el pedido');
   } else if (estado === ESTADOS.PEDIDO_CONFIRMADO) {
     estado = ESTADOS.PEDIDO_CONFIRMADO_CON_CAMBIOS;
     saveMsState(mesaId, { estado });
+    showToast('Cambios pendientes de confirmar en el pedido');
   }
 }
 
 function handleGuardarCambios() {
   // Estado 5 (COMANDA_CON_AJUSTES) → Estado 6 (CAMBIOS_GUARDADOS)
-  showToast('Cambios del pedido guardados');
   transicion(ESTADOS.CAMBIOS_GUARDADOS, { horaComanda });
+  showToast('Cambios guardados — pendiente reenviar comanda a cocina');
 }
 
 function handleGuardarCambiosPendiente() {
@@ -989,13 +1011,12 @@ function handleGuardarCambiosPendiente() {
   transicion(ESTADOS.PEDIDO_CONFIRMADO);
 }
 
-function showToast(msg, type) {
-  type = type || 'success';
+function showToast(msg) {
   const t = el('toast');
-  t.textContent = msg;
-  t.className = 'show toast-' + type;
+  el('toast-text').textContent = msg;
+  t.classList.add('show');
   clearTimeout(t._tid);
-  t._tid = setTimeout(() => { t.className = ''; }, 2500);
+  t._tid = setTimeout(() => { t.classList.remove('show'); }, 3000);
 }
 
 /* ══ Info Drop Up ══ */
