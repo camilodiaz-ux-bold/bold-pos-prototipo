@@ -205,9 +205,11 @@
       font-size: 16px; font-weight: 500; color: var(--blue-100);
       width: 48px; text-align: center; line-height: 20px;
     }
-    .qty-readonly { font-size: 20px; font-weight: 600; color: var(--black-100); line-height: 24px; flex-shrink: 0; text-align: right; }
-    .product-card-readonly-inner { display: flex; flex-direction: column; gap: 22px; justify-content: center; min-height: 68px; width: 100%; }
-    .product-card-readonly-nota { font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .product-card.readonly { min-height: auto; padding: 12px 14px; border-radius: 12px; flex-direction: column; justify-content: flex-start; gap: 4px; }
+    .product-card-readonly-row { display: flex; align-items: center; gap: 8px; }
+    .product-card-readonly-name { font-size: 14px; font-weight: 500; color: var(--black-100); line-height: 20px; flex: 1; }
+    .product-card-readonly-price { font-size: 14px; font-weight: 500; color: var(--black-100); line-height: 20px; white-space: nowrap; }
+    .product-card-readonly-nota { font-size: 12px; font-weight: 400; color: var(--black-40, #969696); line-height: 16px; }
 
     .btn-trash {
       width: 24px; height: 24px; border: none; background: transparent;
@@ -678,16 +680,11 @@ function renderProductList(readOnly) {
         ? `<span class="product-card-readonly-nota">${escHtml(item.nota.trim())}</span>` : '';
       return `
         <div class="product-card readonly">
-          <div class="product-card-readonly-inner">
-            <div class="product-card-top">
-              <span class="product-card-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(item.nombre)}</span>
-              <span class="qty-readonly">x${item.cantidad}</span>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:2px;">
-              <span class="product-card-price">${sub}</span>
-              ${notaRO}
-            </div>
+          <div class="product-card-readonly-row">
+            <span class="product-card-readonly-name">${escHtml(item.nombre)} × ${item.cantidad}</span>
+            <span class="product-card-readonly-price">${sub}</span>
           </div>
+          ${notaRO}
         </div>`;
     }
 
