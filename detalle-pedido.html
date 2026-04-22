@@ -66,13 +66,20 @@
     /* ─── Mesa info card ─── */
     #mesa-info-card {
       margin: 8px 16px 0; background: transparent;
-      padding: 4px 0; display: flex; align-items: center; flex-shrink: 0; gap: 6px;
+      padding: 4px 0; display: flex; align-items: center; flex-shrink: 0; gap: 8px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
-    .info-item { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
-    .info-val { font-size: 12px; font-weight: 500; color: var(--black-100); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .info-sep { width: 1px; height: 20px; background: #E8E9F0; flex-shrink: 0; margin: 0 5px; }
-    #mesa-info-card { cursor: pointer; -webkit-tap-highlight-color: transparent; }
     #mesa-info-card:active { opacity: 0.75; }
+    .info-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #f0f0f0; border-radius: 20px; padding: 4px 10px;
+      flex-shrink: 0;
+    }
+    .info-chip svg { flex-shrink: 0; }
+    .info-chip-val {
+      font-size: 13px; font-weight: 400; color: var(--black-100);
+      white-space: nowrap; line-height: 18px;
+    }
 
     /* ─── Section header: PEDIDO + ＋ Agregar ─── */
     #section-header {
@@ -356,8 +363,24 @@
 
   <!-- Mesa info card -->
   <div id="mesa-info-card" onclick="openInfoDropUp()" role="button" aria-label="Ver detalles de mesa">
-    <span class="info-val" id="du-info-text" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
-    <svg id="info-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;" aria-hidden="true">
+    <div class="info-chip">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="9" cy="7" r="3" stroke="#606060" stroke-width="1.6"/>
+        <path d="M3 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M21 21v-1a4 4 0 0 0-3-3.85" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="info-chip-val" id="du-chip-personas">—</span>
+    </div>
+    <div class="info-chip">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="13" r="8" stroke="#606060" stroke-width="1.6"/>
+        <path d="M12 9v4l2.5 2.5" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M9 2h6M12 2v3" stroke="#606060" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="info-chip-val" id="du-chip-tiempo">—</span>
+    </div>
+    <svg id="info-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-left:auto;" aria-hidden="true">
       <path d="M6 9l6 6 6-6" stroke="#606060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
@@ -616,9 +639,8 @@ function renderInfoCard() {
   const mesa    = DataManager.getMesa(mesaId);
   const personas = mesa && mesa.personas ? mesa.personas : null;
   const tiempo   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : null;
-  let infoText   = personas ? `${personas} persona${personas !== 1 ? 's' : ''} en mesa` : '—';
-  if (tiempo) infoText += ` · Abierta hace ${tiempo}`;
-  document.getElementById('du-info-text').textContent = infoText;
+  document.getElementById('du-chip-personas').textContent = personas ? String(personas) : '—';
+  document.getElementById('du-chip-tiempo').textContent   = tiempo || '—';
   // Drop Up fields
   document.getElementById('info-dropup-mesa-name').textContent  = 'Mesa ' + mesaId;
   document.getElementById('info-dropup-zona-label').textContent = 'Zona: ' + (zonaLabel[zona] || zona);
