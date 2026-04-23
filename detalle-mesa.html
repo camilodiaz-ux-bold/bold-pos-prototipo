@@ -1880,9 +1880,21 @@ function handleScanOverlayClick(e) {
     }
   }
 
-  // Restore comanda state (needed for "modified" tracking)
-  const stored = loadComandaState(mesaId);
-  comandaState = stored.estado || "pending";
+  // Restore comanda state — derive from mesa_{ID} written by detalle-pedido
+  // (COMANDA_ENVIADA / CAMBIOS_GUARDADOS → sent; COMANDA_CON_AJUSTES → modified)
+  const msStored = (function() {
+    try { return JSON.parse(localStorage.getItem('mesa_' + mesaId)) || {}; } catch(e) { return {}; }
+  })();
+  const msEstado = msStored.estado || "";
+  if (msEstado === "COMANDA_ENVIADA" || msEstado === "CAMBIOS_GUARDADOS") {
+    comandaState = "sent";
+  } else if (msEstado === "COMANDA_CON_AJUSTES") {
+    comandaState = "modified";
+  } else {
+    // Fall back to own key for state set within detalle-mesa session
+    const stored = loadComandaState(mesaId);
+    comandaState = stored.estado || "pending";
+  }
 
   syncCartBar();
   updateComandaUI();
