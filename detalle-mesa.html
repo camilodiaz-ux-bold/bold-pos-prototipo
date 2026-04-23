@@ -464,8 +464,27 @@
       display: flex;
       flex-direction: column;
     }
-    /* Fila 1: estado comanda — hidden in catalog mode */
-    #comanda-status-row { display: none !important; }
+    /* Fila 1: estado comanda */
+    #comanda-status-row {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 18px;
+      border-radius: 0;
+    }
+    #comanda-status-row.sent {
+      display: flex;
+      background: #ECFDF5;
+      color: #065F46;
+    }
+    #comanda-status-row.modified {
+      display: flex;
+      background: #FFFBEB;
+      color: #92400E;
+    }
     /* Fila 2: resumen + botón (siempre visible) */
     #bottom-main-row {
       display: flex;
@@ -1525,7 +1544,7 @@ function setComandaState(newState, hora) {
   if (currentMesaId) {
     saveComandaState(currentMesaId, newState, hora || null);
   }
-  // UI update skipped — detalle-mesa is pure catalog; state is read by detalle-pedido
+  updateComandaUI();
 }
 
 function updateComandaUI() {
@@ -1539,12 +1558,9 @@ function updateComandaUI() {
   spinner.style.display = "none";
   row.className = "";
 
-  // Estado de mesa: cuenta solicitada
+  // Estado de mesa: cuenta solicitada — ocultar banner de comanda
   if (mesaState === "bill_requested") {
-    const hora = currentMesaId ? loadHoraCuenta(currentMesaId) : null;
-    row.classList.add("bill_requested");
-    rowIcon.textContent = "⏱";
-    rowText.textContent = hora ? `Cuenta solicitada · ${fmtHora(hora)}` : "Cuenta solicitada";
+    row.style.display = "none";
     btnText.textContent = "Pagar";
     btn.disabled = false;
     return;
@@ -1561,13 +1577,13 @@ function updateComandaUI() {
     const hora   = stored.hora ? fmtHora(stored.hora) : "";
     row.classList.add("sent");
     rowIcon.textContent = "✓";
-    rowText.textContent = hora ? `Comanda enviada · ${hora}` : "Comanda enviada";
+    rowText.textContent = hora ? `Todos los ítems enviados a cocina · ${hora}` : "Todos los ítems enviados a cocina";
     btnText.textContent = "Solicitar cuenta";
     btn.disabled = false;
   } else if (comandaState === "modified") {
     row.classList.add("modified");
     rowIcon.textContent = "⚠";
-    rowText.textContent = "Cambios pendientes";
+    rowText.textContent = "Cambios pendientes de reenviar comanda a cocina";
     btnText.textContent = "Reenviar comanda";
   }
 }
