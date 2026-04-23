@@ -110,22 +110,7 @@
     #mesa-info-card {
       display: none;
     }
-    /* ─── Banner de cambios pendientes (contenido, inline permanente) ─── */
-    #pending-banner {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      background: #FFFBEB;
-      color: #92400E;
-      font-size: 13px;
-      font-weight: 500;
-      line-height: 18px;
-      flex-shrink: 0;
-    }
-    #pending-banner.show { display: flex; }
-    #pending-banner-text { flex: 1; }
-    .info-item {
+.info-item {
       display: flex;
       align-items: center;
       gap: 4px;
@@ -925,15 +910,6 @@
     </button>
   </div>
 
-  <!-- BANNER DE CAMBIOS PENDIENTES (inline permanente) -->
-  <div id="pending-banner" role="status" aria-live="polite">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="#F59E0B"/>
-      <path d="M12 9v4M12 17h.01" stroke="white" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    <span id="pending-banner-text"></span>
-  </div>
-
   <!-- SEARCH BAR + BADGE -->
   <div id="search-bar-wrap">
     <div id="search-and-badge">
@@ -1563,26 +1539,6 @@ function saveComandaState(mesaId, estado, hora) {
   localStorage.setItem("boldPOS_comanda_" + mesaId, JSON.stringify({ estado, hora }));
 }
 
-function updatePendingBanner() {
-  const banner = document.getElementById("pending-banner");
-  const bannerText = document.getElementById("pending-banner-text");
-  if (!banner) return;
-  try {
-    const ms = JSON.parse(localStorage.getItem('mesa_' + currentMesaId)) || {};
-    const estado = ms.estado || "";
-    if (estado === "COMANDA_CON_AJUSTES" || estado === "PEDIDO_CONFIRMADO_CON_CAMBIOS") {
-      bannerText.textContent = "Cambios pendientes de confirmar en el pedido";
-      banner.classList.add("show");
-    } else if (estado === "CAMBIOS_GUARDADOS") {
-      bannerText.textContent = "Cambios guardados — pendiente reenviar comanda a cocina";
-      banner.classList.add("show");
-    } else {
-      banner.classList.remove("show");
-    }
-  } catch(e) {
-    banner.classList.remove("show");
-  }
-}
 
 function setComandaState(newState, hora) {
   comandaState = newState;
@@ -1943,7 +1899,6 @@ function handleScanOverlayClick(e) {
 
   syncCartBar();
   updateComandaUI();
-  updatePendingBanner();
 
   if (mesaState === "bill_requested") {
     document.getElementById('search-bar-wrap').style.display = 'none';

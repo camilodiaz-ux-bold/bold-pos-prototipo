@@ -855,6 +855,7 @@ function render() {
 
     case ESTADOS.PEDIDO_CONFIRMADO_CON_CAMBIOS:
       flex('section-header', true); flex('btn-agregar-header', true);
+      showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
       renderProductList(false);
       renderTotals();
       show('totals-wrap', true);
@@ -874,6 +875,7 @@ function render() {
 
     case ESTADOS.COMANDA_CON_AJUSTES:
       flex('section-header', true); flex('btn-agregar-header', true);
+      showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
       renderProductList(false);
       renderTotals();
       show('totals-wrap', true);
@@ -883,6 +885,7 @@ function render() {
 
     case ESTADOS.CAMBIOS_GUARDADOS:
       flex('section-header', true); flex('btn-agregar-header', true);
+      showAlert('Cambios guardados — pendiente reenviar comanda a cocina', 'modified');
       renderProductList(false);
       renderTotals();
       show('totals-wrap', true);
