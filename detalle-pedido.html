@@ -467,15 +467,15 @@
   <!-- Footer: totals + action bar -->
   <div id="footer">
     <div id="totals-wrap">
-      <div class="totals-row">
+      <div class="totals-row" id="totals-row-subtotal">
         <span class="totals-label">Subtotal</span>
         <span class="totals-amount" id="val-subtotal">$0</span>
       </div>
-      <div class="totals-row">
+      <div class="totals-row" id="totals-row-iva">
         <span class="totals-label">IVA (19%)</span>
         <span class="totals-amount" id="val-iva">$0</span>
       </div>
-      <div class="totals-sep"></div>
+      <div class="totals-sep" id="totals-sep"></div>
       <div class="totals-row totals-row-total">
         <span class="totals-label">Total</span>
         <span class="totals-amount" id="val-total">$0</span>
@@ -573,6 +573,9 @@ const params        = new URLSearchParams(location.search);
 const mesaId        = params.get("mesa")   || "S05";
 const zona          = params.get("zona")   || "salon";
 const personasParam = parseInt(params.get("personas")) || 2;
+
+/* ══ Feature flags ══ */
+const COMANDA_ENABLED = false; // set true to re-enable comanda flow
 
 /* ══ State ══ */
 const ESTADOS = {
@@ -700,12 +703,16 @@ function renderInfoCard() {
 }
 
 /* ══ Render totals ══ */
-function renderTotals() {
+function renderTotals(showFull) {
   const sub = cart.reduce((s, p) => s + p.precio * p.cantidad, 0);
   const iva = Math.round(sub * 0.19);
   document.getElementById('val-subtotal').textContent = fmtMoney(sub);
   document.getElementById('val-iva').textContent      = fmtMoney(iva);
-  document.getElementById('val-total').textContent    = fmtMoney(sub + iva);
+  document.getElementById('val-total').textContent    = fmtMoney(showFull ? sub + iva : sub);
+  const d = showFull ? '' : 'none';
+  document.getElementById('totals-row-subtotal').style.display = d;
+  document.getElementById('totals-row-iva').style.display      = d;
+  document.getElementById('totals-sep').style.display          = d;
 }
 
 /* ══ Render product list ══ */
@@ -838,7 +845,7 @@ function render() {
     case ESTADOS.PEDIDO_PENDIENTE:
       flex('section-header', true); flex('btn-agregar-header', true);
       renderProductList(false);
-      renderTotals();
+      renderTotals(false);
       show('totals-wrap', true);
       setSingleBtn('Confirmar pedido', false);
       show('footer', true);
@@ -847,9 +854,13 @@ function render() {
     case ESTADOS.PEDIDO_CONFIRMADO:
       flex('section-header', true); flex('btn-agregar-header', true);
       renderProductList(false);
-      renderTotals();
+      renderTotals(false);
       show('totals-wrap', true);
-      setDualBtn('Solicitar cuenta', handleSolicitarCuenta, 'Enviar comanda');
+      if (COMANDA_ENABLED) {
+        setDualBtn('Solicitar cuenta', handleSolicitarCuenta, 'Enviar comanda');
+      } else {
+        setSingleBtn('Solicitar cuenta', false);
+      }
       show('footer', true);
       break;
 
@@ -857,37 +868,40 @@ function render() {
       flex('section-header', true); flex('btn-agregar-header', true);
       showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
       renderProductList(false);
-      renderTotals();
+      renderTotals(false);
       show('totals-wrap', true);
-      setSingleBtn('Guardar cambios del pedido', false);
+      setSingleBtn('Guardar cambios', false);
       show('footer', true);
       break;
 
     case ESTADOS.COMANDA_ENVIADA:
+      if (!COMANDA_ENABLED) { transicion(ESTADOS.PEDIDO_CONFIRMADO); break; }
       flex('section-header', true); flex('btn-agregar-header', true);
       showAlert('Todos los ítems enviados a cocina', 'sent');
       renderProductList(false);
-      renderTotals();
+      renderTotals(false);
       show('totals-wrap', true);
       setDualBtn('Solicitar cuenta', handleSolicitarCuenta, 'Reenviar comanda');
       show('footer', true);
       break;
 
     case ESTADOS.COMANDA_CON_AJUSTES:
+      if (!COMANDA_ENABLED) { transicion(ESTADOS.PEDIDO_CONFIRMADO_CON_CAMBIOS); break; }
       flex('section-header', true); flex('btn-agregar-header', true);
       showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
       renderProductList(false);
-      renderTotals();
+      renderTotals(false);
       show('totals-wrap', true);
-      setSingleBtn('Guardar cambios del pedido', false);
+      setSingleBtn('Guardar cambios', false);
       show('footer', true);
       break;
 
     case ESTADOS.CAMBIOS_GUARDADOS:
+      if (!COMANDA_ENABLED) { transicion(ESTADOS.PEDIDO_CONFIRMADO); break; }
       flex('section-header', true); flex('btn-agregar-header', true);
       showAlert('Cambios guardados — pendiente reenviar comanda a cocina', 'modified');
       renderProductList(false);
-      renderTotals();
+      renderTotals(false);
       show('totals-wrap', true);
       setDualBtn('Solicitar cuenta', handleSolicitarCuenta, 'Reenviar comanda');
       show('footer', true);
@@ -896,9 +910,13 @@ function render() {
     case ESTADOS.CUENTA_SOLICITADA:
       flex('section-header', true); flex('btn-agregar-header', false);
       renderProductList(true);
-      renderTotals();
+      renderTotals(true);
       show('totals-wrap', true);
-      setDualBtn('Reenviar comanda', handleReenviarComanda, 'Cobrar mesa');
+      if (COMANDA_ENABLED) {
+        setDualBtn('Reenviar comanda', handleReenviarComanda, 'Cobrar mesa');
+      } else {
+        setSingleBtn('Cobrar mesa', false);
+      }
       show('footer', true);
       break;
   }
@@ -936,11 +954,12 @@ function handlePrimary() {
   switch(estado) {
     case ESTADOS.DISPONIBLE:                    handleIniciarPedido(); break;
     case ESTADOS.PEDIDO_PENDIENTE:              transicion(ESTADOS.PEDIDO_CONFIRMADO); break;
-    case ESTADOS.PEDIDO_CONFIRMADO:             handleEnviarComanda(); break;
+    case ESTADOS.PEDIDO_CONFIRMADO:
+      if (COMANDA_ENABLED) { handleEnviarComanda(); } else { handleSolicitarCuenta(); } break;
     case ESTADOS.PEDIDO_CONFIRMADO_CON_CAMBIOS: handleGuardarCambiosPendiente(); break;
-    case ESTADOS.COMANDA_ENVIADA:               handleReenviarComanda(); break;
-    case ESTADOS.COMANDA_CON_AJUSTES:           handleGuardarCambios(); break;
-    case ESTADOS.CAMBIOS_GUARDADOS:             handleReenviarComanda(); break;
+    case ESTADOS.COMANDA_ENVIADA:               if (COMANDA_ENABLED) handleReenviarComanda(); break;
+    case ESTADOS.COMANDA_CON_AJUSTES:           if (COMANDA_ENABLED) handleGuardarCambios(); break;
+    case ESTADOS.CAMBIOS_GUARDADOS:             if (COMANDA_ENABLED) handleReenviarComanda(); break;
     case ESTADOS.CUENTA_SOLICITADA:
       location.href = `checkout.html?mesa=${mesaId}&zona=${zona}&estado=bill_requested`;
       break;
@@ -991,7 +1010,7 @@ function deleteItem(lineId) {
   }
 }
 function markModifiedIfSent() {
-  if (estado === ESTADOS.COMANDA_ENVIADA || estado === ESTADOS.CAMBIOS_GUARDADOS) {
+  if (COMANDA_ENABLED && (estado === ESTADOS.COMANDA_ENVIADA || estado === ESTADOS.CAMBIOS_GUARDADOS)) {
     estado = ESTADOS.COMANDA_CON_AJUSTES;
     saveMsState(mesaId, { estado, horaComanda });
     showToast('Cambios pendientes de confirmar en el pedido');
@@ -1037,7 +1056,7 @@ function handleInfoDropUpClick(e) { if (e.target === el('info-dropup-overlay')) 
 function handleDuPrimary() {
   if (estado === ESTADOS.CUENTA_SOLICITADA) {
     closeInfoDropUp();
-    transicion(ESTADOS.COMANDA_ENVIADA);
+    transicion(COMANDA_ENABLED ? ESTADOS.COMANDA_ENVIADA : ESTADOS.PEDIDO_CONFIRMADO);
   } else {
     closeInfoDropUp();
     alert('Cambio de mesa — próximamente');
