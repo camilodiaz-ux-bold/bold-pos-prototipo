@@ -568,6 +568,13 @@
         <div id="info-dropup-summary">
           <div id="info-dropup-mesa-name">—</div>
           <div id="info-dropup-zona-label">—</div>
+          <div id="dropup-badge-occupied" class="badge-estado badge-occupied" style="display:none;">
+            <span class="badge-text">Ocupada</span>
+          </div>
+          <div id="dropup-badge-bill" class="badge-estado badge-bill" style="display:none;">
+            <span class="pulse-dot"></span>
+            <span class="badge-text">Cuenta solicitada</span>
+          </div>
         </div>
         <div id="info-dropup-info-group">
           <div class="du-row">
@@ -1107,11 +1114,10 @@ function showToast(msg) {
 /* ══ Info Drop Up ══ */
 function openInfoDropUp() {
   const btn = el('du-btn-primary');
-  if (estado === ESTADOS.CUENTA_SOLICITADA) {
-    btn.textContent = 'Volver a ocupada';
-  } else {
-    btn.textContent = 'Cambiar a otra mesa';
-  }
+  const isBill = estado === ESTADOS.CUENTA_SOLICITADA;
+  btn.textContent = isBill ? 'Volver a ocupada' : 'Cambiar a otra mesa';
+  el('dropup-badge-occupied').style.display = isBill ? 'none' : 'inline-flex';
+  el('dropup-badge-bill').style.display     = isBill ? 'inline-flex' : 'none';
   el('info-dropup-overlay').classList.add('show');
 }
 function closeInfoDropUp() { el('info-dropup-overlay').classList.remove('show'); }
