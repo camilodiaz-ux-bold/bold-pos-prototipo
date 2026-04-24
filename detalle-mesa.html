@@ -1452,10 +1452,12 @@ function goBackToPedido() {
   if (totalQty > 0) {
     if (nuevoEstado === 'DISPONIBLE' || nuevoEstado === 'SIN_PRODUCTOS') {
       nuevoEstado = 'PEDIDO_PENDIENTE';
+    } else if (nuevoEstado === 'PEDIDO_CONFIRMADO' && hasChanges) {
+      nuevoEstado = 'PEDIDO_CONFIRMADO_CON_CAMBIOS';
     } else if (nuevoEstado === 'COMANDA_ENVIADA') {
       nuevoEstado = 'COMANDA_CON_AJUSTES';
     }
-    // PEDIDO_PENDIENTE, PEDIDO_CONFIRMADO, COMANDA_CON_AJUSTES, CUENTA_SOLICITADA stay as-is
+    // PEDIDO_PENDIENTE, PEDIDO_CONFIRMADO_CON_CAMBIOS, COMANDA_CON_AJUSTES, CUENTA_SOLICITADA stay as-is
   } else {
     // No products in cart — revert to SIN_PRODUCTOS unless account already requested
     if (nuevoEstado !== 'CUENTA_SOLICITADA') nuevoEstado = 'SIN_PRODUCTOS';
