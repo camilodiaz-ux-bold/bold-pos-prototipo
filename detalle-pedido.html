@@ -266,9 +266,13 @@
     }
 
     /* ─── Footer ─── */
-    #footer {
-      background: var(--black-0); border-top: 1px solid rgba(0,0,0,0.08);
-      padding: 12px 16px 20px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px;
+    #footer { flex-shrink: 0; display: flex; flex-direction: column; }
+
+    /* Desglose subtotal/IVA — solo CUENTA_SOLICITADA */
+    #totals-section {
+      display: none; background: var(--black-0);
+      border-top: 1px solid rgba(0,0,0,0.08);
+      padding: 12px 16px;
     }
     #totals-wrap { display: flex; flex-direction: column; }
     .totals-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
@@ -278,20 +282,28 @@
     .totals-row-total .totals-label { font-size: 15px; font-weight: 700; color: var(--black-100); }
     .totals-row-total .totals-amount { font-size: 18px; font-weight: 700; color: var(--blue-100); }
 
-    /* ─── Action bar ─── */
-    #action-bar { display: flex; gap: 10px; }
+    /* Barra de acción — Figma 26687:4541 */
+    #footer-bar {
+      background: rgba(247,248,251,0.2);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      padding: 20px 16px; display: flex; align-items: center;
+    }
+    #footer-value { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    #footer-count { font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; }
+    #footer-amt   { font-size: 16px; font-weight: 500; color: var(--black-100); line-height: 20px; }
+    #footer-btn-wrap { width: 174px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
     #btn-secondary {
-      flex: 1; height: 48px; border-radius: var(--radius-pill);
+      width: 100%; height: 48px; border-radius: var(--radius-pill);
       border: 1.5px solid var(--coral-100); background: transparent;
       font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--coral-100);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; display: none; align-items: center; justify-content: center;
       transition: background .15s; -webkit-tap-highlight-color: transparent; white-space: nowrap;
     }
     #btn-secondary:active { background: rgba(255,41,71,.06); }
     #btn-primary {
-      flex: 1; height: 48px; border-radius: var(--radius-pill); border: none;
+      width: 100%; height: 48px; border-radius: var(--radius-pill); border: none;
       background: var(--coral-100);
-      font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--black-0);
+      font-family: var(--font); font-size: 14px; font-weight: 700; color: var(--black-0);
       cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: opacity .15s; -webkit-tap-highlight-color: transparent; white-space: nowrap;
     }
@@ -490,26 +502,36 @@
 
   </div>
 
-  <!-- Footer: totals + action bar -->
+  <!-- Footer — Figma 26687:4541 -->
   <div id="footer">
-    <div id="totals-wrap">
-      <div class="totals-row" id="totals-row-subtotal">
-        <span class="totals-label">Subtotal</span>
-        <span class="totals-amount" id="val-subtotal">$0</span>
-      </div>
-      <div class="totals-row" id="totals-row-iva">
-        <span class="totals-label">IVA (19%)</span>
-        <span class="totals-amount" id="val-iva">$0</span>
-      </div>
-      <div class="totals-sep" id="totals-sep"></div>
-      <div class="totals-row totals-row-total">
-        <span class="totals-label">Total</span>
-        <span class="totals-amount" id="val-total">$0</span>
+    <!-- Desglose: solo visible en CUENTA_SOLICITADA -->
+    <div id="totals-section">
+      <div id="totals-wrap">
+        <div class="totals-row" id="totals-row-subtotal">
+          <span class="totals-label">Subtotal</span>
+          <span class="totals-amount" id="val-subtotal">$0</span>
+        </div>
+        <div class="totals-row" id="totals-row-iva">
+          <span class="totals-label">IVA (19%)</span>
+          <span class="totals-amount" id="val-iva">$0</span>
+        </div>
+        <div class="totals-sep" id="totals-sep"></div>
+        <div class="totals-row totals-row-total">
+          <span class="totals-label">Total</span>
+          <span class="totals-amount" id="val-total">$0</span>
+        </div>
       </div>
     </div>
-    <div id="action-bar">
-      <button id="btn-secondary" onclick="handleSecondary()">—</button>
-      <button id="btn-primary"   onclick="handlePrimary()">—</button>
+    <!-- Barra principal -->
+    <div id="footer-bar">
+      <div id="footer-value">
+        <span id="footer-count">0 Productos</span>
+        <span id="footer-amt">$0</span>
+      </div>
+      <div id="footer-btn-wrap">
+        <button id="btn-secondary" onclick="handleSecondary()">—</button>
+        <button id="btn-primary"   onclick="handlePrimary()">—</button>
+      </div>
     </div>
   </div>
 
@@ -736,17 +758,22 @@ function renderInfoCard() {
   document.getElementById('dropup-tiempo').textContent   = (mesa && mesa.horaApertura) ? DataManager.calcTime(mesa.horaApertura) : '—';
 }
 
+/* ══ Render footer bar ══ */
+function renderFooterCount() {
+  const total = cart.reduce((s, p) => s + p.cantidad, 0);
+  el('footer-count').textContent = total === 1 ? '1 Producto' : total + ' Productos';
+}
+
 /* ══ Render totals ══ */
 function renderTotals(showFull) {
   const sub = cart.reduce((s, p) => s + p.precio * p.cantidad, 0);
   const iva = Math.round(sub * 0.19);
+  const totalAmt = showFull ? sub + iva : sub;
   document.getElementById('val-subtotal').textContent = fmtMoney(sub);
   document.getElementById('val-iva').textContent      = fmtMoney(iva);
-  document.getElementById('val-total').textContent    = fmtMoney(showFull ? sub + iva : sub);
-  const d = showFull ? '' : 'none';
-  document.getElementById('totals-row-subtotal').style.display = d;
-  document.getElementById('totals-row-iva').style.display      = d;
-  document.getElementById('totals-sep').style.display          = d;
+  document.getElementById('val-total').textContent    = fmtMoney(totalAmt);
+  el('footer-amt').textContent = fmtMoney(totalAmt);
+  el('totals-section').style.display = showFull ? '' : 'none';
 }
 
 /* ══ Render product list ══ */
@@ -822,19 +849,18 @@ function show(id, v) { const e = el(id); if(e) e.style.display = v ? '' : 'none'
 function flex(id, v) { const e = el(id); if(e) e.style.display = v ? 'flex' : 'none'; }
 
 function setSingleBtn(label, disabled) {
-  flex('btn-secondary', false);
+  el('btn-secondary').style.display = 'none';
   const pri = el('btn-primary');
-  pri.style.flex = 'unset'; pri.style.width = '100%';
   pri.className = disabled ? 'disabled' : '';
   pri.textContent = label;
   secondaryFn = null;
 }
 function setDualBtn(secLabel, secFn, priLabel) {
-  flex('btn-secondary', true);
-  el('btn-secondary').textContent = secLabel;
+  const sec = el('btn-secondary');
+  sec.style.display = 'flex';
+  sec.textContent = secLabel;
   secondaryFn = secFn;
   const pri = el('btn-primary');
-  pri.style.flex = '1'; pri.style.width = '';
   pri.className = '';
   pri.textContent = priLabel;
 }
@@ -879,7 +905,7 @@ function render() {
       flex('section-header', true); flex('btn-agregar-header', true);
       renderProductList(false);
       renderTotals(false);
-      show('totals-wrap', true);
+      renderFooterCount();
       setSingleBtn('Confirmar pedido', false);
       show('footer', true);
       break;
@@ -888,7 +914,7 @@ function render() {
       flex('section-header', true); flex('btn-agregar-header', true);
       renderProductList(false);
       renderTotals(false);
-      show('totals-wrap', true);
+      renderFooterCount();
       if (COMANDA_ENABLED) {
         setDualBtn('Solicitar cuenta', handleSolicitarCuenta, 'Enviar comanda');
       } else {
@@ -902,7 +928,7 @@ function render() {
       showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
       renderProductList(false);
       renderTotals(false);
-      show('totals-wrap', true);
+      renderFooterCount();
       setSingleBtn('Guardar cambios del pedido', false);
       show('footer', true);
       break;
@@ -913,7 +939,7 @@ function render() {
       showAlert('Todos los ítems enviados a cocina', 'sent');
       renderProductList(false);
       renderTotals(false);
-      show('totals-wrap', true);
+      renderFooterCount();
       setDualBtn('Solicitar cuenta', handleSolicitarCuenta, 'Reenviar comanda');
       show('footer', true);
       break;
@@ -924,7 +950,7 @@ function render() {
       showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
       renderProductList(false);
       renderTotals(false);
-      show('totals-wrap', true);
+      renderFooterCount();
       setSingleBtn('Guardar cambios', false);
       show('footer', true);
       break;
@@ -935,7 +961,7 @@ function render() {
       showAlert('Cambios guardados — pendiente reenviar comanda a cocina', 'modified');
       renderProductList(false);
       renderTotals(false);
-      show('totals-wrap', true);
+      renderFooterCount();
       setDualBtn('Solicitar cuenta', handleSolicitarCuenta, 'Reenviar comanda');
       show('footer', true);
       break;
@@ -944,7 +970,7 @@ function render() {
       flex('section-header', true); flex('btn-agregar-header', false);
       renderProductList(true);
       renderTotals(true);
-      show('totals-wrap', true);
+      renderFooterCount();
       if (COMANDA_ENABLED) {
         setDualBtn('Reenviar comanda', handleReenviarComanda, 'Cobrar mesa');
       } else {
