@@ -29,7 +29,7 @@
     body { font-family: var(--font); background: #d0d0d0; display: flex; justify-content: center; align-items: flex-start; }
 
     /* ─── Phone shell ─── */
-    #app { width: 393px; height: 100vh; background: var(--background-page); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    #app { width: 393px; height: 100vh; background: var(--background-page); display: flex; flex-direction: column; overflow: hidden; position: relative; transform: translateZ(0); }
 
     /* ─── Status bar ─── */
     #status-bar { background: transparent; display: flex; align-items: center; padding: 8px 8px 0; flex-shrink: 0; }
@@ -141,6 +141,7 @@
     #products-area {
       flex: 1; overflow-y: auto; min-height: 0;
       display: flex; flex-direction: column;
+      padding-bottom: 92px;
       scrollbar-width: none;
     }
     #products-area::-webkit-scrollbar { display: none; }
@@ -272,7 +273,7 @@
     #totals-section {
       display: none; background: var(--black-0);
       border-top: 1px solid rgba(0,0,0,0.08);
-      padding: 12px 16px;
+      padding: 12px 16px 100px;
     }
     #totals-wrap { display: flex; flex-direction: column; }
     .totals-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
@@ -284,7 +285,9 @@
 
     /* Barra de acción — Figma 26687:4541 */
     #footer-bar {
-      position: relative;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 100;
       background: rgba(247,248,251,0.2);
       backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
       padding: 20px 16px; display: flex; align-items: center;
