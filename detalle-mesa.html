@@ -272,133 +272,15 @@
        CSS: overflow:hidden para border-radius; align-items:stretch en lugar
        de center para que .pc-accent (h-full) toque los bordes superior e inferior
        sin quedar recortado por el padding —  resultado visual idéntico al nodo. */
-    .product-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 12px;
-      min-height: 88px;
-      display: flex;
-      flex-direction: row;
-      align-items: stretch;
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .1s;
-    }
-    .product-card:active { transform: scale(0.96); }
-
-    /* Nivel 1a — Vector 80 (Stroke)
-       Figma: w:4px, h:full, shrink-0, position:relative
-       CSS: align-self:stretch (equivalente a h:full en flex stretch) */
-    .pc-accent {
-      width: 4px;
-      flex-shrink: 0;
-      /* background: cat.accent color sólido plano — se aplica inline en el JS */
-    }
-
-    /* Nivel 1b — Info
-       Figma: flex-[1_0_0], flex-row, gap:12px, items-start, min-w:1px
-       El padding:12px de la card se aplica aquí para replicar el espaciado
-       interno (la card no tiene padding propio en CSS para no recortar la barra) */
-    .pc-body {
-      flex: 1 0 0;
-      display: flex;
-      flex-direction: row;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 12px;
-      min-width: 1px;
-    }
-
-    /* Nivel 2a — Text
-       Figma: flex-[1_0_0], flex-col, gap:24px, items-start, 14px/20px, #1e1e1e */
-    .pc-text {
-      flex: 1 0 0;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      align-items: flex-start;
-      min-width: 1px;
-      font-size: 14px;
-      line-height: 20px;
-      color: #1e1e1e;
-    }
-
-    /* Nivel 3a — Name  [PANEL]/H3/Semibold
-       Figma: Montserrat Semibold 600, shrink-0, min-w:full, w:min-content */
-    .product-name {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 20px;
-      color: #1e1e1e;
-      flex-shrink: 0;
-      min-width: 100%;
-      width: min-content;
-    }
-
-    /* Nivel 3b — Price  [PANEL]/H3/Regular
-       Figma: Montserrat Regular 400, shrink-0, whitespace:nowrap */
-    .product-price {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 20px;
-      color: #1e1e1e;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* Nivel 2b — Icon
-       Figma: flex-col, items-center, justify-between, self-stretch, shrink-0
-       Siempre tiene 2 hijos (badge o spacer vacío + estrella) →
-       space-between coloca el primero arriba y la estrella abajo */
-    .pc-icons {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      align-self: stretch;
-      flex-shrink: 0;
-    }
-
-    /* Nivel 3c — .atom/counter (badge)
-       Figma: size:16px, rounded:100px, p:8px, gap:2px, items-center,
-              justify-center, shrink-0
-       Color: #080EFF (Blue/100 del brief, override de #121e6c del nodo)
-       [APP]/Caption/Semibold: 12px/16px, white, center */
-    .pc-badge {
-      width: 16px;
-      height: 16px;
-      border-radius: 100px;
-      background: #121E6C;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 16px;
-      color: #fff;
-      text-align: center;
-    }
-
-    /* Nivel 3d — icon_fill/ic_star
-       Figma: size:16px, shrink-0 */
-    .btn-star {
-      width: 16px;
-      height: 16px;
-      border: none;
-      background: transparent;
-      padding: 0;
-      cursor: pointer;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      -webkit-tap-highlight-color: transparent;
-    }
+    .product-card { display: flex; height: 110px; padding: 12px; justify-content: center; align-items: center; gap: 12px; background: #ffffff; border-radius: 12px; cursor: pointer; }
+    .pc-accent { width: 4px; height: 100%; border-radius: 2px; flex-shrink: 0; }
+    .pc-body { flex: 1 0 0; display: flex; flex-direction: row; align-items: flex-start; gap: 12px; height: 100%; }
+    .pc-text { flex: 1 0 0; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+    .product-name { font-size: 14px; font-weight: 600; line-height: 20px; color: #1e1e1e; }
+    .product-price { font-size: 14px; font-weight: 400; line-height: 20px; color: #1e1e1e; white-space: nowrap; }
+    .pc-icons { display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; flex-shrink: 0; width: 20px; }
+    .pc-badge { width: 20px; height: 20px; border-radius: 100px; background: #121E6C; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; line-height: 1; color: #ffffff; text-align: center; flex-shrink: 0; }
+    .btn-star { width: 16px; height: 16px; background: none; border: none; padding: 0; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 
     /* ─── Bill items (cuenta solicitada, read-only) ─── */
     #bill-items-list {
