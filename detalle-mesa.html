@@ -248,15 +248,25 @@
     #empty-state p { font-size: 14px; font-weight: 500; }
     #empty-state small { font-size: 12px; font-weight: 400; color: var(--black-40); }
 
-    /* ─── Product card (Figma 26748-5480) ─── */
+    /* ─── Product card (Figma 26748-5430) ─── */
+    /*
+      Estructura exacta del nodo:
+      Card: flex-row, gap:12px, p:12px, items-center, border-radius:12px, bg:white, overflow:hidden
+        ├─ pc-accent : w:4px, h:full (rellena alto completo de la card)
+        └─ pc-body   : flex-row, flex:1, gap:12px, items-start
+              ├─ pc-text  : flex-col, flex:1, gap:24px
+              │    ├─ product-name  : Semibold 600, 14px/20px, #1e1e1e
+              │    └─ product-price : Regular 400, 14px/20px, #1e1e1e, nowrap
+              └─ pc-icons : flex-col, items-center, justify-between, self-stretch
+                   ├─ pc-badge (top)  : 16px circle, #080EFF, Semibold 12px white
+                   └─ btn-star (bottom): 16×16px
+    */
     .product-card {
-      background: var(--black-0, #fff);
+      background: #fff;
       border-radius: 12px;
       display: flex;
-      align-items: stretch;
-      height: 110px;
+      align-items: stretch;   /* accent bar fills full card height */
       overflow: hidden;
-      position: relative;
       cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
@@ -264,24 +274,24 @@
     }
     .product-card:active { transform: scale(0.96); }
 
-    /* Left category accent bar: 4px × full height */
+    /* Accent bar: 4px wide, fills full card height (via parent align-items:stretch) */
     .pc-accent {
       width: 4px;
       flex-shrink: 0;
-      /* background set inline per category */
+      /* background set inline with cat.accent color */
     }
 
-    /* Card body: padding 12px, gap 12px between text and icon cols */
+    /* Body = Figma "Info" section: p:12px all sides, gap:12px, items-start */
     .pc-body {
       flex: 1;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
       padding: 12px;
       min-width: 0;
     }
 
-    /* Text column: name + price, gap 24px */
+    /* Text column: flex-col, gap:24px between name and price */
     .pc-text {
       flex: 1;
       display: flex;
@@ -289,38 +299,39 @@
       gap: 24px;
       min-width: 0;
     }
-    /* Montserrat Semibold 14px/20px */
+
+    /* [PANEL]/H3/Semibold — 14px / 20px / weight 600 */
     .product-name {
       font-size: 14px;
       font-weight: 600;
-      color: var(--black-100);
+      color: #1e1e1e;
       line-height: 20px;
     }
-    /* Montserrat Regular 14px/20px */
+
+    /* [PANEL]/H3/Regular — 14px / 20px / weight 400 */
     .product-price {
       font-size: 14px;
       font-weight: 400;
-      color: var(--black-100);
+      color: #1e1e1e;
       line-height: 20px;
       white-space: nowrap;
     }
 
-    /* Icon column: badge top + star bottom, self-stretch */
+    /* Icon column: self-stretch overrides parent items-start → fills full body height
+       justify-between: badge at top-right, star at bottom-right */
     .pc-icons {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: space-between;
       align-self: stretch;
       flex-shrink: 0;
-      padding: 4px 0;
     }
-    .pc-icons.has-badge { justify-content: space-between; }
-    .pc-icons.no-badge  { justify-content: flex-end; }
 
-    /* Quantity badge: Blue/100 #080EFF, 20px circle, Semibold 12px white */
+    /* [APP]/Caption/Semibold — 16px circle, #080EFF, 12px/16px white */
     .pc-badge {
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       border-radius: 100px;
       background: #080EFF;
       display: flex;
@@ -333,12 +344,18 @@
       flex-shrink: 0;
     }
 
+    /* Star icon: 16×16px, bottom of icon column */
     .btn-star {
-      width: 16px; height: 16px;
-      border: none; background: transparent;
-      padding: 0; cursor: pointer;
+      width: 16px;
+      height: 16px;
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
       flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -1423,7 +1440,7 @@ function renderProducts() {
           <span class="product-name">${product.name}</span>
           <span class="product-price">${fmt(product.price)}</span>
         </div>
-        <div class="pc-icons ${qty > 0 ? 'has-badge' : 'no-badge'}">
+        <div class="pc-icons">
           ${qty > 0 ? `<div class="pc-badge">${qty}</div>` : ''}
           <button class="btn-star" data-id="${product.id}" aria-label="Favorito">
             ${starSVG(fav)}
