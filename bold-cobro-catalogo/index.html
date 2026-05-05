@@ -173,49 +173,88 @@
   .search-bar input::placeholder { color: var(--gray); }
   .search-bar input.has-value { color: var(--blue); font-weight: 400; }
 
-  /* ── Product card ── */
+  /* ── Product card (Figma 26748-5480) ── */
   .product-card {
     background: #fff;
-    border-radius: 16px;
+    border-radius: 12px;
     display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
+    align-items: stretch;
+    height: 110px;
     cursor: pointer;
+    overflow: hidden;
     transition: box-shadow .15s, transform .1s;
     position: relative;
   }
   .product-card:active { transform: scale(.99); }
-  .product-card.selected { box-shadow: 0 0 0 2px var(--coral); }
-  .product-thumb {
-    width: 72px; height: 72px;
-    background: var(--bg);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
+
+  /* Left category accent bar: 4px wide, full height */
+  .pc-accent {
+    width: 4px;
     flex-shrink: 0;
+    /* background set inline per categoria */
   }
-  .product-thumb svg { opacity: .5; }
-  .product-info { flex: 1; min-width: 0; }
-  .product-name { font-size: 12px; font-weight: 400; color: var(--black); line-height: 16px; margin-bottom: 2px; }
-  .product-sku  { font-size: 12px; color: var(--gray); margin-bottom: 10px; }
-  .product-price { font-size: 14px; font-weight: 500; color: var(--black); }
-  .product-qty {
-    display: flex; align-items: center; gap: 6px;
+
+  /* Card body: padding 12px, gap 12px between text and icon cols */
+  .pc-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    min-width: 0;
   }
-  .qty-btn {
-    width: 24px; height: 24px; border-radius: 50%;
-    border: none; background: var(--blue); color: #fff;
-    font-size: 16px; font-weight: 700; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    line-height: 1;
+
+  /* Text column: name + price stacked with gap 24px */
+  .pc-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
   }
-  .qty-btn.minus { background: var(--bg); color: var(--blue); border: 1px solid #d2d4e1; }
-  .qty-count { font-size: 14px; font-weight: 600; color: var(--blue); min-width: 18px; text-align: center; }
-  .qty-badge {
-    position: absolute; top: 8px; right: 8px;
-    background: var(--coral); color: #fff;
-    font-size: 10px; font-weight: 700;
-    border-radius: 100px; padding: 1px 6px;
+  /* Montserrat Semibold 14px / 20px — [PANEL]/H3/Semibold */
+  .pc-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e1e1e;
+    line-height: 20px;
+  }
+  /* Montserrat Regular 14px / 20px — [PANEL]/H3/Regular */
+  .pc-price {
+    font-size: 14px;
+    font-weight: 400;
+    color: #1e1e1e;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+
+  /* Icon column: badge top + star bottom, self-stretch */
+  .pc-icons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    padding: 4px 0;
+  }
+  .pc-icons.has-badge { justify-content: space-between; }
+  .pc-icons.no-badge  { justify-content: flex-end; }
+
+  /* Quantity badge: Blue/100 #080EFF, 20px circle, Semibold 12px white */
+  .pc-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 100px;
+    background: #080EFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
   }
 
   /* ── Bottom bar (catalog) ── */
@@ -791,7 +830,7 @@
     </div>
 
     <!-- Product list -->
-    <div class="scroll-content" id="product-list" style="padding:0 16px;display:flex;flex-direction:column;gap:8px;padding-bottom:8px;">
+    <div class="scroll-content" id="product-list" style="padding:0 16px 80px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
       <!-- Products injected by JS -->
     </div>
 
@@ -949,14 +988,26 @@
 
 <script>
 /* ── Data ── */
+/* ── Category color map (Bold POS category palette) ── */
+const CATEGORY_COLORS = {
+  'electronica': '#080EFF',
+  'calzado':     '#FF5500',
+  'audio':       '#4401A9',
+  'deportes':    '#1C70D3',
+  'accesorios':  '#800099',
+  'ropa':        '#FF9400',
+  'tecnologia':  '#B01207',
+  'otros':       '#FF2DC8',
+};
+
 const products = [
-  { id:1, name:'Audífonos JBL inalámbricos tercera generación', sku:'NK-SB-BLUE: 1234', price:559000 },
-  { id:2, name:'Zapatillas Nike S', sku:'NK-SB-BLUE: 1234', price:1677000 },
-  { id:3, name:'Auriculares Beats Studio3 Wireless', sku:'AUD-BEAT-S3: 1234', price:798000 },
-  { id:4, name:'Zapatillas Nike SB edición especial', sku:'NK-SB-BLUE: 1234', price:1677000 },
-  { id:5, name:'Maletín Nike Sport 2.0', sku:'NK-SB-BLUE: 1234', price:589000 },
-  { id:6, name:'Camiseta Nike DRI-FIT Pro', sku:'NK-DRI-PRO: 5678', price:189000 },
-  { id:7, name:'Mochila Adidas Classic', sku:'AD-MCH-CL: 9012', price:329000 },
+  { id:1, name:'Audífonos JBL inalámbricos tercera generación', sku:'NK-SB-BLUE: 1234', price:559000, categoria:'electronica' },
+  { id:2, name:'Zapatillas Nike S', sku:'NK-SB-BLUE: 1234', price:1677000, categoria:'calzado' },
+  { id:3, name:'Auriculares Beats Studio3 Wireless', sku:'AUD-BEAT-S3: 1234', price:798000, categoria:'audio' },
+  { id:4, name:'Zapatillas Nike SB edición especial', sku:'NK-SB-BLUE: 1234', price:1677000, categoria:'calzado' },
+  { id:5, name:'Maletín Nike Sport 2.0', sku:'NK-SB-BLUE: 1234', price:589000, categoria:'deportes' },
+  { id:6, name:'Camiseta Nike DRI-FIT Pro', sku:'NK-DRI-PRO: 5678', price:189000, categoria:'ropa' },
+  { id:7, name:'Mochila Adidas Classic', sku:'AD-MCH-CL: 9012', price:329000, categoria:'accesorios' },
 ];
 
 let cart = {}; // { productId: qty }
@@ -1028,31 +1079,26 @@ function renderProducts(filter = '') {
     return;
   }
 
+  const starPath = 'M8 1.5l1.545 3.13 3.455.502-2.5 2.437.59 3.44L8 9.25l-3.09 1.759.59-3.44-2.5-2.437 3.455-.502L8 1.5z';
   list.innerHTML = filtered.map(p => {
-    const qty = cart[p.id] || 0;
+    const qty   = cart[p.id] || 0;
+    const color = CATEGORY_COLORS[p.categoria] || '#080EFF';
+    const starColor = qty > 0 ? '#F5A623' : '#d2d4e1';
     return `
-      <div class="product-card ${qty > 0 ? 'selected' : ''}" id="pc-${p.id}">
-        <div class="product-thumb">
-          <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-            <path d="M8 12h24l-3 18H11L8 12z" stroke="#babdd3" stroke-width="2" fill="#e8eaf5"/>
-            <path d="M15 12v-3a5 5 0 0 1 10 0v3" stroke="#babdd3" stroke-width="2"/>
-          </svg>
-        </div>
-        <div class="product-info">
-          <div class="product-name">${p.name}</div>
-          <div class="product-sku">${p.sku}</div>
-          <div class="product-price">${fmt(p.price)}</div>
-        </div>
-        ${qty > 0 ? `
-          <div class="product-qty">
-            <button class="qty-btn minus" onclick="changeQty(${p.id}, -1, event)">−</button>
-            <span class="qty-count">${qty}</span>
-            <button class="qty-btn" onclick="changeQty(${p.id}, 1, event)">+</button>
+      <div class="product-card" id="pc-${p.id}" onclick="changeQty(${p.id}, 1, event)">
+        <div class="pc-accent" style="background:${color};"></div>
+        <div class="pc-body">
+          <div class="pc-text">
+            <span class="pc-name">${p.name}</span>
+            <span class="pc-price">${fmt(p.price)}</span>
           </div>
-        ` : `
-          <button class="qty-btn" onclick="changeQty(${p.id}, 1, event)" style="width:32px;height:32px;">+</button>
-        `}
-        ${qty > 0 ? `<div class="qty-badge">${qty}</div>` : ''}
+          <div class="pc-icons ${qty > 0 ? 'has-badge' : 'no-badge'}">
+            ${qty > 0 ? `<div class="pc-badge" onclick="changeQty(${p.id}, -1, event)">${qty}</div>` : ''}
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="${starColor}" xmlns="http://www.w3.org/2000/svg">
+              <path d="${starPath}"/>
+            </svg>
+          </div>
+        </div>
       </div>
     `;
   }).join('');
