@@ -248,12 +248,14 @@
     #empty-state p { font-size: 14px; font-weight: 500; }
     #empty-state small { font-size: 12px; font-weight: 400; color: var(--black-40); }
 
-    /* ─── Product card ─── */
+    /* ─── Product card (Figma 26748-5480) ─── */
     .product-card {
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-blue-8);
+      background: var(--black-0, #fff);
+      border-radius: 12px;
       display: flex;
-      flex-direction: column;
+      align-items: stretch;
+      height: 110px;
+      overflow: hidden;
       position: relative;
       cursor: pointer;
       user-select: none;
@@ -261,40 +263,83 @@
       transition: transform .1s;
     }
     .product-card:active { transform: scale(0.96); }
-    .product-card-inner {
-      padding: 12px 10px 12px 10px;
+
+    /* Left category accent bar: 4px × full height */
+    .pc-accent {
+      width: 4px;
+      flex-shrink: 0;
+      /* background set inline per category */
+    }
+
+    /* Card body: padding 12px, gap 12px between text and icon cols */
+    .pc-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    /* Text column: name + price, gap 24px */
+    .pc-text {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      flex: 1;
+      gap: 24px;
+      min-width: 0;
     }
-    .product-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 4px;
-    }
+    /* Montserrat Semibold 14px/20px */
     .product-name {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--black-100);
-      line-height: 18px;
-      flex: 1;
+      line-height: 20px;
     }
+    /* Montserrat Regular 14px/20px */
+    .product-price {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--black-100);
+      line-height: 20px;
+      white-space: nowrap;
+    }
+
+    /* Icon column: badge top + star bottom, self-stretch */
+    .pc-icons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      align-self: stretch;
+      flex-shrink: 0;
+      padding: 4px 0;
+    }
+    .pc-icons.has-badge { justify-content: space-between; }
+    .pc-icons.no-badge  { justify-content: flex-end; }
+
+    /* Quantity badge: Blue/100 #080EFF, 20px circle, Semibold 12px white */
+    .pc-badge {
+      width: 20px;
+      height: 20px;
+      border-radius: 100px;
+      background: #080EFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 16px;
+      flex-shrink: 0;
+    }
+
     .btn-star {
-      width: 22px; height: 22px;
+      width: 16px; height: 16px;
       border: none; background: transparent;
       padding: 0; cursor: pointer;
       flex-shrink: 0;
-      display: flex; align-items: flex-start; justify-content: center;
-      padding-top: 1px;
+      display: flex; align-items: center; justify-content: center;
       -webkit-tap-highlight-color: transparent;
-    }
-    .product-price {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--black-100);
-      line-height: 20px;
     }
 
     /* ─── Bill items (cuenta solicitada, read-only) ─── */
@@ -439,21 +484,7 @@
       margin-top: 4px;
     }
 
-    /* Quantity badge */
-    .qty-badge {
-      position: absolute;
-      top: -8px; right: -8px;
-      min-width: 22px; height: 22px;
-      border-radius: 11px;
-      background: var(--coral-100);
-      color: #fff;
-      font-family: var(--font);
-      font-size: 11px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 5px;
-      box-shadow: 0 2px 6px rgba(255,41,71,.4);
-      z-index: 5;
-    }
+    /* .qty-badge replaced by .pc-badge inside icon column */
 
     /* ─── Bottom bar ─── */
     /* Barra de acción — Figma 26687:4541 */
@@ -1151,14 +1182,16 @@
    DATA
 ══════════════════════════════════════════ */
 const CATEGORIES = [
-  { id:"favoritos",          label:"Favoritos",          bg:"#121E6C", color:"#ffffff" },
-  { id:"entradas-frias",     label:"Entradas Frías",     bg:"#DBEAFE", color:"#3B82F6" },
-  { id:"entradas-calientes", label:"Entradas Calientes", bg:"#FFEDD5", color:"#F97316" },
-  { id:"pastas",             label:"Pastas & Risottos",  bg:"#FEF9C3", color:"#EAB308" },
-  { id:"carnes",             label:"Carnes",             bg:"#FEE2E2", color:"#EF4444" },
-  { id:"pescados",           label:"Pescados",           bg:"#E0F2FE", color:"#0EA5E9" },
-  { id:"postres",            label:"Postres",            bg:"#FCE7F3", color:"#EC4899" },
-  { id:"bebidas",            label:"Bebidas",            bg:"#D1FAE5", color:"#10B981" },
+  { id:"favoritos",          label:"Favoritos",          bg:"#121E6C", color:"#ffffff", accent:"#080EFF" },
+  { id:"entradas-frias",     label:"Entradas Frías",     bg:"#DBEAFE", color:"#3B82F6", accent:"#1C70D3" },
+  { id:"entradas-calientes", label:"Entradas Calientes", bg:"#FFEDD5", color:"#F97316", accent:"#FF5500" },
+  { id:"pastas",             label:"Pastas & Risottos",  bg:"#FEF9C3", color:"#EAB308", accent:"#FF9400" },
+  { id:"carnes",             label:"Carnes",             bg:"#FEE2E2", color:"#EF4444", accent:"#B01207" },
+  { id:"pescados",           label:"Pescados",           bg:"#E0F2FE", color:"#0EA5E9", accent:"#4401A9" },
+  { id:"postres",            label:"Postres",            bg:"#FCE7F3", color:"#EC4899", accent:"#FF2DC8" },
+  { id:"bebidas",            label:"Bebidas",            bg:"#D1FAE5", color:"#10B981", accent:"#1C70D3" },
+  { id:"sushi",              label:"Sushi",              bg:"#F3E8FF", color:"#9333EA", accent:"#800099" },
+  { id:"desayunos",          label:"Desayunos",          bg:"#F8FAFC", color:"#94A3B8", accent:"#d2d4e1" },
 ];
 
 const PRODUCTS = [
@@ -1382,18 +1415,20 @@ function renderProducts() {
     const card = document.createElement("div");
     card.className = "product-card";
     card.dataset.id = product.id;
-    card.style.background = cat.bg;
 
     card.innerHTML = `
-      ${qty > 0 ? `<div class="qty-badge">${qty}</div>` : ""}
-      <div class="product-card-inner">
-        <div class="product-top">
+      <div class="pc-accent" style="background:${cat.accent || '#080EFF'};"></div>
+      <div class="pc-body">
+        <div class="pc-text">
           <span class="product-name">${product.name}</span>
+          <span class="product-price">${fmt(product.price)}</span>
+        </div>
+        <div class="pc-icons ${qty > 0 ? 'has-badge' : 'no-badge'}">
+          ${qty > 0 ? `<div class="pc-badge">${qty}</div>` : ''}
           <button class="btn-star" data-id="${product.id}" aria-label="Favorito">
             ${starSVG(fav)}
           </button>
         </div>
-        <div class="product-price">${fmt(product.price)}</div>
       </div>
     `;
 
