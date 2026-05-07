@@ -400,6 +400,15 @@
     #btn-confirm-cancel-action:active { opacity: 0.85; }
     #btn-confirm-keep { width: 100%; height: 44px; border-radius: var(--radius-pill); border: 1.5px solid rgba(18,30,108,.15); background: transparent; color: var(--blue-100); font-family: var(--font); font-size: 15px; font-weight: 500; cursor: pointer; transition: background .15s; }
     #btn-confirm-keep:active { background: var(--blue-10); }
+
+    /* ─── Client pill + Resolution pill — CUENTA_SOLICITADA ─── */
+    .client-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .client-pill { flex: 1; display: flex; align-items: center; gap: 8px; height: 40px; background: var(--black-0); border-radius: var(--radius-pill); padding: 0 12px; box-shadow: var(--shadow-blue-8); }
+    .client-text { flex: 1; font-size: 14px; font-weight: 400; color: var(--blue-100); line-height: 20px; }
+    .client-add { width: 24px; height: 24px; border: none; background: transparent; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
+    .resolution-pill { display: flex; align-items: center; gap: 8px; height: 40px; background: var(--black-0); border-radius: var(--radius-pill); padding: 0 12px; margin-bottom: 20px; cursor: pointer; box-shadow: var(--shadow-blue-8); }
+    .resolution-text { flex: 1; font-size: 12px; font-weight: 600; color: var(--blue-100); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #dp-checkout-prelude { display: none; flex-direction: column; padding: 0 16px; margin-top: 16px; }
   </style>
 </head>
 <body>
@@ -505,6 +514,41 @@
 
     <!-- Product list -->
     <div id="products-list"></div>
+
+    <!-- Client + Resolution — solo visible en CUENTA_SOLICITADA -->
+    <div id="dp-checkout-prelude">
+      <div class="client-row">
+        <div class="client-pill">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" stroke="#121e6c" stroke-width="1.8"/>
+            <path d="M21 21l-4.35-4.35" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span class="client-text">Consumidor Final</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" stroke="#969696" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <button class="client-add" onclick="showToast('Próximamente: agregar cliente')" aria-label="Agregar cliente">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M18 14c2.67.56 4 1.78 4 3" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="9" cy="8" r="3" stroke="#121e6c" stroke-width="1.6"/>
+            <path d="M3 21c0-3 2.69-5 6-5s6 2 6 5" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M19 8v6M22 11h-6" stroke="#121e6c" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="resolution-pill" onclick="showToast('Próximamente: cambiar resolución')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#121e6c" stroke-width="1.8" stroke-linejoin="round"/>
+          <polyline points="14 2 14 8 20 8" stroke="#121e6c" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <span class="resolution-text">Resolution Test - Resolution 1234567890</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
 
   </div>
 
@@ -906,6 +950,7 @@ function render() {
   flex('view-sin-productos', false);
   show('section-header', false);
   show('products-list', false);
+  show('dp-checkout-prelude', false);
   clearAlert();
   show('footer', false);
 
@@ -988,6 +1033,7 @@ function render() {
       flex('section-header', true); flex('btn-agregar-header', false);
       renderProductList(true);
       renderTotals(true);
+      flex('dp-checkout-prelude', true);
       renderFooterCount();
       if (COMANDA_ENABLED) {
         setDualBtn('Reenviar comanda', handleReenviarComanda, 'Cobrar mesa');
