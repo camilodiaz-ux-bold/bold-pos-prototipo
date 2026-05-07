@@ -152,6 +152,17 @@
     .tot-row.grand .tot-label { font-size: 14px; font-weight: 600; }
     .tot-row.grand .tot-value { font-size: 16px; font-weight: 700; }
 
+    /* ─── Mesa summary card (Step 1) ─── */
+    .mesa-card {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--black-0); border-radius: var(--radius-card);
+      padding: 14px 16px; margin: 0 16px 8px; box-shadow: var(--shadow-2);
+      cursor: pointer; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+    }
+    .mesa-card-name  { font-size: 15px; font-weight: 700; color: var(--blue-100); flex-shrink: 0; }
+    .mesa-card-meta  { flex: 1; font-size: 12px; font-weight: 400; color: var(--black-60); padding-left: 6px; }
+    .mesa-card-total { font-size: 15px; font-weight: 700; color: var(--blue-100); flex-shrink: 0; }
+
     /* ─── Step 2 ─── */
     .inp-group { margin-bottom: 16px; }
     .inp-label { font-size: 14px; font-weight: 600; color: var(--blue-100); line-height: 20px; margin-bottom: 4px; }
@@ -399,6 +410,16 @@
           <path d="M18 6L6 18M6 6l12 12" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
       </button>
+    </div>
+
+    <!-- Mesa summary -->
+    <div class="mesa-card" onclick="goToMesa()">
+      <span class="mesa-card-name" id="s1-mesa-name">Mesa —</span>
+      <span class="mesa-card-meta" id="s1-mesa-meta">— productos</span>
+      <span class="mesa-card-total" id="s1-mesa-total">$0</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 18l6-6-6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </div>
 
     <div class="step-body" id="s1-body">
@@ -827,6 +848,7 @@ function exitToHome() {
 ══════════════════════════════════════════ */
 function renderProducts() {
   const container = document.getElementById('s1-products');
+  if (!container) return;
   container.innerHTML = '';
   if (!cart.length) {
     container.innerHTML = '<div class="product-card"><span class="product-name" style="color:var(--black-40)">Sin productos</span></div>';
@@ -857,6 +879,10 @@ function renderTotalsS1() {
 
   document.getElementById('bar1-count').textContent  = totalItems + ' Producto' + (totalItems !== 1 ? 's' : '');
   document.getElementById('bar1-amount').textContent = fmt(total);
+
+  document.getElementById('s1-mesa-name').textContent  = 'Mesa ' + mesaId;
+  document.getElementById('s1-mesa-meta').textContent  = totalItems + ' producto' + (totalItems !== 1 ? 's' : '');
+  document.getElementById('s1-mesa-total').textContent = fmt(total);
 }
 
 function openPropina() {
