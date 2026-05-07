@@ -308,6 +308,50 @@
     }
     .terminal-check.on { background: var(--blue-100); border-color: var(--blue-100); }
 
+    /* ─── Step 3 extras ─── */
+    .s3-simple-total {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--black-0); border-radius: var(--radius-card);
+      padding: 14px 16px; box-shadow: var(--shadow-2); margin-bottom: 16px;
+    }
+    .s3-simple-total-label { font-size: 13px; font-weight: 500; color: var(--black-60); }
+    .s3-simple-total-val   { font-size: 18px; font-weight: 700; color: var(--blue-100); }
+    .s3-dividir-link {
+      display: flex; align-items: center; gap: 6px;
+      border: none; background: transparent; padding: 0 0 16px;
+      font-family: var(--font); font-size: 13px; font-weight: 600;
+      color: var(--blue-100); text-decoration: underline;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ─── Divide Drop Up (Step 3) ─── */
+    #s3-divide-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 200;
+    }
+    #s3-divide-backdrop.open { display: block; }
+    #s3-divide-sheet {
+      display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 393px; max-height: 78vh; background: var(--black-0);
+      border-radius: 20px 20px 0 0; z-index: 201;
+      flex-direction: column; overflow: hidden;
+    }
+    #s3-divide-sheet.open { display: flex; }
+    .s3d-handle { width: 36px; height: 4px; border-radius: 2px; background: #e0e0e0; margin: 12px auto 0; flex-shrink: 0; }
+    .s3d-header { display: flex; align-items: center; padding: 12px 16px 8px; flex-shrink: 0; }
+    .s3d-title  { flex: 1; font-size: 16px; font-weight: 700; color: var(--blue-100); }
+    .s3d-close  { width: 32px; height: 32px; border: none; background: transparent; cursor: pointer; font-size: 18px; color: var(--black-60); display: flex; align-items: center; justify-content: center; }
+    .s3d-body   { flex: 1; overflow-y: auto; padding: 0 16px 8px; scrollbar-width: none; }
+    .s3d-body::-webkit-scrollbar { display: none; }
+    .s3d-total-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 14px; }
+    .s3d-total-lbl { font-size: 13px; font-weight: 500; color: var(--black-60); }
+    #s3d-total-val { font-size: 16px; font-weight: 700; color: var(--blue-100); }
+    #s3d-validation { margin-top: 8px; font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 8px; display: none; }
+    #s3d-validation.ok  { background: #e8f9f2; color: #1b8959; display: block; }
+    #s3d-validation.err { background: #fef1f3; color: #c31a2f; display: block; }
+    .s3d-confirm { margin: 8px 16px 16px; height: 52px; border-radius: var(--radius-pill); border: none; background: var(--blue-100); color: #fff; font-family: var(--font); font-size: 15px; font-weight: 600; cursor: pointer; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+    .s3d-confirm:disabled { opacity: 0.5; }
+
     /* ─── Step 4 ─── */
     .step-body.no-pad { padding-bottom: 24px; }
 
@@ -602,7 +646,7 @@
   <!-- ══════════════ STEP 3: Método de pago ══════════════ -->
   <div class="step" id="s3">
     <div class="nav-row">
-      <button class="nav-btn" onclick="goStep(2)" aria-label="Volver">
+      <button class="nav-btn" onclick="goStep(1)" aria-label="Volver">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -619,8 +663,8 @@
     </div>
 
     <div class="step-body">
-      <!-- Progress -->
-      <div class="pay-progress">
+      <!-- Progress (solo si dividir) -->
+      <div class="pay-progress" id="s3-progress-block">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="10" stroke="#ff2947" stroke-width="1.8"/>
           <path d="M12 8v4l2 2" stroke="#ff2947" stroke-width="1.8" stroke-linecap="round"/>
@@ -629,11 +673,24 @@
         <span class="pay-progress-rest" id="s3-progress-rest"></span>
       </div>
 
-      <!-- Person list -->
+      <!-- Person list (solo si dividir) -->
       <div class="ppl-list" id="s3-ppl-list"></div>
+
+      <!-- Total simple (solo si !dividir) -->
+      <div class="s3-simple-total" id="s3-simple-total">
+        <span class="s3-simple-total-label">Total a cobrar</span>
+        <span class="s3-simple-total-val" id="s3-total-val">$0</span>
+      </div>
 
       <!-- Payment method grid -->
       <div class="pay-grid-label">¿Cómo cobrar?</div>
+      <button class="s3-dividir-link" onclick="openDivideDropUp()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M16 3H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z" stroke="#121e6c" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M12 3v18" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Dividir cuenta
+      </button>
       <div class="pay-grid" id="pay-grid">
         <!-- Rendered by JS -->
       </div>
@@ -662,6 +719,50 @@
       </div>
       <button class="bar-btn" id="btn-confirm-pay" onclick="confirmPerson()" disabled>Confirmar pago</button>
     </div>
+  </div>
+
+  <!-- ══════════════ Divide Drop Up ══════════════ -->
+  <div id="s3-divide-backdrop" onclick="closeDivideDropUp()"></div>
+  <div id="s3-divide-sheet">
+    <div class="s3d-handle"></div>
+    <div class="s3d-header">
+      <span class="s3d-title">Dividir cuenta</span>
+      <button class="s3d-close" onclick="closeDivideDropUp()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="s3d-body">
+      <div class="s3d-total-row">
+        <span class="s3d-total-lbl">Total a dividir</span>
+        <span id="s3d-total-val">$0</span>
+      </div>
+      <div class="divide-tabs">
+        <button class="dtab active" id="s3d-tab-equal"  onclick="s3dSetMode('equal')">Partes iguales</button>
+        <button class="dtab"        id="s3d-tab-custom" onclick="s3dSetMode('custom')">Personalizado</button>
+      </div>
+      <div id="s3d-equal" style="margin-top:12px">
+        <div class="personas-counter">
+          <span class="personas-counter-label">¿Entre cuántas personas?</span>
+          <div class="ctr-ctrl">
+            <button class="ctr-btn" id="s3d-minus" onclick="s3dChangePersonas(-1)" disabled>−</button>
+            <span class="ctr-num" id="s3d-num">2</span>
+            <button class="ctr-btn" id="s3d-plus"  onclick="s3dChangePersonas(1)">+</button>
+          </div>
+        </div>
+        <div class="person-cards" id="s3d-equal-cards"></div>
+      </div>
+      <div id="s3d-custom" style="display:none; margin-top:12px">
+        <div class="personas-counter">
+          <span class="personas-counter-label">¿Entre cuántas personas?</span>
+          <div class="ctr-ctrl">
+            <button class="ctr-btn" id="s3d-minus-c" onclick="s3dChangePersonasCustom(-1)" disabled>−</button>
+            <span class="ctr-num" id="s3d-num-c">2</span>
+            <button class="ctr-btn" id="s3d-plus-c"  onclick="s3dChangePersonasCustom(1)">+</button>
+          </div>
+        </div>
+        <div class="person-cards" id="s3d-custom-cards"></div>
+        <div id="s3d-validation"></div>
+      </div>
+    </div>
+    <button class="s3d-confirm" id="s3d-confirm-btn" onclick="confirmDivideDropUp()">Confirmar división</button>
   </div>
 
   <!-- ══════════════ STEP 4: Comprobante ══════════════ -->
@@ -1081,6 +1182,15 @@ function renderStep3() {
   const paid    = personas.slice(0, currentPersonIdx).reduce((s, p) => s + p.amount, 0);
   const rest    = total - paid;
 
+  // Show/hide blocks based on divide mode
+  const showDivide = dividir;
+  document.getElementById('s3-progress-block').style.display = showDivide ? '' : 'none';
+  document.getElementById('s3-ppl-list').style.display       = showDivide ? '' : 'none';
+  document.getElementById('s3-simple-total').style.display   = showDivide ? 'none' : '';
+  if (!showDivide) {
+    document.getElementById('s3-total-val').textContent = fmt(total);
+  }
+
   document.getElementById('s3-progress-text').textContent =
     `Pagando ${currentPersonIdx + 1} de ${personas.length}`;
   document.getElementById('s3-progress-rest').textContent =
@@ -1146,6 +1256,111 @@ function confirmPerson() {
     // All paid → comprobante
     goStep(4);
   }
+}
+
+/* ══════════════════════════════════════════
+   DIVIDE DROP UP (Step 3)
+══════════════════════════════════════════ */
+function openDivideDropUp() {
+  document.getElementById('s3d-total-val').textContent = fmt(calcTotal());
+  document.getElementById('s3d-num').textContent   = numPersonas;
+  document.getElementById('s3d-minus').disabled    = numPersonas <= 2;
+  document.getElementById('s3d-plus').disabled     = numPersonas >= 10;
+  document.getElementById('s3d-num-c').textContent = numPersonas;
+  document.getElementById('s3d-minus-c').disabled  = numPersonas <= 2;
+  document.getElementById('s3d-plus-c').disabled   = numPersonas >= 10;
+  s3dSetMode(divideMode);
+  document.getElementById('s3-divide-backdrop').classList.add('open');
+  document.getElementById('s3-divide-sheet').classList.add('open');
+}
+
+function closeDivideDropUp() {
+  document.getElementById('s3-divide-backdrop').classList.remove('open');
+  document.getElementById('s3-divide-sheet').classList.remove('open');
+}
+
+function s3dSetMode(mode) {
+  divideMode = mode;
+  document.getElementById('s3d-tab-equal').classList.toggle('active',  mode === 'equal');
+  document.getElementById('s3d-tab-custom').classList.toggle('active', mode === 'custom');
+  document.getElementById('s3d-equal').style.display  = mode === 'equal'  ? '' : 'none';
+  document.getElementById('s3d-custom').style.display = mode === 'custom' ? '' : 'none';
+  if (mode === 'equal')  s3dRenderEqualCards();
+  if (mode === 'custom') s3dRenderCustomCards();
+}
+
+function s3dChangePersonas(delta) {
+  numPersonas = Math.max(2, Math.min(10, numPersonas + delta));
+  document.getElementById('s3d-num').textContent = numPersonas;
+  document.getElementById('s3d-minus').disabled  = numPersonas <= 2;
+  document.getElementById('s3d-plus').disabled   = numPersonas >= 10;
+  s3dRenderEqualCards();
+}
+
+function s3dRenderEqualCards() {
+  const perPers = Math.ceil(calcTotal() / numPersonas);
+  const container = document.getElementById('s3d-equal-cards');
+  container.innerHTML = '';
+  for (let i = 1; i <= numPersonas; i++) {
+    const div = document.createElement('div');
+    div.className = 'person-card';
+    div.innerHTML = `<div class="person-card-avatar">${i}</div><span class="person-card-name">Persona ${i}</span><span class="person-card-amount">${fmt(perPers)}</span>`;
+    container.appendChild(div);
+  }
+}
+
+function s3dChangePersonasCustom(delta) {
+  numPersonas = Math.max(2, Math.min(10, numPersonas + delta));
+  document.getElementById('s3d-num-c').textContent  = numPersonas;
+  document.getElementById('s3d-minus-c').disabled   = numPersonas <= 2;
+  document.getElementById('s3d-plus-c').disabled    = numPersonas >= 10;
+  s3dRenderCustomCards();
+}
+
+function s3dRenderCustomCards() {
+  const total   = calcTotal();
+  const perPers = Math.floor(total / numPersonas);
+  customAmts = Array.from({length: numPersonas}, (_, i) =>
+    i < numPersonas - 1 ? perPers : total - perPers * (numPersonas - 1));
+  const container = document.getElementById('s3d-custom-cards');
+  container.innerHTML = '';
+  for (let i = 0; i < numPersonas; i++) {
+    const div = document.createElement('div');
+    div.className = 'person-card';
+    div.innerHTML = `<div class="person-card-avatar">${i+1}</div><span class="person-card-name">Persona ${i+1}</span><input class="person-card-input" type="number" data-idx="${i}" value="${customAmts[i]}" oninput="s3dUpdateCustomAmt(${i}, this.value)"/>`;
+    container.appendChild(div);
+  }
+  s3dValidateCustom();
+}
+
+function s3dUpdateCustomAmt(idx, val) {
+  customAmts[idx] = parseInt(val) || 0;
+  s3dValidateCustom();
+}
+
+function s3dValidateCustom() {
+  const total = calcTotal();
+  const sum   = customAmts.reduce((a, b) => a + b, 0);
+  const diff  = total - sum;
+  const el    = document.getElementById('s3d-validation');
+  const btn   = document.getElementById('s3d-confirm-btn');
+  if (diff === 0) {
+    el.className = 'ok';  el.textContent = 'La suma es correcta ✓'; btn.disabled = false;
+  } else if (diff > 0) {
+    el.className = 'err'; el.textContent = 'Faltan ' + fmt(diff) + ' por asignar'; btn.disabled = true;
+  } else {
+    el.className = 'err'; el.textContent = fmt(-diff) + ' de más — ajusta los montos'; btn.disabled = true;
+  }
+}
+
+function confirmDivideDropUp() {
+  if (divideMode === 'custom') {
+    const sum = customAmts.reduce((a, b) => a + b, 0);
+    if (sum !== calcTotal()) return;
+  }
+  dividir = true;
+  closeDivideDropUp();
+  initStep3();
 }
 
 /* ══════════════════════════════════════════
