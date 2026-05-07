@@ -279,7 +279,7 @@
 
     .pay-grid-label { font-size: 14px; font-weight: 700; color: var(--black-100); margin-bottom: 12px; }
     .pay-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;
     }
     .method-card {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -322,6 +322,16 @@
     }
     .s3-simple-total-label { font-size: 13px; font-weight: 500; color: var(--black-60); }
     .s3-simple-total-val   { font-size: 18px; font-weight: 700; color: var(--blue-100); }
+
+    /* ─── Step 3 dividir toggle card ─── */
+    .s3-toggle-card {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--black-0); border-radius: var(--radius-card);
+      padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-2);
+    }
+    .s3-toggle-icon { width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .s3-toggle-label { flex: 1; font-size: 14px; font-weight: 600; color: var(--black-100); }
+
     .s3-dividir-link {
       display: flex; align-items: center; gap: 6px;
       border: none; background: transparent; padding: 0 0 16px;
@@ -777,15 +787,19 @@
         <span class="s3-simple-total-val" id="s3-total-val">$0</span>
       </div>
 
+      <!-- Dividir cobro toggle -->
+      <div class="s3-toggle-card">
+        <div class="s3-toggle-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M16 3h5m0 0v5m0-5-7 7M8 21H3m0 0v-5m0 5 7-7" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="s3-toggle-label">Dividir cobro</span>
+        <button class="toggle-sw" id="s3-dividir-toggle" onclick="toggleDividirS3()" aria-label="Dividir cobro"></button>
+      </div>
+
       <!-- Payment method grid -->
-      <div class="pay-grid-label">¿Cómo cobrar?</div>
-      <button class="s3-dividir-link" onclick="openDivideDropUp()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M16 3H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z" stroke="#121e6c" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M12 3v18" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        Dividir cuenta
-      </button>
+      <div class="pay-grid-label">¿Cómo quieres cobrar?</div>
       <div class="pay-grid" id="pay-grid">
         <!-- Rendered by JS -->
       </div>
@@ -812,7 +826,7 @@
         <span class="bar-count" id="s3-bar-label">Persona 1 de 1</span>
         <span class="bar-amount" id="s3-bar-amount">$0</span>
       </div>
-      <button class="bar-btn" id="btn-confirm-pay" onclick="confirmPerson()" disabled>Confirmar pago</button>
+      <button class="bar-btn" id="btn-confirm-pay" onclick="confirmPerson()" disabled>Continuar</button>
     </div>
   </div>
 
@@ -1236,27 +1250,22 @@ function validateCustom() {
 /* ══════════════════════════════════════════
    STEP 3
 ══════════════════════════════════════════ */
+const _ph = `<svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#E0E0E0"/></svg>`;
 const METHODS = [
-  { id: 'bold',           name: 'Bold',          color: '#121e6c', icon: 'terminal' },
-  { id: 'efectivo',       name: 'Efectivo',       color: '#1b8959', icon: 'cash'     },
-  { id: 'nequi',          name: 'Nequi',          color: '#7b2d8b', icon: 'phone'    },
-  { id: 'daviplata',      name: 'Daviplata',      color: '#e8222e', icon: 'phone'    },
-  { id: 'redeban',        name: 'Redeban',        color: '#0047ab', icon: 'card'     },
-  { id: 'credibanc',      name: 'Credibanc',      color: '#2e7d32', icon: 'card'     },
-  { id: 'transferencia',  name: 'Transferencia',  color: '#37474f', icon: 'bank'     },
-  { id: 'mixto',          name: 'Mixto',          color: '#ff2947', icon: 'mix'      },
+  { id: 'transferencia', name: 'Transferencia bancaria', iconHTML: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.7984 3.22365C16.6725 2.63226 15.3176 2.63226 14.1917 3.22365L14.1902 3.22444L3.2796 8.91984C2.47062 9.33526 2.69976 10.6068 3.73506 10.6068H28.2684C29.2903 10.6068 29.5357 9.34402 28.7197 8.91764L17.8002 3.22459L17.7984 3.22365ZM18.4175 2.04278C16.9038 1.24809 15.0861 1.24811 13.5725 2.04285V2.04285L2.67052 7.73373L2.66846 7.73479C0.520076 8.8403 1.41111 11.9401 3.73506 11.9401H28.2684C30.5798 11.9401 31.4811 8.8562 29.3371 7.73591L18.4175 2.04278V2.04278Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M6.05584 14.2601C6.42403 14.2605 6.72216 14.5594 6.72173 14.9276L6.70839 26.3009C6.70796 26.6691 6.40913 26.9672 6.04094 26.9668C5.67275 26.9663 5.37463 26.6675 5.37506 26.2993L5.38839 14.926C5.38883 14.5578 5.68765 14.2597 6.05584 14.2601Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12.5884 14.2601C12.9566 14.2601 13.2551 14.5586 13.2551 14.9268V26.3001C13.2551 26.6683 12.9566 26.9668 12.5884 26.9668C12.2202 26.9668 11.9217 26.6683 11.9217 26.3001V14.9268C11.9217 14.5586 12.2202 14.2601 12.5884 14.2601Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M19.1217 14.2601C19.4899 14.2601 19.7884 14.5586 19.7884 14.9268V26.3001C19.7884 26.6683 19.4899 26.9668 19.1217 26.9668C18.7535 26.9668 18.4551 26.6683 18.4551 26.3001V14.9268C18.4551 14.5586 18.7535 14.2601 19.1217 14.2601Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M25.6692 14.2601C26.0374 14.2605 26.3355 14.5594 26.3351 14.9276L26.3217 26.3009C26.3213 26.6691 26.0225 26.9672 25.6543 26.9668C25.2861 26.9663 24.988 26.6675 24.9884 26.2993L25.0017 14.926C25.0022 14.5578 25.301 14.2597 25.6692 14.2601Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M2.88173 29.8868C2.88173 29.5186 3.1802 29.2201 3.54839 29.2201H28.4551C28.8232 29.2201 29.1217 29.5186 29.1217 29.8868C29.1217 30.255 28.8232 30.5534 28.4551 30.5534H3.54839C3.1802 30.5534 2.88173 30.255 2.88173 29.8868Z" fill="#121E6C"/></svg>` },
+  { id: 'efectivo',      name: 'Efectivo',               iconHTML: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.92742 7.73323C4.26438 7.73323 3.73323 8.27076 3.73323 8.92742V23.1297C3.73323 23.7843 4.2729 24.3239 4.92742 24.3239H27.0732C27.7277 24.3239 28.2674 23.7843 28.2674 23.1297V8.92742C28.2674 8.26438 27.7299 7.73323 27.0732 7.73323H4.92742ZM2.66699 8.92742C2.66699 7.68618 3.67123 6.66699 4.92742 6.66699H27.0732C28.3145 6.66699 29.3337 7.67123 29.3337 8.92742V23.1297C29.3337 24.3731 28.3166 25.3902 27.0732 25.3902H4.92742C3.68403 25.3902 2.66699 24.3731 2.66699 23.1297V8.92742Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15.995 10.5268C12.9564 10.5268 10.4932 12.99 10.4932 16.0286C10.4932 19.0671 12.9564 21.5304 15.995 21.5304C19.0335 21.5304 21.4968 19.0671 21.4968 16.0286C21.4968 12.99 19.0335 10.5268 15.995 10.5268ZM9.42695 16.0286C9.42695 12.4011 12.3676 9.46054 15.995 9.46054C19.6224 9.46054 22.563 12.4011 22.563 16.0286C22.563 19.656 19.6224 22.5966 15.995 22.5966C12.3676 22.5966 9.42695 19.656 9.42695 16.0286Z" fill="#121E6C"/></svg>` },
+  { id: 'intercambio',   name: 'Intercambio',             iconHTML: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24.4952 4.1725C24.7246 3.94277 25.0967 3.94246 25.3265 4.1718L30.6663 9.5027L25.3274 14.8574C25.0982 15.0873 24.7261 15.0878 24.4962 14.8586C24.2663 14.6294 24.2658 14.2573 24.495 14.0274L29.0045 9.50462L24.4959 5.00371C24.2662 4.77437 24.2659 4.40222 24.4952 4.1725Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5762 9.50366C1.5762 9.17905 1.83935 8.91591 2.16395 8.91591H29.8354C30.16 8.91591 30.4231 9.17905 30.4231 9.50366C30.4231 9.82827 30.16 10.0914 29.8354 10.0914H2.16395C1.83935 10.0914 1.5762 9.82827 1.5762 9.50366Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M7.5041 15.9315C7.27476 15.7018 6.90262 15.7014 6.67289 15.9308L1.33301 21.2617L6.67193 26.6164C6.90112 26.8463 7.27327 26.8468 7.50314 26.6176C7.73301 26.3884 7.73356 26.0163 7.50436 25.7864L2.9949 21.2636L7.5034 16.7627C7.73313 16.5334 7.73344 16.1612 7.5041 15.9315Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M30.4231 21.2626C30.4231 20.938 30.16 20.6749 29.8354 20.6749H2.16395C1.83935 20.6749 1.5762 20.938 1.5762 21.2626C1.5762 21.5873 1.83935 21.8504 2.16395 21.8504H29.8354C30.16 21.8504 30.4231 21.5873 30.4231 21.2626Z" fill="#121E6C"/></svg>` },
+  { id: 'otro',          name: 'Otro',                    iconHTML: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24.8541 2.77979C25.2222 2.7792 25.5212 3.07721 25.5218 3.4454L25.5274 6.99872L29.0807 6.99312C29.4489 6.99254 29.7479 7.29054 29.7484 7.65873C29.749 8.02692 29.451 8.32587 29.0828 8.32645L25.5295 8.33206L25.5351 11.8854C25.5357 12.2536 25.2377 12.5525 24.8695 12.5531C24.5013 12.5537 24.2024 12.2557 24.2018 11.8875L24.1962 8.33416L20.6295 8.33978C20.2613 8.34037 19.9623 8.04236 19.9618 7.67417C19.9612 7.30598 20.2592 7.00703 20.6274 7.00645L24.1941 7.00083L24.1884 3.4475C24.1879 3.07932 24.4859 2.78037 24.8541 2.77979Z" fill="#121E6C"/></svg>` },
+  { id: 'contra-entrega', name: 'Pago contra entrega',   iconHTML: _ph },
+  { id: 'bold',           name: 'Bold',                  iconHTML: _ph },
+  { id: 'nequi',          name: 'Nequi',                 iconHTML: _ph },
+  { id: 'daviplata',      name: 'Daviplata',              iconHTML: _ph },
+  { id: 'credibanco',     name: 'Credibanco',             iconHTML: _ph },
+  { id: 'redeban',        name: 'Redeban',                iconHTML: _ph },
+  { id: 'addi',           name: 'Addi',                  iconHTML: _ph },
+  { id: 'sistecredito',   name: 'Sistecredito',           iconHTML: _ph },
+  { id: 'credito',        name: '100% a crédito',         iconHTML: _ph },
 ];
-
-function methodIconSVG(type, color) {
-  const s = color;
-  if (type === 'terminal') return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="${s}" stroke-width="1.8"/><path d="M2 10h20" stroke="${s}" stroke-width="1.8"/><circle cx="7" cy="15" r="1" fill="${s}"/></svg>`;
-  if (type === 'cash')     return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="1" stroke="${s}" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="${s}" stroke-width="1.8"/><path d="M7 6v12M17 6v12" stroke="${s}" stroke-width="1.4" opacity=".5"/></svg>`;
-  if (type === 'phone')    return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" stroke="${s}" stroke-width="1.8"/><circle cx="12" cy="18" r="1" fill="${s}"/><path d="M9 5h6" stroke="${s}" stroke-width="1.6" stroke-linecap="round"/></svg>`;
-  if (type === 'card')     return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="${s}" stroke-width="1.8"/><path d="M2 10h20" stroke="${s}" stroke-width="1.8"/><path d="M6 15h4" stroke="${s}" stroke-width="1.6" stroke-linecap="round"/></svg>`;
-  if (type === 'bank')     return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 21h18M3 10h18M5 10V21M19 10V21M12 3L2 10h20L12 3z" stroke="${s}" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
-  if (type === 'mix')      return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="12" r="5" stroke="${s}" stroke-width="1.8"/><circle cx="15" cy="12" r="5" stroke="${s}" stroke-width="1.8" opacity=".6"/></svg>`;
-  return '';
-}
 
 function initStep3() {
   const total = calcTotal();
@@ -1290,7 +1299,7 @@ function initStep3() {
     card.className = 'method-card';
     card.dataset.id = m.id;
     card.innerHTML = `
-      <div class="method-icon">${methodIconSVG(m.icon, m.color)}</div>
+      <div class="method-icon">${m.iconHTML}</div>
       <span class="method-name">${m.name}</span>`;
     card.addEventListener('click', () => selectMethod(m.id));
     grid.appendChild(card);
@@ -1337,9 +1346,10 @@ function renderStep3() {
   });
 
   // Bottom bar
+  document.getElementById('s3-dividir-toggle').classList.toggle('on', dividir);
   document.getElementById('s3-bar-label').textContent = current.name;
   document.getElementById('s3-bar-amount').textContent = fmt(current.amount);
-  document.getElementById('btn-confirm-pay').textContent = 'Confirmar · ' + current.name;
+  document.getElementById('btn-confirm-pay').textContent = 'Continuar';
   document.getElementById('btn-confirm-pay').disabled = selectedMethod === null;
 
   // Reset method selection
@@ -1384,6 +1394,15 @@ function confirmPerson() {
 /* ══════════════════════════════════════════
    DIVIDE DROP UP (Step 3)
 ══════════════════════════════════════════ */
+function toggleDividirS3() {
+  if (dividir) {
+    dividir = false;
+    renderStep3();
+  } else {
+    openDivideDropUp(); // wait for confirm before setting dividir=true
+  }
+}
+
 function openDivideDropUp() {
   document.getElementById('s3d-total-val').textContent = fmt(calcTotal());
   document.getElementById('s3d-num').textContent   = numPersonas;
@@ -1400,6 +1419,9 @@ function openDivideDropUp() {
 function closeDivideDropUp() {
   document.getElementById('s3-divide-backdrop').classList.remove('open');
   document.getElementById('s3-divide-sheet').classList.remove('open');
+  // Sync toggle with actual dividir state (cancel → OFF, confirm → ON)
+  const toggle = document.getElementById('s3-dividir-toggle');
+  if (toggle) toggle.classList.toggle('on', dividir);
 }
 
 function s3dSetMode(mode) {
