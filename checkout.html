@@ -330,6 +330,40 @@
       cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
 
+    /* ─── Step SM: Mesa productos ─── */
+    .sm-section-label { font-size: 12px; font-weight: 500; color: var(--black-60); line-height: 28px; margin-bottom: 12px; display: block; }
+    .sm-product-card {
+      display: flex; align-items: center;
+      background: var(--black-0); border-radius: var(--radius-card); padding: 16px;
+    }
+    .sm-card-info { display: flex; flex: 1; gap: 22px; align-items: center; min-width: 0; }
+    .sm-card-name-group { display: flex; flex: 1; gap: 6px; align-items: center; min-width: 0; }
+    .sm-card-name  { font-size: 14px; font-weight: 400; color: var(--black-100); line-height: 20px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sm-card-qty   { font-size: 14px; font-weight: 700; color: var(--black-100); line-height: 20px; flex-shrink: 0; }
+    .sm-card-price { flex: 1; font-size: 14px; font-weight: 500; color: var(--black-100); line-height: 20px; text-align: right; white-space: nowrap; }
+    .sm-footer {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 393px; z-index: 100;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 8px 16px 16px;
+      background: rgba(247,248,251,0.85);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
+    .sm-btn-salir {
+      width: 100%; height: 48px; border-radius: var(--radius-pill); border: none;
+      background: var(--coral-100); font-family: var(--font);
+      font-size: 14px; font-weight: 700; color: var(--black-0);
+      cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity .15s;
+    }
+    .sm-btn-salir:active { opacity: 0.85; }
+    .sm-btn-volver {
+      height: 44px; border: none; background: transparent; font-family: var(--font);
+      font-size: 12px; font-weight: 600; color: var(--coral-100); text-decoration: underline;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sm-btn-volver:active { opacity: 0.7; }
+
     /* ─── Divide Drop Up (Step 3) ─── */
     #s3-divide-backdrop {
       display: none; position: fixed; inset: 0;
@@ -466,7 +500,7 @@
       <div class="settings-card">
 
         <!-- Mesa row -->
-        <div class="settings-row" onclick="goToMesa()">
+        <div class="settings-row" onclick="openMesaProducts()">
           <div class="settings-row-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M2.08644 7.3197H17.8951L16.9127 3.98656H3.09381L2.08644 7.3197ZM14.9897 8.30468H4.99783L4.64675 10.9946H15.3538L14.9897 8.30468ZM2.83648 17L4.02039 8.30566H1.66654C1.44911 8.30566 1.27357 8.21865 1.13992 8.04464C1.00626 7.87063 0.968364 7.67823 1.02621 7.46745L2.19815 3.47044C2.23871 3.31941 2.31651 3.20055 2.43154 3.11388C2.54657 3.02654 2.68222 2.98944 2.83848 3.00258H17.162C17.3176 3.00258 17.4529 3.04591 17.568 3.13259C17.683 3.21993 17.7611 3.33878 17.8024 3.48915L18.9743 7.46646C19.0315 7.67725 18.9932 7.86997 18.8596 8.04464C18.7266 8.21865 18.5514 8.30566 18.334 8.30566H15.9662L17.1441 17H16.1666L15.4734 11.9806H4.50711L3.81492 17H2.83648Z" fill="#121E6C"/>
@@ -923,6 +957,35 @@
         </div>
         <button class="nueva-btn" onclick="nuevaVenta()">Nueva venta</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ STEP SM: Mesa — Productos a cobrar ══════════════ -->
+  <div class="step" id="sm">
+    <div class="nav-row">
+      <button class="nav-btn" onclick="closeMesaProducts()" aria-label="Volver">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="nav-title-group">
+        <span class="nav-title-main" id="sm-mesa-title">Mesa —</span>
+      </div>
+      <button class="nav-btn" onclick="exitToHome()" aria-label="Salir">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18M6 6l12 12" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="step-body">
+      <span class="sm-section-label">Productos a cobrar</span>
+      <div id="sm-products" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <div class="sm-footer">
+      <button class="sm-btn-salir" onclick="closeMesaProducts()">Salir</button>
+      <button class="sm-btn-volver" onclick="goToMesa()">Volver a ocupada</button>
     </div>
   </div>
 
@@ -1448,6 +1511,46 @@ function nuevaVenta() {
   DataManager.cerrarMesa(mesaId);
   const zona = mesaData ? mesaData.zona : 'salon';
   location.href = 'venta-mesas.html?zona=' + encodeURIComponent(zona);
+}
+
+/* ══════════════════════════════════════════
+   STEP SM — Mesa productos
+══════════════════════════════════════════ */
+function openMesaProducts() {
+  document.getElementById('s1').classList.remove('active');
+  document.getElementById('sm').classList.add('active');
+  document.getElementById('sm-mesa-title').textContent = 'Mesa ' + mesaId;
+  renderMesaProducts();
+}
+
+function closeMesaProducts() {
+  document.getElementById('sm').classList.remove('active');
+  document.getElementById('s1').classList.add('active');
+}
+
+function renderMesaProducts() {
+  const container = document.getElementById('sm-products');
+  container.innerHTML = '';
+  if (!cart.length) {
+    const empty = document.createElement('div');
+    empty.className = 'sm-product-card';
+    empty.innerHTML = '<span class="sm-card-name" style="color:var(--black-40)">Sin productos</span>';
+    container.appendChild(empty);
+    return;
+  }
+  cart.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'sm-product-card';
+    div.innerHTML = `
+      <div class="sm-card-info">
+        <div class="sm-card-name-group">
+          <span class="sm-card-name">${p.nombre}</span>
+          <span class="sm-card-qty">x${p.cantidad}</span>
+        </div>
+        <span class="sm-card-price">${fmt(p.precio * p.cantidad)}</span>
+      </div>`;
+    container.appendChild(div);
+  });
 }
 
 /* ══════════════════════════════════════════
