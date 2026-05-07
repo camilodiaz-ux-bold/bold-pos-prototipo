@@ -781,12 +781,6 @@
       <!-- Person list (solo si dividir) -->
       <div class="ppl-list" id="s3-ppl-list"></div>
 
-      <!-- Total simple (solo si !dividir) -->
-      <div class="s3-simple-total" id="s3-simple-total">
-        <span class="s3-simple-total-label">Total a cobrar</span>
-        <span class="s3-simple-total-val" id="s3-total-val">$0</span>
-      </div>
-
       <!-- Dividir cobro toggle -->
       <div class="s3-toggle-card">
         <div class="s3-toggle-icon">
@@ -804,20 +798,6 @@
         <!-- Rendered by JS -->
       </div>
 
-      <!-- Terminal option -->
-      <div class="terminal-row" onclick="toggleTerminal()">
-        <div class="terminal-icon-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="5" width="20" height="14" rx="2" stroke="#121e6c" stroke-width="1.8"/>
-            <path d="M2 10h20" stroke="#121e6c" stroke-width="1.8"/>
-          </svg>
-        </div>
-        <div class="terminal-info">
-          <div class="terminal-main">Terminal conectada</div>
-          <div class="terminal-sub">Bold Smart (simulado)</div>
-        </div>
-        <div class="terminal-check" id="terminal-check"></div>
-      </div>
     </div>
 
     <!-- Bottom bar S3 -->
@@ -1264,7 +1244,6 @@ const METHODS = [
   { id: 'redeban',        name: 'Redeban',                iconHTML: _ph },
   { id: 'addi',           name: 'Addi',                  iconHTML: _ph },
   { id: 'sistecredito',   name: 'Sistecredito',           iconHTML: _ph },
-  { id: 'credito',        name: '100% a crédito',         iconHTML: _ph },
 ];
 
 function initStep3() {
@@ -1318,10 +1297,6 @@ function renderStep3() {
   const showDivide = dividir;
   document.getElementById('s3-progress-block').style.display = showDivide ? '' : 'none';
   document.getElementById('s3-ppl-list').style.display       = showDivide ? '' : 'none';
-  document.getElementById('s3-simple-total').style.display   = showDivide ? 'none' : '';
-  if (!showDivide) {
-    document.getElementById('s3-total-val').textContent = fmt(total);
-  }
 
   document.getElementById('s3-progress-text').textContent =
     `Pagando ${currentPersonIdx + 1} de ${personas.length}`;
