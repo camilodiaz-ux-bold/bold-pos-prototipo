@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>BoldPOS — Detalle Pedido</title>
+  <title>BoldPOS — Detalle Orden</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -510,7 +510,7 @@
 
   <!-- Section header: PEDIDO + ＋ Agregar -->
   <div id="section-header">
-    <span id="section-label">Pedido</span>
+    <span id="section-label">Orden</span>
     <button id="btn-agregar-header" onclick="goToAgregar()">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M6 1v10M1 6h10" stroke="#E8194B" stroke-width="1.5" stroke-linecap="round"/>
@@ -524,7 +524,7 @@
 
     <!-- DISPONIBLE: centered CTA -->
     <div id="view-disponible">
-      <button id="btn-iniciar" onclick="handleIniciarPedido()">Iniciar pedido</button>
+      <button id="btn-iniciar" onclick="handleIniciarPedido()">Iniciar orden</button>
     </div>
 
     <!-- SIN_PRODUCTOS: empty state -->
@@ -678,13 +678,13 @@
         </svg>
       </div>
       <p id="confirm-title">¿Cancelar y liberar mesa?</p>
-      <p id="confirm-body">Se eliminará todo el pedido y la mesa quedará disponible. Esta acción no se puede deshacer.</p>
+      <p id="confirm-body">Se eliminará toda la orden y la mesa quedará disponible. Esta acción no se puede deshacer.</p>
       <div id="confirm-btns">
         <button id="btn-confirm-cancel-action" onclick="ejecutarCancelar()">
           <div class="spinner" id="spinner-cancelar" style="display:none"></div>
-          <span id="btn-cancelar-text">Sí, cancelar pedido</span>
+          <span id="btn-cancelar-text">Sí, cancelar orden</span>
         </button>
-        <button id="btn-confirm-keep" onclick="closeCancelConfirm()">Mantener pedido</button>
+        <button id="btn-confirm-keep" onclick="closeCancelConfirm()">Mantener orden</button>
       </div>
     </div>
   </div>
@@ -947,7 +947,7 @@ function render() {
   show('section-header', false);
   show('products-list', false);
   show('dp-checkout-prelude', false);
-  document.getElementById('section-label').textContent = 'Pedido';
+  document.getElementById('section-label').textContent = 'Orden';
   clearAlert();
   show('footer', false);
 
@@ -966,7 +966,7 @@ function render() {
       renderProductList(false);
       renderTotals(false);
       renderFooterCount();
-      setSingleBtn('Confirmar pedido', false);
+      setSingleBtn('Confirmar orden', false);
       show('footer', true);
       break;
 
@@ -985,11 +985,11 @@ function render() {
 
     case ESTADOS.PEDIDO_CONFIRMADO_CON_CAMBIOS:
       flex('section-header', true); flex('btn-agregar-header', true);
-      showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
+      showAlert('Cambios pendientes de confirmar en la orden', 'modified');
       renderProductList(false);
       renderTotals(false);
       renderFooterCount();
-      setSingleBtn('Actualizar pedido', false);
+      setSingleBtn('Actualizar orden', false);
       show('footer', true);
       break;
 
@@ -1007,11 +1007,11 @@ function render() {
     case ESTADOS.COMANDA_CON_AJUSTES:
       if (!COMANDA_ENABLED) { transicion(ESTADOS.PEDIDO_CONFIRMADO_CON_CAMBIOS); break; }
       flex('section-header', true); flex('btn-agregar-header', true);
-      showAlert('Cambios pendientes de confirmar en el pedido', 'modified');
+      showAlert('Cambios pendientes de confirmar en la orden', 'modified');
       renderProductList(false);
       renderTotals(false);
       renderFooterCount();
-      setSingleBtn('Actualizar pedido', false);
+      setSingleBtn('Actualizar orden', false);
       show('footer', true);
       break;
 
@@ -1133,11 +1133,11 @@ function markModifiedIfSent() {
   if (COMANDA_ENABLED && (estado === ESTADOS.COMANDA_ENVIADA || estado === ESTADOS.CAMBIOS_GUARDADOS)) {
     estado = ESTADOS.COMANDA_CON_AJUSTES;
     saveMsState(mesaId, { estado, horaComanda });
-    showToast('Cambios pendientes de confirmar en el pedido');
+    showToast('Cambios pendientes de confirmar en la orden');
   } else if (estado === ESTADOS.PEDIDO_CONFIRMADO) {
     estado = ESTADOS.PEDIDO_CONFIRMADO_CON_CAMBIOS;
     saveMsState(mesaId, { estado });
-    showToast('Cambios pendientes de confirmar en el pedido');
+    showToast('Cambios pendientes de confirmar en la orden');
   }
 }
 
@@ -1149,7 +1149,7 @@ function handleGuardarCambios() {
 
 function handleGuardarCambiosPendiente() {
   // Estado 3 (PEDIDO_CONFIRMADO_CON_CAMBIOS) → Estado 2 (PEDIDO_CONFIRMADO)
-  showToast('Cambios del pedido guardados');
+  showToast('Cambios de la orden guardados');
   transicion(ESTADOS.PEDIDO_CONFIRMADO);
 }
 
