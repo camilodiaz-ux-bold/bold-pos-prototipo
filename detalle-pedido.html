@@ -248,7 +248,7 @@
     .product-card.readonly { min-height: auto; padding: 16px; border-radius: 16px; flex-direction: row; align-items: center; justify-content: flex-start; gap: 22px; cursor: default; }
     .product-card.readonly:active { opacity: 1; }
     .product-card-readonly-row { display: flex; flex: 1 0 0; align-items: center; gap: 6px; overflow: hidden; }
-    .product-card-readonly-name { font-size: 14px; font-weight: 400; color: var(--black-100); line-height: 20px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .product-card-readonly-name { font-size: 14px; font-weight: 400; color: var(--black-100); line-height: 20px; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     .product-card-readonly-qty  { font-size: 14px; font-weight: 700; color: var(--black-100); line-height: 20px; flex-shrink: 0; }
     .product-card-readonly-price { flex: 1 0 0; font-size: 14px; font-weight: 500; color: var(--black-100); line-height: 20px; text-align: right; white-space: nowrap; }
     .product-card-readonly-nota { font-size: 12px; font-weight: 400; color: var(--black-40, #969696); line-height: 16px; }
@@ -402,15 +402,29 @@
     #btn-confirm-keep { width: 100%; height: 44px; border-radius: var(--radius-pill); border: 1.5px solid rgba(18,30,108,.15); background: transparent; color: var(--blue-100); font-family: var(--font); font-size: 15px; font-weight: 500; cursor: pointer; transition: background .15s; }
     #btn-confirm-keep:active { background: var(--blue-10); }
 
-    /* ─── Client pill + Resolution pill — CUENTA_SOLICITADA ─── */
-    .client-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-    .client-pill { flex: 1; display: flex; align-items: center; gap: 8px; height: 40px; background: var(--black-0); border-radius: var(--radius-pill); padding: 0 12px; box-shadow: var(--shadow-blue-8); }
-    .client-text { flex: 1; font-size: 14px; font-weight: 400; color: var(--blue-100); line-height: 20px; }
-    .client-add { height: 40px; border: none; background: transparent; padding: 0 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
-    .client-add-label { font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--blue-100); white-space: nowrap; }
-    .resolution-pill { display: flex; align-items: center; gap: 8px; height: 40px; background: var(--black-0); border-radius: var(--radius-pill); padding: 0 12px; margin-bottom: 20px; cursor: pointer; box-shadow: var(--shadow-blue-8); }
-    .resolution-text { flex: 1; font-size: 12px; font-weight: 600; color: var(--blue-100); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #dp-checkout-prelude { display: none; flex-direction: column; padding: 0 16px; margin-top: 16px; }
+    /* ─── Checkout fields — CUENTA_SOLICITADA ─── */
+    #dp-checkout-prelude { display: none; flex-direction: column; padding: 0 16px; margin-top: 12px; gap: 8px; flex-shrink: 0; }
+    .checkout-fields-row { display: flex; gap: 8px; }
+    .checkout-field-pill {
+      flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+      height: 48px; background: var(--black-0); border-radius: 12px;
+      padding: 0 12px; box-shadow: var(--shadow-blue-8);
+      border: none; cursor: pointer; text-align: left;
+      -webkit-tap-highlight-color: transparent; transition: opacity .15s;
+    }
+    .checkout-field-pill:active { opacity: 0.75; }
+    .checkout-field-inner { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+    .checkout-field-label { font-size: 10px; font-weight: 600; color: var(--black-40); line-height: 14px; text-transform: uppercase; letter-spacing: .4px; }
+    .checkout-field-value { font-size: 13px; font-weight: 500; color: var(--blue-100); line-height: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .checkout-resolution-pill {
+      display: flex; align-items: center; gap: 8px; height: 40px;
+      background: var(--black-0); border-radius: 12px; padding: 0 12px;
+      box-shadow: var(--shadow-blue-8); border: none; cursor: pointer;
+      width: 100%; text-align: left; -webkit-tap-highlight-color: transparent;
+      transition: opacity .15s;
+    }
+    .checkout-resolution-pill:active { opacity: 0.75; }
+    .checkout-resolution-text { flex: 1; font-size: 12px; font-weight: 500; color: var(--blue-100); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -479,33 +493,38 @@
     <button id="card-ver-mas" onclick="openInfoDropUp()">Ver más</button>
   </div>
 
-  <!-- Client + Resolution — solo visible en CUENTA_SOLICITADA -->
+  <!-- Cliente + Vendedor + Resolución — solo visible en CUENTA_SOLICITADA -->
   <div id="dp-checkout-prelude">
-    <div class="client-row">
-      <div class="client-pill">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="11" cy="11" r="8" stroke="#121e6c" stroke-width="1.8"/>
-          <path d="M21 21l-4.35-4.35" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        <span class="client-text">Consumidor Final</span>
+    <div class="checkout-fields-row">
+      <button class="checkout-field-pill" onclick="showToast('Próximamente: cambiar cliente')">
+        <div class="checkout-field-inner">
+          <span class="checkout-field-label">Cliente</span>
+          <span class="checkout-field-value">Consumidor Final</span>
+        </div>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 6L6 18M6 6l12 12" stroke="#969696" stroke-width="2" stroke-linecap="round"/>
+          <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-      </div>
-      <button class="client-add" onclick="showToast('Próximamente: agregar cliente')" aria-label="Agregar cliente">
-        <span class="client-add-label">+ Agregar</span>
+      </button>
+      <button class="checkout-field-pill" onclick="showToast('Próximamente: cambiar vendedor')">
+        <div class="checkout-field-inner">
+          <span class="checkout-field-label">Vendedor</span>
+          <span class="checkout-field-value">Restaurante Andrés</span>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </button>
     </div>
-    <div class="resolution-pill" onclick="showToast('Próximamente: cambiar resolución')">
+    <button class="checkout-resolution-pill" onclick="showToast('Próximamente: cambiar resolución')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#121e6c" stroke-width="1.8" stroke-linejoin="round"/>
         <polyline points="14 2 14 8 20 8" stroke="#121e6c" stroke-width="1.8" stroke-linejoin="round"/>
       </svg>
-      <span class="resolution-text">Resolution Test - Resolution 1234567890</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <span class="checkout-resolution-text">Resolution Test - Resolution 1234567890</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-    </div>
+    </button>
   </div>
 
   <!-- Section header: PEDIDO + ＋ Agregar -->
@@ -1028,6 +1047,7 @@ function render() {
 
     case ESTADOS.CUENTA_SOLICITADA:
       flex('section-header', true); flex('btn-agregar-header', false);
+      flex('dp-checkout-prelude', true);
       document.getElementById('section-label').textContent = 'Productos a cobrar';
       renderProductList(true);
       renderTotals(false);
