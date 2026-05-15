@@ -3,1592 +3,573 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>BoldPOS — Checkout</title>
+  <title>BoldPOS — Método de cobro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --blue-100:        #121e6c;
-      --blue-10:         #f1f2f6;
-      --coral-100:       #ff2947;
-      --black-0:         #ffffff;
-      --black-10:        #f3f3f3;
-      --black-40:        #969696;
-      --black-60:        #606060;
-      --black-100:       #1e1e1e;
-      --green-100:       #6cdcab;
-      --background-page: #f7f8fb;
-      --font:            'Montserrat', sans-serif;
-      --shadow-2:        0 4px 12px rgba(18,30,108,0.08);
-      --shadow-8:        0 8px 20px rgba(18,30,108,0.08);
-      --radius-card:     16px;
-      --radius-pill:     100px;
+      --blue:   #121e6c;
+      --blue10: #f1f2f6;
+      --coral:  #ff2947;
+      --white:  #ffffff;
+      --g40:    #969696;
+      --g60:    #606060;
+      --black:  #1e1e1e;
+      --bg:     #f7f8fb;
+      --font:   'Montserrat', sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
-    body { font-family: var(--font); background: #d0d0d0; display: flex; justify-content: center; align-items: flex-start; }
+    body { font-family: var(--font); background: #d0d0d0; display: flex; justify-content: center; }
+    #app { width: 393px; height: 100vh; background: var(--bg); display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
-    #app {
-      width: 393px; height: 100vh;
-      background: var(--background-page);
-      display: flex; flex-direction: column;
-      overflow: hidden; position: relative;
-      transform: translateZ(0);
-    }
+    /* ── Status bar ── */
+    #sb  { flex-shrink:0; display:flex; align-items:center; padding:8px 8px 0; }
+    .sbl { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--black); }
+    .sbr { margin-left:auto; display:flex; align-items:center; }
 
-    /* Status bar */
-    #status-bar {
-      flex-shrink: 0; display: flex; align-items: center;
-      padding: 8px 8px 0; background: var(--background-page);
-    }
-    .sb-left   { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--black-100); }
-    .sb-center { position:absolute; left:50%; transform:translateX(-50%); font-size:12px; font-weight:600; color:var(--black-100); }
-    .sb-right  { margin-left:auto; display:flex; align-items:center; }
+    /* ── Header — App/Title/Bold 18px ── */
+    #hdr { flex-shrink:0; display:flex; align-items:center; gap:8px; padding:0 12px; height:56px; }
+    .hbtn { width:24px; height:24px; border:none; background:transparent; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; flex-shrink:0; border-radius:6px; transition:background .12s; }
+    .hbtn:active { background:var(--blue10); }
+    #htitle { flex:1; text-align:center; font-size:18px; font-weight:700; color:var(--blue); line-height:24px; }
+    .hsp { width:24px; flex-shrink:0; }
 
-    /* Steps */
-    .step { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-    .step.active { display: flex; }
+    /* ── Scrollable body ── */
+    #body { flex:1; overflow-y:auto; padding:14px 16px 100px; display:flex; flex-direction:column; gap:24px; scrollbar-width:none; }
+    #body::-webkit-scrollbar { display:none; }
 
-    /* Nav row */
-    .nav-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 0 12px; height: 56px; flex-shrink: 0;
-    }
-    .nav-btn {
-      width: 24px; height: 24px; border: none; background: transparent;
-      padding: 0; cursor: pointer; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .nav-btn:active { opacity: 0.6; }
-    .nav-title-group { flex: 1; display: flex; flex-direction: column; align-items: center; }
-    .nav-title-main { font-size: 18px; font-weight: 700; color: var(--blue-100); line-height: 22px; text-align: center; }
-    .nav-title-sub  { font-size: 12px; font-weight: 500; color: var(--black-60); line-height: 16px; text-align: center; }
+    /* ── Total card — white rounded-16 pad 12/16 ── */
+    /* Figma: bg-white rounded-[16px] px-[16px] py-[12px] gap-[16px] */
+    #total-card { background:var(--white); border-radius:16px; padding:12px 16px; display:flex; flex-direction:column; gap:16px; }
+    /* [APP]/Caption/Regular: 12px 400 lh16 */
+    .tc-lbl { font-size:12px; font-weight:400; color:var(--black); line-height:16px; }
+    /* Numeric/Small/Regular: 24px 400 lh28 */
+    .tc-amt { font-size:24px; font-weight:400; color:var(--black); line-height:28px; margin-top:4px; }
+    .tc-rows { display:flex; flex-direction:column; gap:4px; }
+    .tc-row  { display:flex; align-items:center; height:16px; }
+    /* Caption/Regular */
+    .tc-rlbl { flex:1; font-size:12px; font-weight:400; color:var(--black); line-height:16px; }
+    /* Caption/medium */
+    .tc-rval { font-size:12px; font-weight:500; color:var(--black); line-height:16px; }
+    /* Link/Small: Semibold 12px Blue/100 underline */
+    .tc-link { font-size:12px; font-weight:600; color:var(--blue); text-decoration:underline; text-underline-offset:2px; cursor:pointer; background:none; border:none; font-family:var(--font); padding:0; }
 
-    /* Scrollable body */
-    .step-body { flex: 1; overflow-y: auto; padding: 12px 16px 100px; scrollbar-width: none; }
-    .step-body::-webkit-scrollbar { display: none; }
+    /* ── Section ── */
+    .section { display:flex; flex-direction:column; gap:16px; }
+    /* Section header row */
+    .sec-hdr { display:flex; align-items:center; justify-content:space-between; height:29px; }
+    /* Medium 12px #606060 */
+    .sec-title { font-size:12px; font-weight:500; color:var(--g60); line-height:16px; }
+    /* + Agregar button */
+    .btn-add  { display:flex; align-items:center; gap:8px; border:none; background:transparent; cursor:pointer; padding:4px 0; -webkit-tap-highlight-color:transparent; }
+    .btn-add:active { opacity:.7; }
+    /* Semibold 12px coral underline */
+    .btn-add-lbl { font-size:12px; font-weight:600; color:var(--coral); text-decoration:underline; text-underline-offset:2px; line-height:16px; white-space:nowrap; }
 
-    /* Fixed bottom bar */
-    .step-bar {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(247,248,251,0.85);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-      display: flex; align-items: center; padding: 20px 16px; gap: 12px;
-    }
-    .bar-col { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-    .bar-count  { font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; }
-    .bar-amount { font-size: 16px; font-weight: 500; color: var(--black-100); line-height: 20px; }
-    .bar-btn {
-      width: 174px; height: 48px; flex-shrink: 0;
-      border-radius: var(--radius-pill); border: none;
-      background: var(--coral-100); font-family: var(--font);
-      font-size: 14px; font-weight: 700; color: var(--black-0);
-      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: opacity .15s; -webkit-tap-highlight-color: transparent;
-    }
-    .bar-btn:active { opacity: 0.85; }
-    .bar-btn:disabled { opacity: 0.38; cursor: not-allowed; }
-    .bar-btn.wide { width: 100%; }
+    .rows-list { display:flex; flex-direction:column; gap:16px; }
 
-    /* ─── Step 1 ─── */
-    .client-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-    .client-pill {
-      flex: 1; display: flex; align-items: center; gap: 8px;
-      height: 40px; background: var(--black-0);
-      border-radius: var(--radius-pill); padding: 0 12px;
-      box-shadow: var(--shadow-2);
+    /* ── Pay row — Figma: flex gap-[16px] items-end ── */
+    .pay-row       { display:flex; gap:16px; align-items:flex-end; width:100%; }
+    /* inner: flex flex:1 gap-[12px] items-center */
+    .pay-row-inner { flex:1; min-width:0; display:flex; gap:12px; align-items:flex-end; }
+
+    /* ── MERLin input field — label + pill ── */
+    .ml-field { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+    /* [APP]/Body/Semibold: 14px 600 Blue/100 lh20 */
+    .ml-lbl { font-size:14px; font-weight:600; color:var(--blue); line-height:20px; }
+    /* .atom/text_input_fields: white 40px rounded-12 pad 8/12 gap 12 */
+    .ml-pill {
+      height:40px; background:var(--white); border-radius:12px;
+      padding:8px 12px; display:flex; align-items:center; gap:12px;
+      border:none; cursor:pointer; width:100%; text-align:left;
+      -webkit-tap-highlight-color:transparent; transition:opacity .15s;
     }
-    .client-text { flex: 1; font-size: 14px; font-weight: 400; color: var(--blue-100); line-height: 20px; }
-    .client-add {
-      width: 24px; height: 24px; border: none; background: transparent;
-      padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      -webkit-tap-highlight-color: transparent; flex-shrink: 0;
-    }
-    .resolution-pill {
-      display: flex; align-items: center; gap: 8px;
-      height: 40px; background: var(--black-0);
-      border-radius: var(--radius-pill); padding: 0 10px 0 12px;
-      margin-bottom: 20px; cursor: pointer; box-shadow: var(--shadow-2);
-    }
-    .resolution-text {
-      flex: 1; font-size: 12px; font-weight: 600; color: var(--blue-100);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    .ml-pill:active { opacity:.85; }
+    .ml-pill.editable { cursor:default; }
+    /* [APP]/Body/Medium: 14px 500 Black/100 lh20 */
+    .ml-val { flex:1; font-size:14px; font-weight:500; color:var(--black); line-height:20px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ml-native {
+      flex:1; border:none; background:transparent; font-family:var(--font);
+      font-size:14px; font-weight:500; color:var(--black); line-height:20px;
+      outline:none; width:0; min-width:0; padding:0;
     }
 
-    .section-hdr { display: flex; align-items: center; justify-content: space-between; height: 28px; margin-bottom: 8px; }
-    .section-hdr-label { font-size: 12px; font-weight: 500; color: var(--black-60); }
-    .section-hdr-link {
-      display: flex; align-items: center; gap: 4px;
-      font-size: 12px; font-weight: 600; color: var(--coral-100);
-      text-decoration: underline; cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
+    /* Trash */
+    .btn-trash { width:24px; height:24px; flex-shrink:0; border:none; background:transparent; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; }
+    .btn-trash:active { opacity:.6; }
 
-    .product-card {
-      display: flex; align-items: center;
-      background: var(--black-0); border-radius: var(--radius-card);
-      padding: 16px; margin-bottom: 8px; box-shadow: var(--shadow-2);
-      gap: 6px;
-    }
-    .product-name { flex: 1; font-size: 14px; font-weight: 400; color: var(--black-100); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .product-qty  { font-size: 14px; font-weight: 700; color: var(--coral-100); flex-shrink: 0; }
-    .product-price{ font-size: 14px; font-weight: 500; color: var(--black-100); flex-shrink: 0; margin-left: 16px; }
+    /* Divider */
+    .divider { height:1px; background:#EEF0F8; flex-shrink:0; }
 
-    .totals-card {
-      background: var(--black-0); border-radius: var(--radius-card);
-      padding: 12px 16px; box-shadow: var(--shadow-2); margin-top: 4px;
+    /* ── Footer — Figma: backdrop-blur pad 20/16 ── */
+    #footer {
+      position:fixed; bottom:0; left:0; right:0; z-index:100;
+      background:rgba(247,248,251,.2);
+      backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+      display:flex; align-items:center; padding:20px 16px; gap:12px;
     }
-    .tot-row { display: flex; align-items: center; padding: 5px 0; }
-    .tot-label { font-size: 12px; font-weight: 400; color: var(--black-100); flex-shrink: 0; }
-    .tot-link  {
-      font-size: 12px; font-weight: 700; color: var(--blue-100);
-      text-decoration: underline; cursor: pointer; margin-left: 6px; flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
+    #ft-left { flex:1; display:flex; flex-direction:column; gap:2px; }
+    /* Caption/Regular 12px #606060 */
+    .ft-lbl { font-size:12px; font-weight:400; color:var(--g60); line-height:16px; }
+    /* Body/Medium 16px Black/100 */
+    .ft-val { font-size:16px; font-weight:500; color:var(--black); line-height:20px; }
+    .ft-val.missing { color:var(--coral); }
+    /* Cobrar button: coral 48px radius-100 Bold 14px white 174px */
+    #btn-cobrar {
+      width:174px; height:48px; border-radius:100px;
+      background:var(--coral); border:none;
+      font-family:var(--font); font-size:14px; font-weight:700; color:var(--white);
+      cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+      white-space:nowrap; transition:opacity .15s; -webkit-tap-highlight-color:transparent;
     }
-    .tot-value { flex: 1; font-size: 12px; font-weight: 400; color: var(--black-100); text-align: right; }
-    .tot-sep   { height: 1px; background: rgba(0,0,0,.08); margin: 6px 0; }
-    .tot-row.grand .tot-label { font-size: 14px; font-weight: 600; }
-    .tot-row.grand .tot-value { font-size: 16px; font-weight: 700; }
+    #btn-cobrar:active:not(.disabled) { opacity:.85; }
+    #btn-cobrar.disabled { opacity:.38; cursor:not-allowed; }
+    .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* ─── Step 1 settings card ─── */
-    .settings-card {
-      background: var(--black-0); border-radius: var(--radius-card);
-      padding: 0 12px; margin-bottom: 24px; box-shadow: var(--shadow-2);
+    /* ── Bottom sheet ── */
+    #bsco-ov { display:none; position:absolute; inset:0; z-index:400; background:rgba(0,0,0,.5); align-items:flex-end; }
+    #bsco-ov.show { display:flex; }
+    #bsco-sheet {
+      width:100%; background:var(--white); border-radius:32px 32px 0 0;
+      max-height:90%; display:flex; flex-direction:column;
+      box-shadow:0px -4px 8px rgba(0,0,0,.12);
+      transform:translateY(100%); transition:transform 250ms ease;
     }
-    .settings-row {
-      display: flex; align-items: center; gap: 12px; padding-top: 12px;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-    }
-    .settings-row-last { padding-bottom: 12px; }
-    .settings-row-icon { width: 20px; height: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .settings-row-text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-    .settings-row-label { font-size: 14px; font-weight: 600; color: var(--black-100); line-height: 20px; }
-    .settings-row-value { font-size: 12px; font-weight: 400; color: var(--black-100); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .settings-row-chevron { width: 16px; height: 16px; flex-shrink: 0; }
-    .settings-row-divider { height: 1px; background: rgba(0,0,0,0.08); margin-top: 12px; }
-
-    /* ─── Step 2 ─── */
-    .inp-group { margin-bottom: 16px; }
-    .inp-label { font-size: 14px; font-weight: 600; color: var(--blue-100); line-height: 20px; margin-bottom: 4px; }
-    .inp-field {
-      display: flex; align-items: center; gap: 12px;
-      height: 40px; background: var(--black-0); border-radius: 12px; padding: 0 12px;
-      cursor: pointer; box-shadow: var(--shadow-2);
-    }
-    .inp-field-text { flex: 1; font-size: 14px; font-weight: 500; color: var(--black-100); }
-    .inp-field-placeholder { font-size: 14px; font-weight: 300; color: var(--black-60); }
-
-    .toggle-row { display: flex; align-items: center; padding: 10px 0; }
-    .toggle-row-label { flex: 1; font-size: 12px; font-weight: 500; color: var(--black-60); }
-    .toggle-sw {
-      width: 52px; height: 28px; border-radius: 14px; background: #E0E0E0;
-      position: relative; cursor: pointer; transition: background .2s;
-      flex-shrink: 0; border: none; padding: 0; -webkit-tap-highlight-color: transparent;
-    }
-    .toggle-sw.on { background: var(--blue-100); }
-    .toggle-sw::after {
-      content: ''; position: absolute; top: 2px; left: 2px;
-      width: 24px; height: 24px; border-radius: 50%; background: white;
-      box-shadow: 0 1px 4px rgba(0,0,0,.2); transition: transform .2s;
-    }
-    .toggle-sw.on::after { transform: translateX(24px); }
-    .divider-line { height: 1px; background: rgba(0,0,0,.08); margin: 8px 0; }
-
-    #divide-panel { display: none; }
-    #divide-panel.open { display: block; }
-
-    .divide-tabs { display: flex; background: #EDEEF4; border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 16px; }
-    .dtab {
-      flex: 1; height: 34px; border: none; border-radius: 8px; background: transparent;
-      font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--black-60);
-      cursor: pointer; transition: all .15s; -webkit-tap-highlight-color: transparent;
-    }
-    .dtab.active { background: var(--black-0); color: var(--black-100); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
-
-    .personas-counter { display: flex; align-items: center; margin-bottom: 14px; }
-    .personas-counter-label { flex: 1; font-size: 13px; font-weight: 500; color: var(--black-60); }
-    .ctr-ctrl { display: flex; align-items: center; gap: 14px; }
-    .ctr-btn {
-      width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--blue-100);
-      background: transparent; color: var(--blue-100); font-size: 20px; line-height: 1;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      -webkit-tap-highlight-color: transparent; transition: background .12s;
-    }
-    .ctr-btn:active { background: var(--blue-10); }
-    .ctr-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .ctr-num { font-size: 20px; font-weight: 700; color: var(--blue-100); min-width: 24px; text-align: center; }
-
-    .person-cards { display: flex; flex-direction: column; gap: 8px; }
-    .person-card {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--black-0); border-radius: var(--radius-card);
-      padding: 12px 16px; box-shadow: var(--shadow-2);
-    }
-    .person-card-avatar {
-      width: 32px; height: 32px; border-radius: 50%; background: var(--blue-10);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; color: var(--blue-100); flex-shrink: 0;
-    }
-    .person-card-name { flex: 1; font-size: 14px; font-weight: 500; color: var(--black-100); }
-    .person-card-amount { font-size: 16px; font-weight: 700; color: var(--blue-100); }
-    .person-card-input {
-      width: 120px; height: 36px; border: 1.5px solid var(--blue-10);
-      border-radius: 8px; background: var(--background-page);
-      font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--blue-100);
-      text-align: right; padding: 0 10px; outline: none;
-    }
-    .person-card-input:focus { border-color: var(--blue-100); }
-    #split-validation {
-      margin-top: 8px; font-size: 12px; font-weight: 500;
-      padding: 6px 12px; border-radius: 8px; display: none;
-    }
-    #split-validation.ok  { background: #e8f9f2; color: #1b8959; display: block; }
-    #split-validation.err { background: #fef1f3; color: #c31a2f; display: block; }
-
-    /* ─── Step 3 ─── */
-    .pay-progress {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--black-0); border-radius: var(--radius-card);
-      padding: 12px 16px; box-shadow: var(--shadow-2); margin-bottom: 16px;
-    }
-    .pay-progress-text { flex: 1; font-size: 13px; font-weight: 600; color: var(--black-100); }
-    .pay-progress-rest { font-size: 13px; font-weight: 600; color: var(--coral-100); }
-
-    .ppl-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
-    .ppl-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 16px; background: var(--black-0);
-      border-radius: 12px; box-shadow: var(--shadow-2);
-      border: 2px solid transparent;
-    }
-    .ppl-item.current { border-color: var(--blue-100); }
-    .ppl-avatar {
-      width: 32px; height: 32px; border-radius: 50%; background: var(--blue-10);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; color: var(--blue-100); flex-shrink: 0;
-    }
-    .ppl-item.current .ppl-avatar { background: var(--blue-100); color: white; }
-    .ppl-name   { flex: 1; font-size: 14px; font-weight: 500; color: var(--black-100); }
-    .ppl-status { font-size: 12px; font-weight: 600; color: var(--black-60); }
-    .ppl-item.current .ppl-status { color: var(--blue-100); }
-    .ppl-item.paid-done .ppl-avatar { background: #e8f9f2; }
-    .ppl-item.paid-done .ppl-status { color: #1b8959; }
-    .ppl-amount { font-size: 14px; font-weight: 700; color: var(--black-100); flex-shrink: 0; }
-
-    .pay-grid-label { font-size: 14px; font-weight: 700; color: var(--black-100); margin-bottom: 12px; }
-    .pay-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;
-    }
-    .method-card {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 8px; background: var(--black-0); border-radius: var(--radius-card);
-      height: 108px; box-shadow: var(--shadow-2); border: 2px solid transparent;
-      cursor: pointer; transition: all .15s; -webkit-tap-highlight-color: transparent;
-      padding: 12px; user-select: none;
-    }
-    .method-card:active { opacity: 0.85; }
-    .method-card.selected { border-color: var(--blue-100); background: var(--blue-10); }
-    .method-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
-    .method-name { font-size: 12px; font-weight: 600; color: var(--black-100); text-align: center; }
-    .method-card.selected .method-name { color: var(--blue-100); }
-
-    .terminal-row {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--black-0); border-radius: var(--radius-card);
-      padding: 14px 16px; box-shadow: var(--shadow-2);
-      cursor: pointer; -webkit-tap-highlight-color: transparent; margin-bottom: 8px;
-    }
-    .terminal-icon-wrap {
-      width: 32px; height: 32px; background: var(--blue-10); border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .terminal-info { flex: 1; }
-    .terminal-main { font-size: 14px; font-weight: 600; color: var(--black-100); }
-    .terminal-sub  { font-size: 11px; font-weight: 400; color: var(--black-60); }
-    .terminal-check {
-      width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd;
-      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-      transition: all .15s;
-    }
-    .terminal-check.on { background: var(--blue-100); border-color: var(--blue-100); }
-
-    /* ─── Step 3 extras ─── */
-    .s3-simple-total {
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--black-0); border-radius: var(--radius-card);
-      padding: 14px 16px; box-shadow: var(--shadow-2); margin-bottom: 16px;
-    }
-    .s3-simple-total-label { font-size: 13px; font-weight: 500; color: var(--black-60); }
-    .s3-simple-total-val   { font-size: 18px; font-weight: 700; color: var(--blue-100); }
-
-    /* ─── Step 3 dividir toggle card ─── */
-    .s3-toggle-card {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--black-0); border-radius: var(--radius-card);
-      padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-2);
-    }
-    .s3-toggle-icon { width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .s3-toggle-label { flex: 1; font-size: 14px; font-weight: 600; color: var(--black-100); }
-
-    .s3-dividir-link {
-      display: flex; align-items: center; gap: 6px;
-      border: none; background: transparent; padding: 0 0 16px;
-      font-family: var(--font); font-size: 13px; font-weight: 600;
-      color: var(--blue-100); text-decoration: underline;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-    }
-
-    /* ─── Step SM: Mesa productos ─── */
-    .sm-section-label { font-size: 12px; font-weight: 500; color: var(--black-60); line-height: 28px; margin-bottom: 12px; display: block; }
-    .sm-product-card {
-      display: flex; align-items: center;
-      background: var(--black-0); border-radius: var(--radius-card); padding: 16px;
-    }
-    .sm-card-info { display: flex; flex: 1; gap: 22px; align-items: center; min-width: 0; }
-    .sm-card-name-group { display: flex; flex: 1; gap: 6px; align-items: center; min-width: 0; }
-    .sm-card-name  { font-size: 14px; font-weight: 400; color: var(--black-100); line-height: 20px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .sm-card-qty   { font-size: 14px; font-weight: 700; color: var(--black-100); line-height: 20px; flex-shrink: 0; }
-    .sm-card-price { flex: 1; font-size: 14px; font-weight: 500; color: var(--black-100); line-height: 20px; text-align: right; white-space: nowrap; }
-    .sm-footer {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 393px; z-index: 100;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 8px 16px 16px;
-      background: rgba(247,248,251,0.85);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    }
-    .sm-btn-salir {
-      width: 100%; height: 48px; border-radius: var(--radius-pill); border: none;
-      background: var(--coral-100); font-family: var(--font);
-      font-size: 14px; font-weight: 700; color: var(--black-0);
-      cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity .15s;
-    }
-    .sm-btn-salir:active { opacity: 0.85; }
-    .sm-btn-volver {
-      height: 44px; border: none; background: transparent; font-family: var(--font);
-      font-size: 12px; font-weight: 600; color: var(--coral-100); text-decoration: underline;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .sm-btn-volver:active { opacity: 0.7; }
-
-    /* ─── Divide Drop Up (Step 3) ─── */
-    #s3-divide-backdrop {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.5); z-index: 200;
-    }
-    #s3-divide-backdrop.open { display: block; }
-    #s3-divide-sheet {
-      display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 393px; max-height: 78vh; background: var(--black-0);
-      border-radius: 20px 20px 0 0; z-index: 201;
-      flex-direction: column; overflow: hidden;
-    }
-    #s3-divide-sheet.open { display: flex; }
-    .s3d-handle { width: 36px; height: 4px; border-radius: 2px; background: #e0e0e0; margin: 12px auto 0; flex-shrink: 0; }
-    .s3d-header { display: flex; align-items: center; padding: 12px 16px 8px; flex-shrink: 0; }
-    .s3d-title  { flex: 1; font-size: 16px; font-weight: 700; color: var(--blue-100); }
-    .s3d-close  { width: 32px; height: 32px; border: none; background: transparent; cursor: pointer; font-size: 18px; color: var(--black-60); display: flex; align-items: center; justify-content: center; }
-    .s3d-body   { flex: 1; overflow-y: auto; padding: 0 16px 8px; scrollbar-width: none; }
-    .s3d-body::-webkit-scrollbar { display: none; }
-    .s3d-total-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 14px; }
-    .s3d-total-lbl { font-size: 13px; font-weight: 500; color: var(--black-60); }
-    #s3d-total-val { font-size: 16px; font-weight: 700; color: var(--blue-100); }
-    #s3d-validation { margin-top: 8px; font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 8px; display: none; }
-    #s3d-validation.ok  { background: #e8f9f2; color: #1b8959; display: block; }
-    #s3d-validation.err { background: #fef1f3; color: #c31a2f; display: block; }
-    .s3d-confirm { margin: 8px 16px 16px; height: 52px; border-radius: var(--radius-pill); border: none; background: var(--blue-100); color: #fff; font-family: var(--font); font-size: 15px; font-weight: 600; cursor: pointer; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
-    .s3d-confirm:disabled { opacity: 0.5; }
-
-    /* ─── Step 4 ─── */
-    .step-body.no-pad { padding-bottom: 24px; }
-
-    .receipt-top {
-      width: 100%; height: 14px; flex-shrink: 0;
-    }
-    .receipt-body {
-      background: var(--black-0); border-radius: 0 0 16px 16px;
-      padding: 24px 16px; box-shadow: var(--shadow-8); margin-bottom: 32px;
-    }
-    .receipt-hdr { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 24px; }
-    .receipt-check {
-      width: 40px; height: 40px; border-radius: 50%; background: var(--green-100);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .receipt-title  { font-size: 16px; font-weight: 700; color: var(--black-100); text-align: center; }
-    .receipt-amount { font-size: 32px; font-weight: 600; color: var(--blue-100); line-height: 40px; }
-    .receipt-date   { font-size: 12px; font-weight: 400; color: var(--black-60); }
-    .receipt-section { display: flex; flex-direction: column; gap: 8px; }
-    .receipt-row { display: flex; align-items: center; min-height: 16px; }
-    .rr-label { flex: 1; font-size: 12px; font-weight: 400; color: var(--black-100); }
-    .rr-value { font-size: 12px; font-weight: 500; color: var(--black-100); text-align: right; }
-    .receipt-row.bold .rr-label, .receipt-row.bold .rr-value { font-weight: 700; }
-    .receipt-sep { height: 1px; background: rgba(0,0,0,.08); margin: 8px 0; }
-
-    .send-section { display: flex; flex-direction: column; align-items: center; }
-    .send-label { font-size: 14px; font-weight: 700; color: var(--blue-100); margin-bottom: 4px; }
-    .send-btns  { display: flex; gap: 12px; width: 100%; padding: 16px 0; }
-    .send-btn {
-      flex: 1; height: 48px; border-radius: var(--radius-pill); border: none;
-      background: var(--coral-100); font-family: var(--font); font-size: 14px;
-      font-weight: 700; color: white; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: opacity .15s; -webkit-tap-highlight-color: transparent;
-    }
-    .send-btn:active { opacity: 0.85; }
-    .nueva-btn {
-      width: 100%; height: 48px; border-radius: var(--radius-pill); border: none;
-      background: transparent; font-family: var(--font); font-size: 14px;
-      font-weight: 700; color: var(--coral-100); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      -webkit-tap-highlight-color: transparent; transition: opacity .15s;
-    }
-    .nueva-btn:active { opacity: 0.7; }
+    #bsco-ov.show #bsco-sheet { transform:translateY(0); }
+    .bs-handle { width:48px; height:4px; background:#DADADA; border-radius:4px; margin:12px auto 0; flex-shrink:0; }
+    .bs-hdr    { display:flex; align-items:center; height:56px; padding:0 16px; flex-shrink:0; }
+    .bs-nav    { width:24px; height:24px; flex-shrink:0; border:none; background:transparent; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; }
+    .bs-nav:active { opacity:.6; }
+    .bs-title  { flex:1; text-align:center; font-size:16px; font-weight:700; color:var(--blue); line-height:24px; }
+    .bs-body   { overflow-y:auto; padding:16px; flex:1; scrollbar-width:none; }
+    .bs-body::-webkit-scrollbar { display:none; }
+    .bs-grid   { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .bs-card   { background:#f7f8fb; border-radius:16px; height:108px; padding:12px 16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; border:none; cursor:pointer; width:100%; -webkit-tap-highlight-color:transparent; transition:opacity .15s; }
+    .bs-card:active { opacity:.7; }
+    .bs-icon   { width:32px; height:32px; border-radius:100px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .bs-icon img { width:100%; height:100%; object-fit:contain; display:block; }
+    .bs-clbl   { font-size:14px; font-weight:500; color:var(--black); line-height:20px; text-align:center; width:100%; }
 
     /* Toast */
-    #toast {
-      position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
-      background: var(--black-100); color: #fff; font-family: var(--font);
-      font-size: 13px; font-weight: 500; padding: 10px 20px;
-      border-radius: 100px; white-space: nowrap; pointer-events: none;
-      z-index: 500; opacity: 0; transition: opacity .2s;
-    }
-    #toast.show { opacity: 1; }
+    #toast { position:absolute; top:60px; left:50%; transform:translateX(-50%) translateY(-8px); width:calc(100% - 32px); max-width:361px; background:var(--black); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:10px; z-index:9999; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    #toast-txt  { color:var(--white); font-size:14px; font-weight:500; line-height:20px; }
   </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- STATUS BAR -->
-  <div id="status-bar">
-    <div class="sb-left">
-      <svg width="17" height="10" viewBox="0 0 17 10" fill="none" aria-hidden="true">
-        <rect x="0"    y="6" width="3" height="4"  rx="0.5" fill="#1e1e1e"/>
-        <rect x="4.5"  y="4" width="3" height="6"  rx="0.5" fill="#1e1e1e"/>
-        <rect x="9"    y="2" width="3" height="8"  rx="0.5" fill="#1e1e1e"/>
-        <rect x="13.5" y="0" width="3" height="10" rx="0.5" fill="#1e1e1e"/>
+  <!-- Status bar -->
+  <div id="sb">
+    <div class="sbl"><span id="sb-time">9:41</span></div>
+    <div class="sbr">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0" y="8" width="3" height="4" rx="1" fill="#1e1e1e"/>
+        <rect x="4.5" y="5.5" width="3" height="6.5" rx="1" fill="#1e1e1e"/>
+        <rect x="9" y="3" width="3" height="9" rx="1" fill="#1e1e1e"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1e1e1e"/>
       </svg>
-      <svg width="16" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true">
-        <path d="M8 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#1e1e1e"/>
-        <path d="M3.5 6a6.5 6.5 0 0 1 9 0" stroke="#1e1e1e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-        <path d="M1 3.5a10 10 0 0 1 14 0" stroke="#1e1e1e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style="margin-left:5px">
+        <path d="M8 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z" fill="#1e1e1e"/>
+        <path d="M8 6.5C9.66 6.5 11.16 7.17 12.25 8.25L13.31 7.19A7 7 0 0 0 8 5a7 7 0 0 0-5.31 2.19l1.06 1.06A5 5 0 0 1 8 6.5z" fill="#1e1e1e"/>
+        <path d="M8 3.5c2.48 0 4.73 1 6.36 2.63l1.06-1.06A9.95 9.95 0 0 0 8 2a9.95 9.95 0 0 0-7.42 3.07L1.64 6.13A8 8 0 0 1 8 3.5z" fill="#1e1e1e"/>
       </svg>
-      <span>Carrier</span>
-    </div>
-    <div class="sb-center" id="current-time">9:41</div>
-    <div class="sb-right">
-      <svg width="27" height="12" viewBox="0 0 27 12" fill="none" aria-hidden="true">
-        <rect x="0.5" y="0.5" width="22" height="11" rx="3.5" stroke="#1e1e1e" stroke-opacity="0.35"/>
-        <rect x="2"   y="2"   width="18" height="8"  rx="2"   fill="#1e1e1e"/>
-        <path d="M23.5 4v4a2 2 0 0 0 0-4z" fill="#1e1e1e" fill-opacity="0.4"/>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none" style="margin-left:5px">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1e1e1e" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="16" height="8" rx="2" fill="#1e1e1e"/>
+        <path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1e1e1e" fill-opacity="0.4"/>
       </svg>
     </div>
   </div>
 
-  <!-- ══════════════ STEP 1: Configuración del cobro ══════════════ -->
-  <div class="step active" id="s1">
-    <div class="nav-row">
-      <button class="nav-btn" onclick="goToMesa()" aria-label="Volver">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <div class="nav-title-group">
-        <span class="nav-title-main">Configuración del cobro</span>
-      </div>
-      <button class="nav-btn" onclick="exitToHome()" aria-label="Salir">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="step-body" id="s1-body">
-      <!-- Settings card -->
-      <div class="settings-card">
-
-        <!-- Mesa row -->
-        <div class="settings-row" onclick="openMesaProducts()">
-          <div class="settings-row-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M2.08644 7.3197H17.8951L16.9127 3.98656H3.09381L2.08644 7.3197ZM14.9897 8.30468H4.99783L4.64675 10.9946H15.3538L14.9897 8.30468ZM2.83648 17L4.02039 8.30566H1.66654C1.44911 8.30566 1.27357 8.21865 1.13992 8.04464C1.00626 7.87063 0.968364 7.67823 1.02621 7.46745L2.19815 3.47044C2.23871 3.31941 2.31651 3.20055 2.43154 3.11388C2.54657 3.02654 2.68222 2.98944 2.83848 3.00258H17.162C17.3176 3.00258 17.4529 3.04591 17.568 3.13259C17.683 3.21993 17.7611 3.33878 17.8024 3.48915L18.9743 7.46646C19.0315 7.67725 18.9932 7.86997 18.8596 8.04464C18.7266 8.21865 18.5514 8.30566 18.334 8.30566H15.9662L17.1441 17H16.1666L15.4734 11.9806H4.50711L3.81492 17H2.83648Z" fill="#121E6C"/>
-            </svg>
-          </div>
-          <div class="settings-row-text">
-            <span class="settings-row-label" id="s1-mesa-label">Mesa —</span>
-            <span class="settings-row-value" id="s1-mesa-meta">— productos</span>
-          </div>
-          <svg class="settings-row-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 18l6-6-6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="settings-row-divider"></div>
-
-        <!-- Cliente row -->
-        <div class="settings-row" onclick="showToast('Próximamente: seleccionar cliente')">
-          <div class="settings-row-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M10.0168 2.52962C8.36913 2.52962 7.03345 3.86531 7.03345 5.51296C7.03345 7.16061 8.36913 8.49629 10.0168 8.49629C11.6644 8.49629 13.0001 7.16061 13.0001 5.51296C13.0001 3.86531 11.6644 2.52962 10.0168 2.52962ZM6.20011 5.51296C6.20011 3.40507 7.90889 1.69629 10.0168 1.69629C12.1247 1.69629 13.8334 3.40507 13.8334 5.51296C13.8334 7.62084 12.1247 9.32962 10.0168 9.32962C7.90889 9.32962 6.20011 7.62084 6.20011 5.51296Z" fill="#121E6C"/>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M10.0001 9.32967C7.0383 9.34032 4.48947 11.2398 3.656 13.896L3.6553 13.8983C3.39944 14.6978 3.27842 15.4369 3.20495 16.0002C3.15665 16.3705 3.38636 16.7113 3.74284 16.8004L3.74425 16.8008C4.82943 17.0761 6.88668 17.4713 9.97511 17.4713C13.0639 17.4713 15.1547 17.076 16.2484 16.8006C16.6094 16.7103 16.843 16.3657 16.7953 16.0002C16.7223 15.4406 16.5931 14.6989 16.344 13.8954C15.5104 11.2398 12.9537 9.34032 10.0001 9.32967ZM9.95989 8.49656C6.66027 8.52419 3.80293 10.6461 2.86125 13.6454C2.58402 14.5121 2.4551 15.306 2.37861 15.8924C2.27695 16.6718 2.76352 17.4141 3.53989 17.6086C4.68818 17.9 6.81408 18.3046 9.97511 18.3046C13.136 18.3046 15.295 17.9 16.4515 17.6088C17.2236 17.4156 17.7239 16.6767 17.6216 15.8924C17.5446 15.3022 17.4072 14.5108 17.1398 13.6479L17.1393 13.6465C16.198 10.6464 13.332 8.52428 10.0404 8.49656C10.0353 8.49638 10.0302 8.49629 10.0251 8.49629C10.0168 8.49629 10.0084 8.4963 10.0001 8.49633C9.99176 8.4963 9.98344 8.49629 9.97511 8.49629C9.97002 8.49629 9.96494 8.49638 9.95989 8.49656Z" fill="#121E6C"/>
-            </svg>
-          </div>
-          <div class="settings-row-text">
-            <span class="settings-row-label">Cliente</span>
-            <span class="settings-row-value" id="s1-cliente-val">Consumidor final</span>
-          </div>
-          <svg class="settings-row-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 18l6-6-6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="settings-row-divider"></div>
-
-        <!-- Resolución row -->
-        <div class="settings-row" onclick="showToast('Próximamente: seleccionar resolución')">
-          <div class="settings-row-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M8.30807 11.3163C8.42511 11.9428 8.92322 12.4215 9.55807 12.5689V13.1163C9.55807 13.3497 9.74141 13.533 9.97474 13.533C10.2081 13.533 10.3914 13.3497 10.3914 13.1163V12.5685C11.1237 12.3968 11.6664 11.7829 11.6664 11.0497C11.6664 10.183 10.9081 9.48301 9.97474 9.48301C9.49974 9.48301 9.11641 9.14967 9.11641 8.74967C9.11641 8.34967 9.49974 8.01634 9.97474 8.01634C10.3831 8.01634 10.7414 8.26634 10.8164 8.60801C10.8664 8.83301 11.0914 8.97468 11.3164 8.92467C11.5414 8.87467 11.6831 8.64968 11.6331 8.42468C11.4962 7.83625 11.0055 7.37703 10.3914 7.23153V6.66634C10.3914 6.43301 10.2081 6.24967 9.97474 6.24967C9.74141 6.24967 9.55807 6.43301 9.55807 6.66634V7.23087C8.8258 7.40259 8.28307 8.01649 8.28307 8.74967C8.28307 9.61634 9.04141 10.3163 9.97474 10.3163C10.4497 10.3163 10.8331 10.6497 10.8331 11.0497C10.8331 11.4497 10.4497 11.783 9.97474 11.783C9.55807 11.783 9.19141 11.5163 9.12474 11.1663C9.08307 10.9413 8.86641 10.7913 8.64141 10.833C8.41641 10.8747 8.26641 11.0913 8.30807 11.3163Z" fill="#121E6C"/>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M3.74338 19.3413L3.74974 19.3413C3.90278 19.3413 4.03431 19.2625 4.10671 19.1424L5.80807 17.433L7.29974 18.9247C7.62474 19.2497 8.14974 19.2497 8.47474 18.9247L9.95807 17.433L11.4497 18.9247C11.7747 19.2497 12.2997 19.2497 12.6247 18.9247L14.1081 17.433L15.8914 19.2163C15.9664 19.2997 16.0747 19.3413 16.1831 19.3413H16.1914C16.4247 19.3413 16.6081 19.158 16.6081 18.9247V1.24967C16.6081 1.01634 16.4247 0.833008 16.1914 0.833008L16.1893 0.833013C16.1431 0.832782 16.097 0.840411 16.0526 0.855901C15.9917 0.876838 15.9375 0.911313 15.8935 0.9559L15.8914 0.958008L14.1331 2.74134L12.6414 1.24967C12.3164 0.924675 11.7914 0.924675 11.4664 1.24967L9.98307 2.74134L8.49141 1.24967C8.16641 0.924675 7.64141 0.924675 7.31641 1.24967L5.83307 2.74134L4.04974 0.958008C3.99838 0.903945 3.9365 0.868295 3.87063 0.850206C3.8325 0.839003 3.79194 0.833008 3.74974 0.833008C3.51641 0.833008 3.33307 1.01634 3.33307 1.24967V18.8052C3.29153 18.9461 3.32764 19.1026 3.44141 19.2163C3.52634 19.3013 3.63509 19.3429 3.74338 19.3413ZM14.6997 3.33301L15.7747 2.25801V17.9163L14.6997 16.8413C14.3747 16.5163 13.8497 16.5163 13.5247 16.8413L12.0414 18.333L10.5497 16.8413C10.2247 16.5163 9.69974 16.5163 9.37474 16.8413L7.89141 18.333L6.39974 16.8413C6.07474 16.5163 5.54974 16.5163 5.22474 16.8413L4.16641 17.8997V2.24795L5.23307 3.32467C5.55807 3.64967 6.08307 3.64967 6.40807 3.32467L7.89141 1.83301L9.38307 3.32467C9.70807 3.64967 10.2331 3.64967 10.5581 3.32467L12.0414 1.83301L13.5331 3.32467C13.6914 3.48301 13.9081 3.56634 14.1164 3.56634V3.57467C14.3247 3.57467 14.5414 3.49134 14.6997 3.33301Z" fill="#121E6C"/>
-            </svg>
-          </div>
-          <div class="settings-row-text">
-            <span class="settings-row-label">Resolución</span>
-            <span class="settings-row-value" id="s1-resolucion-val">Resolution Test - 123456789000000</span>
-          </div>
-          <svg class="settings-row-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 18l6-6-6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="settings-row-divider"></div>
-
-        <!-- Vendedor row -->
-        <div class="settings-row settings-row-last" onclick="showToast('Próximamente: seleccionar vendedor')">
-          <div class="settings-row-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M10.217 2.50033C5.9552 2.50033 2.50033 5.9552 2.50033 10.217C2.50033 14.4788 5.9552 17.9337 10.217 17.9337C14.4788 17.9337 17.9337 14.4788 17.9337 10.217C17.9337 5.9552 14.4788 2.50033 10.217 2.50033ZM1.66699 10.217C1.66699 5.49496 5.49496 1.66699 10.217 1.66699C14.939 1.66699 18.767 5.49496 18.767 10.217C18.767 14.939 14.939 18.767 10.217 18.767C5.49496 18.767 1.66699 14.939 1.66699 10.217Z" fill="#121E6C"/>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M10.2337 5.05866C8.90818 5.05866 7.83366 6.13318 7.83366 7.45866C7.83366 8.78414 8.90818 9.85866 10.2337 9.85866C11.5591 9.85866 12.6337 8.78414 12.6337 7.45866C12.6337 6.13318 11.5591 5.05866 10.2337 5.05866ZM7.00033 7.45866C7.00033 5.67294 8.44794 4.22533 10.2337 4.22533C12.0194 4.22533 13.467 5.67294 13.467 7.45866C13.467 9.24438 12.0194 10.692 10.2337 10.692C8.44794 10.692 7.00033 9.24438 7.00033 7.45866Z" fill="#121E6C"/>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M10.2337 10.6837C7.80304 10.6837 5.70908 12.2445 5.03141 14.4161L5.03072 14.4183C4.86447 14.9408 4.76847 15.4349 4.70363 15.8482C4.66796 16.0756 4.45476 16.231 4.22742 16.1953C4.00008 16.1596 3.8447 15.9464 3.88036 15.7191C3.94881 15.2827 4.05272 14.7439 4.23625 14.1668C5.02561 11.639 7.44801 9.85033 10.2337 9.85033C10.4638 9.85033 10.6503 10.0369 10.6503 10.267C10.6503 10.4971 10.4638 10.6837 10.2337 10.6837Z" fill="#121E6C"/>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M9.77532 10.267C9.77532 10.0369 9.96187 9.85033 10.192 9.85033C12.9682 9.85033 15.3998 11.6296 16.1895 14.167C16.373 14.744 16.4769 15.2828 16.5453 15.7191C16.581 15.9464 16.4256 16.1596 16.1982 16.1953C15.9709 16.231 15.7577 16.0756 15.722 15.8482C15.6572 15.4349 15.5612 14.9408 15.3949 14.4183L15.3941 14.4157C14.7166 12.2371 12.6153 10.6837 10.192 10.6837C9.96187 10.6837 9.77532 10.4971 9.77532 10.267Z" fill="#121E6C"/>
-            </svg>
-          </div>
-          <div class="settings-row-text">
-            <span class="settings-row-label">Vendedor</span>
-            <span class="settings-row-value" id="s1-vendedor-val">Carlos Mendez</span>
-          </div>
-          <svg class="settings-row-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 18l6-6-6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-
-      </div>
-
-      <!-- Detalle a cobrar -->
-      <div class="section-hdr">
-        <span class="section-hdr-label">Detalle a cobrar</span>
-        <span class="section-hdr-link" onclick="showToast('Próximamente: notas')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-          </svg>
-          Agregar notas
-        </span>
-      </div>
-      <div class="totals-card">
-        <div class="tot-row">
-          <span class="tot-label">Impuesto</span>
-          <span class="tot-value" id="val-impuesto">$0</span>
-        </div>
-        <div class="tot-row">
-          <span class="tot-label">Subtotal</span>
-          <span class="tot-value" id="val-subtotal">$0</span>
-        </div>
-        <div class="tot-row">
-          <span class="tot-label">Propina</span>
-          <span class="tot-link" onclick="openPropina()">Agregar</span>
-          <span class="tot-value" id="val-propina">$0</span>
-        </div>
-        <div class="tot-row">
-          <span class="tot-label">Descuento</span>
-          <span class="tot-link" onclick="showToast('Próximamente: descuentos')">Agregar</span>
-          <span class="tot-value" id="val-descuento">$0</span>
-        </div>
-        <div class="tot-sep"></div>
-        <div class="tot-row grand">
-          <span class="tot-label">Total a cobrar</span>
-          <span class="tot-value" id="val-total">$0</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom bar S1 -->
-    <div class="step-bar">
-      <div class="bar-col">
-        <span class="bar-count" id="bar1-count">0 Productos</span>
-        <span class="bar-amount" id="bar1-amount">$0</span>
-      </div>
-      <button class="bar-btn" onclick="goStep(3)">Continuar</button>
-    </div>
+  <!-- Header -->
+  <div id="hdr">
+    <button class="hbtn" onclick="goBack()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18l-6-6 6-6" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <span id="htitle">Método de cobro</span>
+    <div class="hsp"></div>
   </div>
 
-  <!-- ══════════════ STEP 2: Vendedor y cobro ══════════════ -->
-  <div class="step" id="s2">
-    <div class="nav-row">
-      <button class="nav-btn" onclick="goStep(1)" aria-label="Volver">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <div class="nav-title-group">
-        <span class="nav-title-main">Vendedor y cobro</span>
-        <span class="nav-title-sub" id="s2-label">Mesa —</span>
+  <!-- Scrollable body -->
+  <div id="body">
+
+    <!-- Total card -->
+    <div id="total-card">
+      <div>
+        <div class="tc-lbl">Total a cobrar</div>
+        <div class="tc-amt" id="tc-total">$0</div>
       </div>
-      <button class="nav-btn" onclick="exitToHome()" aria-label="Salir">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </button>
+      <div class="tc-rows">
+        <div class="tc-row">
+          <span class="tc-rlbl">Subtotal</span>
+          <span class="tc-rval" id="tc-sub">$0</span>
+        </div>
+        <div class="tc-row">
+          <span class="tc-rlbl">Impuesto (19%)</span>
+          <span class="tc-rval" id="tc-tax">$0</span>
+        </div>
+        <div class="tc-row" id="tc-tip-row" style="display:none">
+          <span class="tc-rlbl">Propina</span>
+          <span class="tc-rval" id="tc-tip-val">$0</span>
+        </div>
+        <div class="tc-row">
+          <span class="tc-rlbl">Descuento <button class="tc-link" onclick="showToast('Próximamente: agregar descuento')">Agregar</button></span>
+          <span class="tc-rval">$0</span>
+        </div>
+      </div>
     </div>
 
-    <div class="step-body">
-      <!-- Vendedor -->
-      <div class="inp-group">
-        <div class="inp-label">Vendedor</div>
-        <div class="inp-field" onclick="showToast('Próximamente: seleccionar vendedor')">
-          <span class="inp-field-text" id="s2-vendedor">Carlos Mendez</span>
+    <!-- Propina section -->
+    <div class="section">
+      <div class="sec-hdr">
+        <span class="sec-title">Propina</span>
+        <button class="btn-add" onclick="addTip()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="#ff2947" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="btn-add-lbl">Agregar Propina</span>
+        </button>
+      </div>
+      <div class="rows-list" id="tips-list"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Métodos de cobro section -->
+    <div class="section">
+      <div class="sec-hdr">
+        <span class="sec-title">Métodos de cobro</span>
+        <button class="btn-add" onclick="addPayment()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="#ff2947" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="btn-add-lbl">Agregar método</span>
+        </button>
+      </div>
+      <div class="rows-list" id="payments-list"></div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- Footer -->
+  <div id="footer">
+    <div id="ft-left">
+      <span class="ft-lbl" id="ft-lbl">Cambio</span>
+      <span class="ft-val" id="ft-val">$0</span>
+    </div>
+    <button id="btn-cobrar" class="disabled" onclick="handleCobrar()">Cobrar $0</button>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
+      <circle cx="12" cy="12" r="10" fill="#10B981"/>
+      <path d="M7 12l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span id="toast-txt"></span>
+  </div>
+
+  <!-- Bottom sheet de métodos -->
+  <div id="bsco-ov" onclick="handleBscoOv(event)">
+    <div id="bsco-sheet">
+      <div class="bs-handle"></div>
+      <div class="bs-hdr">
+        <button class="bs-nav" onclick="closeBsco()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <span class="bs-title">Agregar método de cobro</span>
+        <button class="bs-nav" onclick="closeBsco()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 6L6 18M6 6l12 12" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
           </svg>
-        </div>
+        </button>
       </div>
-
-      <!-- Dividir cuenta toggle -->
-      <div class="toggle-row">
-        <span class="toggle-row-label">Dividir cuenta</span>
-        <button class="toggle-sw" id="toggle-dividir" onclick="toggleDividir()" aria-label="Dividir cuenta"></button>
-      </div>
-      <div class="divider-line"></div>
-
-      <!-- Divide panel -->
-      <div id="divide-panel">
-        <div class="divide-tabs" style="margin-top:12px">
-          <button class="dtab active" id="dtab-equal" onclick="setDivideMode('equal')">Partes iguales</button>
-          <button class="dtab"        id="dtab-custom" onclick="setDivideMode('custom')">Personalizado</button>
-        </div>
-
-        <!-- Equal split -->
-        <div id="divide-equal">
-          <div class="personas-counter">
-            <span class="personas-counter-label">¿Entre cuántas personas?</span>
-            <div class="ctr-ctrl">
-              <button class="ctr-btn" id="ctr-minus" onclick="changePersonas(-1)" disabled>−</button>
-              <span class="ctr-num" id="ctr-num">2</span>
-              <button class="ctr-btn" id="ctr-plus" onclick="changePersonas(1)">+</button>
-            </div>
-          </div>
-          <div class="person-cards" id="equal-cards"></div>
-        </div>
-
-        <!-- Custom split -->
-        <div id="divide-custom" style="display:none">
-          <div class="personas-counter">
-            <span class="personas-counter-label">¿Entre cuántas personas?</span>
-            <div class="ctr-ctrl">
-              <button class="ctr-btn" id="ctr-minus-c" onclick="changePersonasCustom(-1)" disabled>−</button>
-              <span class="ctr-num" id="ctr-num-c">2</span>
-              <button class="ctr-btn" id="ctr-plus-c" onclick="changePersonasCustom(1)">+</button>
-            </div>
-          </div>
-          <div class="person-cards" id="custom-cards"></div>
-          <div id="split-validation"></div>
-        </div>
-      </div>
-
-      <!-- Totals summary -->
-      <div style="margin-top:16px">
-        <div class="section-hdr">
-          <span class="section-hdr-label">Detalle a cobrar</span>
-          <span class="section-hdr-link" onclick="showToast('Próximamente: notas')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-              <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            </svg>
-            Agregar notas
-          </span>
-        </div>
-        <div class="totals-card">
-          <div class="tot-row">
-            <span class="tot-label">Subtotal</span>
-            <span class="tot-value" id="s2-subtotal">$0</span>
-          </div>
-          <div class="tot-row">
-            <span class="tot-label">Propina</span>
-            <span class="tot-value" id="s2-propina">$0</span>
-          </div>
-          <div class="tot-row">
-            <span class="tot-label">Descuento</span>
-            <span class="tot-value" id="s2-descuento">$0</span>
-          </div>
-          <div class="tot-sep"></div>
-          <div class="tot-row grand">
-            <span class="tot-label">Total a cobrar</span>
-            <span class="tot-value" id="s2-total">$0</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom bar S2 -->
-    <div class="step-bar">
-      <div class="bar-col">
-        <span class="bar-count" id="bar2-count">0 Productos</span>
-        <span class="bar-amount" id="bar2-amount">$0</span>
-      </div>
-      <button class="bar-btn" id="btn-continue-s2" onclick="goStep(3)">Continuar</button>
-    </div>
-  </div>
-
-  <!-- ══════════════ STEP 3: Método de pago ══════════════ -->
-  <div class="step" id="s3">
-    <div class="nav-row">
-      <button class="nav-btn" onclick="goStep(1)" aria-label="Volver">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <div class="nav-title-group">
-        <span class="nav-title-main">Método de pago</span>
-        <span class="nav-title-sub" id="s3-label">Mesa —</span>
-      </div>
-      <button class="nav-btn" onclick="exitToHome()" aria-label="Salir">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="step-body">
-      <!-- Progress (solo si dividir) -->
-      <div class="pay-progress" id="s3-progress-block">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#ff2947" stroke-width="1.8"/>
-          <path d="M12 8v4l2 2" stroke="#ff2947" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        <span class="pay-progress-text" id="s3-progress-text">Persona 1 de 1</span>
-        <span class="pay-progress-rest" id="s3-progress-rest"></span>
-      </div>
-
-      <!-- Person list (solo si dividir) -->
-      <div class="ppl-list" id="s3-ppl-list"></div>
-
-      <!-- Dividir cobro toggle -->
-      <div class="s3-toggle-card">
-        <div class="s3-toggle-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M16 3h5m0 0v5m0-5-7 7M8 21H3m0 0v-5m0 5 7-7" stroke="#121e6c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <span class="s3-toggle-label">Dividir cobro</span>
-        <button class="toggle-sw" id="s3-dividir-toggle" onclick="toggleDividirS3()" aria-label="Dividir cobro"></button>
-      </div>
-
-      <!-- Payment method grid -->
-      <div class="pay-grid-label">¿Cómo quieres cobrar?</div>
-      <div class="pay-grid" id="pay-grid">
-        <!-- Rendered by JS -->
-      </div>
-
-    </div>
-
-    <!-- Bottom bar S3 -->
-    <div class="step-bar">
-      <div class="bar-col">
-        <span class="bar-count" id="s3-bar-label">Persona 1 de 1</span>
-        <span class="bar-amount" id="s3-bar-amount">$0</span>
-      </div>
-      <button class="bar-btn" id="btn-confirm-pay" onclick="confirmPerson()" disabled>Continuar</button>
-    </div>
-  </div>
-
-  <!-- ══════════════ Divide Drop Up ══════════════ -->
-  <div id="s3-divide-backdrop" onclick="closeDivideDropUp()"></div>
-  <div id="s3-divide-sheet">
-    <div class="s3d-handle"></div>
-    <div class="s3d-header">
-      <span class="s3d-title">Dividir cuenta</span>
-      <button class="s3d-close" onclick="closeDivideDropUp()" aria-label="Cerrar">✕</button>
-    </div>
-    <div class="s3d-body">
-      <div class="s3d-total-row">
-        <span class="s3d-total-lbl">Total a dividir</span>
-        <span id="s3d-total-val">$0</span>
-      </div>
-      <div class="divide-tabs">
-        <button class="dtab active" id="s3d-tab-equal"  onclick="s3dSetMode('equal')">Partes iguales</button>
-        <button class="dtab"        id="s3d-tab-custom" onclick="s3dSetMode('custom')">Personalizado</button>
-      </div>
-      <div id="s3d-equal" style="margin-top:12px">
-        <div class="personas-counter">
-          <span class="personas-counter-label">¿Entre cuántas personas?</span>
-          <div class="ctr-ctrl">
-            <button class="ctr-btn" id="s3d-minus" onclick="s3dChangePersonas(-1)" disabled>−</button>
-            <span class="ctr-num" id="s3d-num">2</span>
-            <button class="ctr-btn" id="s3d-plus"  onclick="s3dChangePersonas(1)">+</button>
-          </div>
-        </div>
-        <div class="person-cards" id="s3d-equal-cards"></div>
-      </div>
-      <div id="s3d-custom" style="display:none; margin-top:12px">
-        <div class="personas-counter">
-          <span class="personas-counter-label">¿Entre cuántas personas?</span>
-          <div class="ctr-ctrl">
-            <button class="ctr-btn" id="s3d-minus-c" onclick="s3dChangePersonasCustom(-1)" disabled>−</button>
-            <span class="ctr-num" id="s3d-num-c">2</span>
-            <button class="ctr-btn" id="s3d-plus-c"  onclick="s3dChangePersonasCustom(1)">+</button>
-          </div>
-        </div>
-        <div class="person-cards" id="s3d-custom-cards"></div>
-        <div id="s3d-validation"></div>
-      </div>
-    </div>
-    <button class="s3d-confirm" id="s3d-confirm-btn" onclick="confirmDivideDropUp()">Confirmar división</button>
-  </div>
-
-  <!-- ══════════════ STEP 4: Comprobante ══════════════ -->
-  <div class="step" id="s4">
-    <div class="nav-row" style="background:var(--background-page)">
-      <div style="width:24px"></div>
-      <div class="nav-title-group">
-        <span class="nav-title-main">Comprobante</span>
-      </div>
-      <button class="nav-btn" onclick="exitToHome()" aria-label="Cerrar">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="step-body no-pad">
-      <!-- Torn paper top + receipt -->
-      <svg class="receipt-top" viewBox="0 0 393 14" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 14 Q10 0 20 8 Q30 14 40 6 Q50 0 60 8 Q70 14 80 5 Q90 0 100 8 Q110 14 120 6 Q130 0 140 8 Q150 14 160 5 Q170 0 180 8 Q190 14 200 6 Q210 0 220 8 Q230 14 240 5 Q250 0 260 8 Q270 14 280 6 Q290 0 300 8 Q310 14 320 5 Q330 0 340 8 Q350 14 360 6 Q370 0 380 8 Q387 14 393 10 L393 14 Z" fill="white"/>
-      </svg>
-      <div class="receipt-body">
-        <div class="receipt-hdr">
-          <div class="receipt-check">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="receipt-title">¡Completaste una venta!</div>
-          <div class="receipt-amount" id="r-amount">$0</div>
-          <div class="receipt-date" id="r-date">—</div>
-        </div>
-
-        <div class="receipt-section">
-          <div class="receipt-row">
-            <span class="rr-label">Cliente</span>
-            <span class="rr-value" id="r-cliente">Consumidor final</span>
-          </div>
-        </div>
-        <div class="receipt-sep"></div>
-        <div class="receipt-section">
-          <div class="receipt-row">
-            <span class="rr-label">Venta No</span>
-            <span class="rr-value" id="r-venta">—</span>
-          </div>
-          <div class="receipt-row">
-            <span class="rr-label">Sucursal</span>
-            <span class="rr-value" id="r-sucursal">Principal</span>
-          </div>
-          <div class="receipt-row">
-            <span class="rr-label">Emitido por</span>
-            <span class="rr-value" id="r-emitido">—</span>
-          </div>
-          <div class="receipt-row">
-            <span class="rr-label">Método de pago</span>
-            <span class="rr-value" id="r-metodo">—</span>
-          </div>
-          <div class="receipt-row">
-            <span class="rr-label">Notas</span>
-            <span class="rr-value">—</span>
-          </div>
-        </div>
-        <div class="receipt-sep"></div>
-        <div class="receipt-section">
-          <div class="receipt-row">
-            <span class="rr-label">Subtotal</span>
-            <span class="rr-value" id="r-subtotal">$0</span>
-          </div>
-          <div class="receipt-row">
-            <span class="rr-label">Descuento</span>
-            <span class="rr-value" id="r-descuento">$0</span>
-          </div>
-          <div class="receipt-row bold">
-            <span class="rr-label">Total de la venta</span>
-            <span class="rr-value" id="r-total">$0</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Send receipt -->
-      <div class="send-section" style="padding:0 16px">
-        <div class="send-label">Enviar recibo por:</div>
-        <div class="send-btns">
-          <button class="send-btn" onclick="showToast('Recibo enviado por correo')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="white" stroke-width="1.8"/>
-              <polyline points="22,6 12,13 2,6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-            Correo
+      <div class="bs-body">
+        <div class="bs-grid">
+          <button class="bs-card" onclick="selectMethod('bold')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/13a861f8-be57-434d-91d9-a17d7c2f72af" alt="Bold"></div>
+            <span class="bs-clbl">Bold</span>
           </button>
-          <button class="send-btn" onclick="showToast('Recibo enviado por WhatsApp')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
-            </svg>
-            WhatsApp
+          <button class="bs-card" onclick="selectMethod('efectivo')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/6f562da4-c32f-4538-85b0-69db817f5e18" alt="Efectivo"></div>
+            <span class="bs-clbl">Efectivo</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('nequi')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/14148419-f7ac-4760-8669-e016c808c5b0" alt="Nequi"></div>
+            <span class="bs-clbl">Nequi</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('daviplata')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/2189929e-8f34-4b06-bac0-295edd188051" alt="Daviplata"></div>
+            <span class="bs-clbl">Daviplata</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('credibanco')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/3daa974d-ce06-4bb4-bffa-a98bcf3bee8b" alt="Credibanco"></div>
+            <span class="bs-clbl">Credibanco</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('redeban')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/d43389f5-3bd8-471d-83b6-f179df323a3a" alt="Redeban"></div>
+            <span class="bs-clbl">Redeban</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('addi')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/53d0faff-d817-4a0b-9b25-a07e7c632c7a" alt="Addi"></div>
+            <span class="bs-clbl">Addi</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('sistecredito')">
+            <div class="bs-icon" style="background:#6ac648"><img src="https://www.figma.com/api/mcp/asset/0a6925c5-6fdd-4761-a337-814043111437" alt="Sistecredito" style="width:57%;height:57%"></div>
+            <span class="bs-clbl">Sistecredito</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('otro')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/67d6b6ab-0608-4f58-a04e-f7db5fc04c03" alt="Otro"></div>
+            <span class="bs-clbl">Otro</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('transferencia')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/ca31695d-d904-49ea-8167-8a13060a5b99" alt="Transferencia"></div>
+            <span class="bs-clbl">Transferencia bancaria</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('intercambio')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/f6551e2c-10df-4ca8-816b-dbcdf107a572" alt="Intercambio"></div>
+            <span class="bs-clbl">Intercambio</span>
+          </button>
+          <button class="bs-card" onclick="selectMethod('pago_contra_entrega')">
+            <div class="bs-icon"><img src="https://www.figma.com/api/mcp/asset/f003d697-472a-4b2b-8b7d-47d3fe94afc7" alt="Pago contra entrega"></div>
+            <span class="bs-clbl">Pago contra entrega</span>
           </button>
         </div>
-        <button class="nueva-btn" onclick="nuevaVenta()">Nueva venta</button>
       </div>
     </div>
   </div>
-
-  <!-- ══════════════ STEP SM: Mesa — Productos a cobrar ══════════════ -->
-  <div class="step" id="sm">
-    <div class="nav-row">
-      <button class="nav-btn" onclick="closeMesaProducts()" aria-label="Volver">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M15 19l-7-7 7-7" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <div class="nav-title-group">
-        <span class="nav-title-main" id="sm-mesa-title">Mesa —</span>
-      </div>
-      <button class="nav-btn" onclick="exitToHome()" aria-label="Salir">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="#606060" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="step-body">
-      <span class="sm-section-label">Productos a cobrar</span>
-      <div id="sm-products" style="display:flex;flex-direction:column;gap:8px;"></div>
-    </div>
-
-    <div class="sm-footer">
-      <button class="sm-btn-salir" onclick="closeMesaProducts()">Salir</button>
-      <button class="sm-btn-volver" onclick="goToMesa()">Volver a ocupada</button>
-    </div>
-  </div>
-
-  <!-- TOAST -->
-  <div id="toast"></div>
 
 </div><!-- /app -->
+
 <script src="data-manager.js"></script>
 <script>
-/* ══════════════════════════════════════════
-   STATE
-══════════════════════════════════════════ */
-let mesaId      = 'S09';
-let mesaData    = null;
-let cart        = [];
-let subtotal    = 0;
-let propinaPct  = 0;
-let descuento   = 0;
-let currentStep = 1;
+/* ── URL params ── */
+const qp         = new URLSearchParams(location.search);
+const mesaId     = qp.get('mesa')   || 'S05';
+const zona       = qp.get('zona')   || 'salon';
+const initMethod = qp.get('method') || 'efectivo';
 
-// Step 2
-let dividir     = false;
-let numPersonas = 2;
-let divideMode  = 'equal'; // 'equal' | 'custom'
-let customAmts  = [];
-let vendedorNombre = 'Carlos Mendez';
+/* ── Method display names ── */
+const MNAMES = {
+  bold:'Bold', efectivo:'Efectivo', nequi:'Nequi', daviplata:'Daviplata',
+  credibanco:'Credibanco', redeban:'Redeban', addi:'Addi', sistecredito:'Sistecredito',
+  otro:'Otro', transferencia:'Transferencia bancaria', intercambio:'Intercambio',
+  pago_contra_entrega:'Pago contra entrega'
+};
+const mName  = k => MNAMES[k] || k;
+const esc    = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmt    = n => '$' + Math.round(n || 0).toLocaleString('es-CO');
+const uid    = () => Date.now() + '-' + Math.floor(Math.random() * 1e6);
 
-// Step 3
-let personas        = []; // [{name, amount, paid, method}]
-let currentPersonIdx = 0;
-let selectedMethod  = null;
-let terminalOn      = false;
-
-/* ══════════════════════════════════════════
-   UTILS
-══════════════════════════════════════════ */
-function fmt(n) {
-  return '$' + Math.round(n).toLocaleString('es-CO');
+/* ── Load cart from localStorage ── */
+let cart = [];
+try {
+  const ms = JSON.parse(localStorage.getItem('mesa_' + mesaId)) || {};
+  cart = ms.productos || [];
+} catch(e) {}
+if (!cart.length) {
+  try {
+    DataManager.init();
+    const dm = DataManager.getMesa(mesaId);
+    cart = (dm && dm.productos) ? dm.productos : [];
+  } catch(e) {}
 }
 
-function calcTotal() {
-  const propina = subtotal * propinaPct / 100;
-  return Math.round(subtotal + propina - descuento);
-}
+const subtotal = cart.reduce((s, p) => s + (p.precio || 0) * (p.cantidad || 1), 0);
+const tax      = Math.round(subtotal * 0.19);
 
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2800);
-}
+/* ── State ── */
+let tips     = [];
+let payments = [];
+let bscoTgt  = null; // { list: 'tips'|'payments', id }
 
-function updateClock() {
-  const d = new Date();
-  document.getElementById('current-time').textContent =
-    d.getHours().toString().padStart(2,'0') + ':' +
-    d.getMinutes().toString().padStart(2,'0');
-}
+const tipSum = () => tips.reduce((s, t) => s + (t.amount || 0), 0);
+const paySum = () => payments.reduce((s, p) => s + (p.amount || 0), 0);
+const total  = () => subtotal + tax + tipSum();
 
-/* ══════════════════════════════════════════
-   NAVIGATION
-══════════════════════════════════════════ */
-function goStep(n) {
-  document.getElementById('s' + currentStep).classList.remove('active');
-  currentStep = n;
-  document.getElementById('s' + currentStep).classList.add('active');
-  if (n === 2) initStep2();
-  if (n === 3) initStep3();
-  if (n === 4) initStep4();
-}
-
-function goToMesa() {
-  const p = new URLSearchParams(location.search);
-  const zona = mesaData ? mesaData.zona : (p.get('zona') || 'salon');
-  location.href = 'detalle-pedido.html?mesa=' + mesaId + '&zona=' + encodeURIComponent(zona);
-}
-
-function exitToHome() {
-  const zona = mesaData ? mesaData.zona : 'salon';
-  location.href = 'venta-mesas.html?zona=' + encodeURIComponent(zona);
-}
-
-/* ══════════════════════════════════════════
-   STEP 1
-══════════════════════════════════════════ */
-function renderProducts() {
-  const container = document.getElementById('s1-products');
-  if (!container) return;
-  container.innerHTML = '';
-  if (!cart.length) {
-    container.innerHTML = '<div class="product-card"><span class="product-name" style="color:var(--black-40)">Sin productos</span></div>';
-    return;
-  }
-  cart.forEach(p => {
-    const lineTotal = p.precio * p.cantidad;
-    const div = document.createElement('div');
-    div.className = 'product-card';
-    div.innerHTML = `
-      <span class="product-name">${p.nombre}</span>
-      <span class="product-qty">×${p.cantidad}</span>
-      <span class="product-price">${fmt(lineTotal)}</span>`;
-    container.appendChild(div);
-  });
-}
-
-function renderTotalsS1() {
-  const propina = subtotal * propinaPct / 100;
-  const total   = calcTotal();
-  const totalItems = cart.reduce((s, p) => s + p.cantidad, 0);
-
-  document.getElementById('val-impuesto').textContent  = '$0';
-  document.getElementById('val-subtotal').textContent  = fmt(subtotal);
-  document.getElementById('val-propina').textContent   = fmt(propina);
-  document.getElementById('val-descuento').textContent = fmt(descuento);
-  document.getElementById('val-total').textContent     = fmt(total);
-
-  document.getElementById('bar1-count').textContent  = totalItems + ' Producto' + (totalItems !== 1 ? 's' : '');
-  document.getElementById('bar1-amount').textContent = fmt(total);
-
-  document.getElementById('s1-mesa-label').textContent = 'Mesa ' + mesaId;
-  document.getElementById('s1-mesa-meta').textContent  = totalItems + ' producto' + (totalItems !== 1 ? 's' : '');
-}
-
-function openPropina() {
-  const pcts = [0, 5, 10, 15, 20];
-  const current = propinaPct;
-  // Cycle through percentages
-  const idx = pcts.indexOf(current);
-  propinaPct = pcts[(idx + 1) % pcts.length];
-  renderTotalsS1();
-  showToast('Propina: ' + propinaPct + '%');
-}
-
-/* ══════════════════════════════════════════
-   STEP 2
-══════════════════════════════════════════ */
-function initStep2() {
-  const mesaLabel = 'Mesa ' + mesaId;
-  document.getElementById('s2-label').textContent = mesaLabel;
-  const total = calcTotal();
-  document.getElementById('s2-subtotal').textContent  = fmt(subtotal);
-  document.getElementById('s2-propina').textContent   = fmt(subtotal * propinaPct / 100);
-  document.getElementById('s2-descuento').textContent = fmt(descuento);
-  document.getElementById('s2-total').textContent     = fmt(total);
-
-  const totalItems = cart.reduce((s, p) => s + p.cantidad, 0);
-  document.getElementById('bar2-count').textContent  = totalItems + ' Producto' + (totalItems !== 1 ? 's' : '');
-  document.getElementById('bar2-amount').textContent = fmt(total);
-
-  renderEqualCards();
-}
-
-function toggleDividir() {
-  dividir = !dividir;
-  document.getElementById('toggle-dividir').classList.toggle('on', dividir);
-  document.getElementById('divide-panel').classList.toggle('open', dividir);
-}
-
-function setDivideMode(mode) {
-  divideMode = mode;
-  document.getElementById('dtab-equal').classList.toggle('active',  mode === 'equal');
-  document.getElementById('dtab-custom').classList.toggle('active', mode === 'custom');
-  document.getElementById('divide-equal').style.display  = mode === 'equal'  ? '' : 'none';
-  document.getElementById('divide-custom').style.display = mode === 'custom' ? '' : 'none';
-  if (mode === 'custom') renderCustomCards();
-}
-
-function changePersonas(delta) {
-  numPersonas = Math.max(2, Math.min(10, numPersonas + delta));
-  document.getElementById('ctr-num').textContent = numPersonas;
-  document.getElementById('ctr-minus').disabled  = numPersonas <= 2;
-  document.getElementById('ctr-plus').disabled   = numPersonas >= 10;
-  renderEqualCards();
-}
-
-function renderEqualCards() {
-  const total   = calcTotal();
-  const perPers = Math.ceil(total / numPersonas);
-  const container = document.getElementById('equal-cards');
-  container.innerHTML = '';
-  for (let i = 1; i <= numPersonas; i++) {
-    const div = document.createElement('div');
-    div.className = 'person-card';
-    div.innerHTML = `
-      <div class="person-card-avatar">${i}</div>
-      <span class="person-card-name">Persona ${i}</span>
-      <span class="person-card-amount">${fmt(perPers)}</span>`;
-    container.appendChild(div);
-  }
-}
-
-/* Custom split */
-function changePersonasCustom(delta) {
-  numPersonas = Math.max(2, Math.min(10, numPersonas + delta));
-  document.getElementById('ctr-num-c').textContent   = numPersonas;
-  document.getElementById('ctr-minus-c').disabled    = numPersonas <= 2;
-  document.getElementById('ctr-plus-c').disabled     = numPersonas >= 10;
-  renderCustomCards();
-}
-
-function renderCustomCards() {
-  const total = calcTotal();
-  const perPers = Math.floor(total / numPersonas);
-  customAmts = Array.from({length: numPersonas}, (_, i) =>
-    i < numPersonas - 1 ? perPers : total - perPers * (numPersonas - 1));
-
-  const container = document.getElementById('custom-cards');
-  container.innerHTML = '';
-  for (let i = 0; i < numPersonas; i++) {
-    const div = document.createElement('div');
-    div.className = 'person-card';
-    div.innerHTML = `
-      <div class="person-card-avatar">${i + 1}</div>
-      <span class="person-card-name">Persona ${i + 1}</span>
-      <input class="person-card-input" type="number" data-idx="${i}" value="${customAmts[i]}"
-             oninput="updateCustomAmt(${i}, this.value)"/>`;
-    container.appendChild(div);
-  }
-  validateCustom();
-}
-
-function updateCustomAmt(idx, val) {
-  customAmts[idx] = parseInt(val) || 0;
-  validateCustom();
-}
-
-function validateCustom() {
-  const total = calcTotal();
-  const sum   = customAmts.reduce((a, b) => a + b, 0);
-  const diff  = total - sum;
-  const el    = document.getElementById('split-validation');
-  const btn   = document.getElementById('btn-continue-s2');
-  if (diff === 0) {
-    el.className = 'ok';
-    el.textContent = 'La suma es correcta ✓';
-    btn.disabled = false;
-  } else if (diff > 0) {
-    el.className = 'err';
-    el.textContent = 'Faltan ' + fmt(diff) + ' por asignar';
-    btn.disabled = true;
-  } else {
-    el.className = 'err';
-    el.textContent = fmt(-diff) + ' de más — ajusta los montos';
-    btn.disabled = true;
-  }
-}
-
-/* ══════════════════════════════════════════
-   STEP 3
-══════════════════════════════════════════ */
-const _ph = `<svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#E0E0E0"/></svg>`;
-const METHODS = [
-  { id: 'transferencia', name: 'Transferencia bancaria', iconHTML: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.7984 3.22365C16.6725 2.63226 15.3176 2.63226 14.1917 3.22365L14.1902 3.22444L3.2796 8.91984C2.47062 9.33526 2.69976 10.6068 3.73506 10.6068H28.2684C29.2903 10.6068 29.5357 9.34402 28.7197 8.91764L17.8002 3.22459L17.7984 3.22365ZM18.4175 2.04278C16.9038 1.24809 15.0861 1.24811 13.5725 2.04285V2.04285L2.67052 7.73373L2.66846 7.73479C0.520076 8.8403 1.41111 11.9401 3.73506 11.9401H28.2684C30.5798 11.9401 31.4811 8.8562 29.3371 7.73591L18.4175 2.04278V2.04278Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M6.05584 14.2601C6.42403 14.2605 6.72216 14.5594 6.72173 14.9276L6.70839 26.3009C6.70796 26.6691 6.40913 26.9672 6.04094 26.9668C5.67275 26.9663 5.37463 26.6675 5.37506 26.2993L5.38839 14.926C5.38883 14.5578 5.68765 14.2597 6.05584 14.2601Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12.5884 14.2601C12.9566 14.2601 13.2551 14.5586 13.2551 14.9268V26.3001C13.2551 26.6683 12.9566 26.9668 12.5884 26.9668C12.2202 26.9668 11.9217 26.6683 11.9217 26.3001V14.9268C11.9217 14.5586 12.2202 14.2601 12.5884 14.2601Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M19.1217 14.2601C19.4899 14.2601 19.7884 14.5586 19.7884 14.9268V26.3001C19.7884 26.6683 19.4899 26.9668 19.1217 26.9668C18.7535 26.9668 18.4551 26.6683 18.4551 26.3001V14.9268C18.4551 14.5586 18.7535 14.2601 19.1217 14.2601Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M25.6692 14.2601C26.0374 14.2605 26.3355 14.5594 26.3351 14.9276L26.3217 26.3009C26.3213 26.6691 26.0225 26.9672 25.6543 26.9668C25.2861 26.9663 24.988 26.6675 24.9884 26.2993L25.0017 14.926C25.0022 14.5578 25.301 14.2597 25.6692 14.2601Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M2.88173 29.8868C2.88173 29.5186 3.1802 29.2201 3.54839 29.2201H28.4551C28.8232 29.2201 29.1217 29.5186 29.1217 29.8868C29.1217 30.255 28.8232 30.5534 28.4551 30.5534H3.54839C3.1802 30.5534 2.88173 30.255 2.88173 29.8868Z" fill="#121E6C"/></svg>` },
-  { id: 'efectivo',      name: 'Efectivo',               iconHTML: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.92742 7.73323C4.26438 7.73323 3.73323 8.27076 3.73323 8.92742V23.1297C3.73323 23.7843 4.2729 24.3239 4.92742 24.3239H27.0732C27.7277 24.3239 28.2674 23.7843 28.2674 23.1297V8.92742C28.2674 8.26438 27.7299 7.73323 27.0732 7.73323H4.92742ZM2.66699 8.92742C2.66699 7.68618 3.67123 6.66699 4.92742 6.66699H27.0732C28.3145 6.66699 29.3337 7.67123 29.3337 8.92742V23.1297C29.3337 24.3731 28.3166 25.3902 27.0732 25.3902H4.92742C3.68403 25.3902 2.66699 24.3731 2.66699 23.1297V8.92742Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15.995 10.5268C12.9564 10.5268 10.4932 12.99 10.4932 16.0286C10.4932 19.0671 12.9564 21.5304 15.995 21.5304C19.0335 21.5304 21.4968 19.0671 21.4968 16.0286C21.4968 12.99 19.0335 10.5268 15.995 10.5268ZM9.42695 16.0286C9.42695 12.4011 12.3676 9.46054 15.995 9.46054C19.6224 9.46054 22.563 12.4011 22.563 16.0286C22.563 19.656 19.6224 22.5966 15.995 22.5966C12.3676 22.5966 9.42695 19.656 9.42695 16.0286Z" fill="#121E6C"/></svg>` },
-  { id: 'intercambio',   name: 'Intercambio',             iconHTML: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24.4952 4.1725C24.7246 3.94277 25.0967 3.94246 25.3265 4.1718L30.6663 9.5027L25.3274 14.8574C25.0982 15.0873 24.7261 15.0878 24.4962 14.8586C24.2663 14.6294 24.2658 14.2573 24.495 14.0274L29.0045 9.50462L24.4959 5.00371C24.2662 4.77437 24.2659 4.40222 24.4952 4.1725Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5762 9.50366C1.5762 9.17905 1.83935 8.91591 2.16395 8.91591H29.8354C30.16 8.91591 30.4231 9.17905 30.4231 9.50366C30.4231 9.82827 30.16 10.0914 29.8354 10.0914H2.16395C1.83935 10.0914 1.5762 9.82827 1.5762 9.50366Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M7.5041 15.9315C7.27476 15.7018 6.90262 15.7014 6.67289 15.9308L1.33301 21.2617L6.67193 26.6164C6.90112 26.8463 7.27327 26.8468 7.50314 26.6176C7.73301 26.3884 7.73356 26.0163 7.50436 25.7864L2.9949 21.2636L7.5034 16.7627C7.73313 16.5334 7.73344 16.1612 7.5041 15.9315Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M30.4231 21.2626C30.4231 20.938 30.16 20.6749 29.8354 20.6749H2.16395C1.83935 20.6749 1.5762 20.938 1.5762 21.2626C1.5762 21.5873 1.83935 21.8504 2.16395 21.8504H29.8354C30.16 21.8504 30.4231 21.5873 30.4231 21.2626Z" fill="#121E6C"/></svg>` },
-  { id: 'otro',          name: 'Otro',                    iconHTML: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24.8541 2.77979C25.2222 2.7792 25.5212 3.07721 25.5218 3.4454L25.5274 6.99872L29.0807 6.99312C29.4489 6.99254 29.7479 7.29054 29.7484 7.65873C29.749 8.02692 29.451 8.32587 29.0828 8.32645L25.5295 8.33206L25.5351 11.8854C25.5357 12.2536 25.2377 12.5525 24.8695 12.5531C24.5013 12.5537 24.2024 12.2557 24.2018 11.8875L24.1962 8.33416L20.6295 8.33978C20.2613 8.34037 19.9623 8.04236 19.9618 7.67417C19.9612 7.30598 20.2592 7.00703 20.6274 7.00645L24.1941 7.00083L24.1884 3.4475C24.1879 3.07932 24.4859 2.78037 24.8541 2.77979Z" fill="#121E6C"/></svg>` },
-  { id: 'contra-entrega', name: 'Pago contra entrega',   iconHTML: _ph },
-  { id: 'bold',           name: 'Bold',                  iconHTML: _ph },
-  { id: 'nequi',          name: 'Nequi',                 iconHTML: _ph },
-  { id: 'daviplata',      name: 'Daviplata',              iconHTML: _ph },
-  { id: 'credibanco',     name: 'Credibanco',             iconHTML: _ph },
-  { id: 'redeban',        name: 'Redeban',                iconHTML: _ph },
-  { id: 'addi',           name: 'Addi',                  iconHTML: _ph },
-  { id: 'sistecredito',   name: 'Sistecredito',           iconHTML: _ph },
-];
-
-function initStep3() {
-  const total = calcTotal();
-  document.getElementById('s3-label').textContent = 'Mesa ' + mesaId;
-
-  // Build personas array
-  if (dividir) {
-    personas = [];
-    for (let i = 0; i < numPersonas; i++) {
-      let amt;
-      if (divideMode === 'equal') {
-        amt = Math.ceil(total / numPersonas);
-        if (i === numPersonas - 1) amt = total - Math.ceil(total / numPersonas) * (numPersonas - 1);
-      } else {
-        amt = customAmts[i] || 0;
-      }
-      personas.push({ name: 'Persona ' + (i + 1), amount: amt, paid: false, method: null });
-    }
-  } else {
-    personas = [{ name: 'Persona 1', amount: total, paid: false, method: null }];
-  }
-
-  currentPersonIdx = 0;
-  selectedMethod   = null;
-
-  // Build payment grid
-  const grid = document.getElementById('pay-grid');
-  grid.innerHTML = '';
-  METHODS.forEach(m => {
-    const card = document.createElement('div');
-    card.className = 'method-card';
-    card.dataset.id = m.id;
-    card.innerHTML = `
-      <div class="method-icon">${m.iconHTML}</div>
-      <span class="method-name">${m.name}</span>`;
-    card.addEventListener('click', () => selectMethod(m.id));
-    grid.appendChild(card);
-  });
-
-  renderStep3();
-}
-
-function renderStep3() {
-  const current = personas[currentPersonIdx];
-  const total   = calcTotal();
-  const paid    = personas.slice(0, currentPersonIdx).reduce((s, p) => s + p.amount, 0);
-  const rest    = total - paid;
-
-  // Show/hide blocks based on divide mode
-  const showDivide = dividir;
-  document.getElementById('s3-progress-block').style.display = showDivide ? '' : 'none';
-  document.getElementById('s3-ppl-list').style.display       = showDivide ? '' : 'none';
-
-  document.getElementById('s3-progress-text').textContent =
-    `Pagando ${currentPersonIdx + 1} de ${personas.length}`;
-  document.getElementById('s3-progress-rest').textContent =
-    personas.length > 1 ? 'Restante ' + fmt(rest) : '';
-
-  // Person list
-  const list = document.getElementById('s3-ppl-list');
-  list.innerHTML = '';
-  personas.forEach((p, i) => {
-    const div = document.createElement('div');
-    div.className = 'ppl-item' +
-      (i === currentPersonIdx ? ' current' : '') +
-      (p.paid ? ' paid-done' : '');
-    let statusText = p.paid ? '✓ Pagado' : (i === currentPersonIdx ? 'Cobrando ahora' : 'Pendiente');
-    div.innerHTML = `
-      <div class="ppl-avatar">${i + 1}</div>
-      <span class="ppl-name">${p.name}</span>
-      <span class="ppl-status">${statusText}</span>
-      <span class="ppl-amount">${fmt(p.amount)}</span>`;
-    list.appendChild(div);
-  });
-
-  // Bottom bar
-  document.getElementById('s3-dividir-toggle').classList.toggle('on', dividir);
-  document.getElementById('s3-bar-label').textContent = current.name;
-  document.getElementById('s3-bar-amount').textContent = fmt(current.amount);
-  document.getElementById('btn-confirm-pay').textContent = 'Continuar';
-  document.getElementById('btn-confirm-pay').disabled = selectedMethod === null;
-
-  // Reset method selection
-  document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
-}
-
-function selectMethod(id) {
-  if (id === 'mixto') { showToast('Próximamente: cobro mixto'); return; }
-  selectedMethod = id;
-  document.querySelectorAll('.method-card').forEach(c => {
-    c.classList.toggle('selected', c.dataset.id === id);
-  });
-  document.getElementById('btn-confirm-pay').disabled = false;
-}
-
-function toggleTerminal() {
-  terminalOn = !terminalOn;
-  document.getElementById('terminal-check').classList.toggle('on', terminalOn);
-  if (terminalOn) {
-    selectMethod('bold');
-    showToast('Terminal Bold Smart conectada');
-  }
-}
-
-function confirmPerson() {
-  if (selectedMethod === null) return;
-  const p = personas[currentPersonIdx];
-  p.paid   = true;
-  p.method = METHODS.find(m => m.id === selectedMethod)?.name || selectedMethod;
-  selectedMethod = null;
-
-  if (currentPersonIdx < personas.length - 1) {
-    currentPersonIdx++;
-    renderStep3();
-    showToast(p.name + ' pagado ✓');
-  } else {
-    // All paid → comprobante
-    goStep(4);
-  }
-}
-
-/* ══════════════════════════════════════════
-   DIVIDE DROP UP (Step 3)
-══════════════════════════════════════════ */
-function toggleDividirS3() {
-  if (dividir) {
-    dividir = false;
-    renderStep3();
-  } else {
-    openDivideDropUp(); // wait for confirm before setting dividir=true
-  }
-}
-
-function openDivideDropUp() {
-  document.getElementById('s3d-total-val').textContent = fmt(calcTotal());
-  document.getElementById('s3d-num').textContent   = numPersonas;
-  document.getElementById('s3d-minus').disabled    = numPersonas <= 2;
-  document.getElementById('s3d-plus').disabled     = numPersonas >= 10;
-  document.getElementById('s3d-num-c').textContent = numPersonas;
-  document.getElementById('s3d-minus-c').disabled  = numPersonas <= 2;
-  document.getElementById('s3d-plus-c').disabled   = numPersonas >= 10;
-  s3dSetMode(divideMode);
-  document.getElementById('s3-divide-backdrop').classList.add('open');
-  document.getElementById('s3-divide-sheet').classList.add('open');
-}
-
-function closeDivideDropUp() {
-  document.getElementById('s3-divide-backdrop').classList.remove('open');
-  document.getElementById('s3-divide-sheet').classList.remove('open');
-  // Sync toggle with actual dividir state (cancel → OFF, confirm → ON)
-  const toggle = document.getElementById('s3-dividir-toggle');
-  if (toggle) toggle.classList.toggle('on', dividir);
-}
-
-function s3dSetMode(mode) {
-  divideMode = mode;
-  document.getElementById('s3d-tab-equal').classList.toggle('active',  mode === 'equal');
-  document.getElementById('s3d-tab-custom').classList.toggle('active', mode === 'custom');
-  document.getElementById('s3d-equal').style.display  = mode === 'equal'  ? '' : 'none';
-  document.getElementById('s3d-custom').style.display = mode === 'custom' ? '' : 'none';
-  if (mode === 'equal')  s3dRenderEqualCards();
-  if (mode === 'custom') s3dRenderCustomCards();
-}
-
-function s3dChangePersonas(delta) {
-  numPersonas = Math.max(2, Math.min(10, numPersonas + delta));
-  document.getElementById('s3d-num').textContent = numPersonas;
-  document.getElementById('s3d-minus').disabled  = numPersonas <= 2;
-  document.getElementById('s3d-plus').disabled   = numPersonas >= 10;
-  s3dRenderEqualCards();
-}
-
-function s3dRenderEqualCards() {
-  const perPers = Math.ceil(calcTotal() / numPersonas);
-  const container = document.getElementById('s3d-equal-cards');
-  container.innerHTML = '';
-  for (let i = 1; i <= numPersonas; i++) {
-    const div = document.createElement('div');
-    div.className = 'person-card';
-    div.innerHTML = `<div class="person-card-avatar">${i}</div><span class="person-card-name">Persona ${i}</span><span class="person-card-amount">${fmt(perPers)}</span>`;
-    container.appendChild(div);
-  }
-}
-
-function s3dChangePersonasCustom(delta) {
-  numPersonas = Math.max(2, Math.min(10, numPersonas + delta));
-  document.getElementById('s3d-num-c').textContent  = numPersonas;
-  document.getElementById('s3d-minus-c').disabled   = numPersonas <= 2;
-  document.getElementById('s3d-plus-c').disabled    = numPersonas >= 10;
-  s3dRenderCustomCards();
-}
-
-function s3dRenderCustomCards() {
-  const total   = calcTotal();
-  const perPers = Math.floor(total / numPersonas);
-  customAmts = Array.from({length: numPersonas}, (_, i) =>
-    i < numPersonas - 1 ? perPers : total - perPers * (numPersonas - 1));
-  const container = document.getElementById('s3d-custom-cards');
-  container.innerHTML = '';
-  for (let i = 0; i < numPersonas; i++) {
-    const div = document.createElement('div');
-    div.className = 'person-card';
-    div.innerHTML = `<div class="person-card-avatar">${i+1}</div><span class="person-card-name">Persona ${i+1}</span><input class="person-card-input" type="number" data-idx="${i}" value="${customAmts[i]}" oninput="s3dUpdateCustomAmt(${i}, this.value)"/>`;
-    container.appendChild(div);
-  }
-  s3dValidateCustom();
-}
-
-function s3dUpdateCustomAmt(idx, val) {
-  customAmts[idx] = parseInt(val) || 0;
-  s3dValidateCustom();
-}
-
-function s3dValidateCustom() {
-  const total = calcTotal();
-  const sum   = customAmts.reduce((a, b) => a + b, 0);
-  const diff  = total - sum;
-  const el    = document.getElementById('s3d-validation');
-  const btn   = document.getElementById('s3d-confirm-btn');
-  if (diff === 0) {
-    el.className = 'ok';  el.textContent = 'La suma es correcta ✓'; btn.disabled = false;
-  } else if (diff > 0) {
-    el.className = 'err'; el.textContent = 'Faltan ' + fmt(diff) + ' por asignar'; btn.disabled = true;
-  } else {
-    el.className = 'err'; el.textContent = fmt(-diff) + ' de más — ajusta los montos'; btn.disabled = true;
-  }
-}
-
-function confirmDivideDropUp() {
-  if (divideMode === 'custom') {
-    const sum = customAmts.reduce((a, b) => a + b, 0);
-    if (sum !== calcTotal()) return;
-  }
-  dividir = true;
-  closeDivideDropUp();
-  initStep3();
-}
-
-/* ══════════════════════════════════════════
-   STEP 4
-══════════════════════════════════════════ */
-function initStep4() {
-  const total = calcTotal();
-  const now   = new Date();
-  const dd    = now.toLocaleDateString('es-CO', { day:'2-digit', month:'2-digit', year:'numeric' });
-  const hh    = now.toTimeString().slice(0, 8);
-
-  document.getElementById('r-amount').textContent   = fmt(total);
-  document.getElementById('r-date').textContent     = dd + ' - ' + hh;
-  document.getElementById('r-cliente').textContent  = 'Consumidor final';
-  document.getElementById('r-venta').textContent    = Math.floor(Math.random() * 9000 + 1000);
-  document.getElementById('r-sucursal').textContent = 'Principal';
-  document.getElementById('r-emitido').textContent  = vendedorNombre;
-  document.getElementById('r-metodo').textContent   = personas[0]?.method || '—';
-  document.getElementById('r-subtotal').textContent  = fmt(subtotal);
-  document.getElementById('r-descuento').textContent = fmt(descuento);
-  document.getElementById('r-total').textContent    = fmt(total);
-}
-
-function nuevaVenta() {
-  DataManager.cerrarMesa(mesaId);
-  const zona = mesaData ? mesaData.zona : 'salon';
-  location.href = 'venta-mesas.html?zona=' + encodeURIComponent(zona);
-}
-
-/* ══════════════════════════════════════════
-   STEP SM — Mesa productos
-══════════════════════════════════════════ */
-function openMesaProducts() {
-  document.getElementById('s1').classList.remove('active');
-  document.getElementById('sm').classList.add('active');
-  document.getElementById('sm-mesa-title').textContent = 'Mesa ' + mesaId;
-  renderMesaProducts();
-}
-
-function closeMesaProducts() {
-  document.getElementById('sm').classList.remove('active');
-  document.getElementById('s1').classList.add('active');
-}
-
-function renderMesaProducts() {
-  const container = document.getElementById('sm-products');
-  container.innerHTML = '';
-  if (!cart.length) {
-    const empty = document.createElement('div');
-    empty.className = 'sm-product-card';
-    empty.innerHTML = '<span class="sm-card-name" style="color:var(--black-40)">Sin productos</span>';
-    container.appendChild(empty);
-    return;
-  }
-  cart.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'sm-product-card';
-    div.innerHTML = `
-      <div class="sm-card-info">
-        <div class="sm-card-name-group">
-          <span class="sm-card-name">${p.nombre}</span>
-          <span class="sm-card-qty">x${p.cantidad}</span>
-        </div>
-        <span class="sm-card-price">${fmt(p.precio * p.cantidad)}</span>
-      </div>`;
-    container.appendChild(div);
-  });
-}
-
-/* ══════════════════════════════════════════
-   INIT
-══════════════════════════════════════════ */
+/* ── Init ── */
 (function init() {
-  DataManager.init();
-  const p  = new URLSearchParams(location.search);
-  mesaId   = p.get('mesa') || 'S09';
-  mesaData = DataManager.getMesa(mesaId);
+  try { DataManager.init(); } catch(e) {}
 
-  // Try to read cart from mesa_ key (set by detalle-mesa) or DataManager
-  const msRaw = localStorage.getItem('mesa_' + mesaId);
-  if (msRaw) {
-    try {
-      const ms = JSON.parse(msRaw);
-      cart = ms.productos || [];
-    } catch(e) { cart = []; }
-  }
-  if (!cart.length && mesaData && mesaData.productos) {
-    cart = mesaData.productos;
-  }
+  const tipAmt = Math.round(subtotal * 0.10);
+  tips     = [{ id: uid(), method: initMethod, amount: tipAmt }];
+  // payments set after tips so total() is correct
+  payments = [{ id: uid(), method: initMethod, amount: total() }];
 
-  subtotal = cart.reduce((s, p) => s + p.precio * p.cantidad, 0);
-
-  // Read settings-card values from URL params (with fallbacks)
-  const clienteVal    = p.get('cliente')    || 'Consumidor final';
-  const resolucionVal = p.get('resolucion') || 'Resolution Test - 123456789000000';
-  vendedorNombre      = p.get('vendedor')   || vendedorNombre;
-
-  document.getElementById('s1-cliente-val').textContent    = clienteVal;
-  document.getElementById('s1-resolucion-val').textContent = resolucionVal;
-  document.getElementById('s1-vendedor-val').textContent   = vendedorNombre;
-  document.getElementById('s3-label').textContent = 'Mesa ' + mesaId;
-
-  renderProducts();
-  renderTotalsS1();
-
+  render();
   updateClock();
   setInterval(updateClock, 30000);
 })();
+
+/* ── Render ── */
+function render() {
+  renderLists();
+  refreshCard();
+  refreshFooter();
+}
+
+function renderLists() {
+  document.getElementById('tips-list').innerHTML     = buildRows(tips,     'tips');
+  document.getElementById('payments-list').innerHTML = buildRows(payments, 'payments');
+}
+
+function buildRows(list, listName) {
+  const amtLabel = listName === 'tips' ? 'Propina' : 'Monto';
+  return list.map(item => `
+    <div class="pay-row">
+      <div class="pay-row-inner">
+        <div class="ml-field">
+          <span class="ml-lbl">Método</span>
+          <button class="ml-pill" onclick="openBsco('${listName}','${item.id}')">
+            <span class="ml-val">${esc(mName(item.method))}</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
+              <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="ml-field">
+          <span class="ml-lbl">${esc(amtLabel)}</span>
+          <div class="ml-pill editable" onclick="this.querySelector('input').focus()">
+            <input class="ml-native" type="text" inputmode="numeric"
+              value="${esc(fmt(item.amount))}"
+              onfocus="this.value=this.value.replace(/[^0-9]/g,'');this.select()"
+              onblur="onAmt('${listName}','${item.id}',this)"
+            />
+          </div>
+        </div>
+      </div>
+      <button class="btn-trash" onclick="removeRow('${listName}','${item.id}')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#969696" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>`).join('');
+}
+
+function refreshCard() {
+  const ts  = tipSum();
+  const tot = total();
+  document.getElementById('tc-total').textContent = fmt(tot);
+  document.getElementById('tc-sub').textContent   = fmt(subtotal);
+  document.getElementById('tc-tax').textContent   = fmt(tax);
+  const tipRow = document.getElementById('tc-tip-row');
+  if (ts > 0) {
+    tipRow.style.display = '';
+    document.getElementById('tc-tip-val').textContent = fmt(ts);
+  } else {
+    tipRow.style.display = 'none';
+  }
+}
+
+function refreshFooter() {
+  const tot = total();
+  const ps  = paySum();
+  const btn = document.getElementById('btn-cobrar');
+  const lbl = document.getElementById('ft-lbl');
+  const val = document.getElementById('ft-val');
+
+  btn.textContent = `Cobrar ${fmt(tot)}`;
+
+  if (ps >= tot) {
+    lbl.textContent = 'Cambio';
+    val.textContent = fmt(ps - tot);
+    val.className   = 'ft-val';
+    btn.classList.remove('disabled');
+  } else {
+    lbl.textContent = 'Falta';
+    val.textContent = fmt(tot - ps);
+    val.className   = 'ft-val missing';
+    btn.classList.add('disabled');
+  }
+}
+
+/* ── Amount blur ── */
+function onAmt(listName, id, input) {
+  const raw  = parseInt(input.value.replace(/[^0-9]/g, '')) || 0;
+  const list = listName === 'tips' ? tips : payments;
+  const item = list.find(x => x.id === id);
+  if (item) item.amount = raw;
+  input.value = fmt(raw);
+  refreshCard();
+  refreshFooter();
+}
+
+/* ── Add / remove ── */
+function addTip() {
+  tips.push({ id: uid(), method: initMethod, amount: 0 });
+  render();
+}
+function addPayment() {
+  payments.push({ id: uid(), method: initMethod, amount: 0 });
+  render();
+}
+function removeRow(listName, id) {
+  if (listName === 'tips') tips     = tips.filter(x => x.id !== id);
+  else                      payments = payments.filter(x => x.id !== id);
+  render();
+}
+
+/* ── Bottom sheet ── */
+function openBsco(listName, id) {
+  bscoTgt = { listName, id };
+  document.getElementById('bsco-ov').classList.add('show');
+}
+function closeBsco() {
+  document.getElementById('bsco-ov').classList.remove('show');
+  bscoTgt = null;
+}
+function handleBscoOv(e) {
+  if (e.target === document.getElementById('bsco-ov')) closeBsco();
+}
+function selectMethod(method) {
+  if (!bscoTgt) return;
+  const list = bscoTgt.listName === 'tips' ? tips : payments;
+  const item = list.find(x => x.id === bscoTgt.id);
+  if (item) item.method = method;
+  closeBsco();
+  render();
+}
+
+/* ── Cobrar ── */
+function handleCobrar() {
+  const btn = document.getElementById('btn-cobrar');
+  if (btn.classList.contains('disabled')) return;
+  btn.innerHTML = '<div class="spinner"></div>';
+  btn.classList.add('disabled');
+  setTimeout(() => {
+    try {
+      DataManager.cerrarMesa(mesaId);
+      localStorage.removeItem('mesa_' + mesaId);
+      localStorage.removeItem('boldPOS_comanda_' + mesaId);
+    } catch(e) {}
+    location.href = 'venta-mesas.html?zona=' + encodeURIComponent(zona) + '&cobrado=1';
+  }, 1200);
+}
+
+/* ── Helpers ── */
+function goBack() { history.back(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-txt').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function updateClock() {
+  const d  = new Date();
+  const el = document.getElementById('sb-time');
+  if (el) el.textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+}
 </script>
 </body>
 </html>
