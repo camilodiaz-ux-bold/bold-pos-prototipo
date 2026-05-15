@@ -105,7 +105,7 @@
 
     /* ── Footer — Figma: backdrop-blur pad 20/16 ── */
     #footer {
-      position:fixed; bottom:0; left:0; right:0; z-index:100;
+      position:absolute; bottom:0; left:0; right:0; z-index:100;
       background:rgba(247,248,251,.2);
       backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
       display:flex; align-items:center; padding:20px 16px; gap:12px;
@@ -125,7 +125,7 @@
       white-space:nowrap; transition:opacity .15s; -webkit-tap-highlight-color:transparent;
     }
     #btn-cobrar:active:not(.disabled) { opacity:.85; }
-    #btn-cobrar.disabled { opacity:.38; cursor:not-allowed; }
+    #btn-cobrar.disabled { opacity:.5; cursor:not-allowed; pointer-events:none; }
     .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
@@ -441,6 +441,7 @@ function buildRows(list, listName) {
             <input class="ml-native" type="text" inputmode="numeric"
               value="${esc(fmt(item.amount))}"
               onfocus="this.value=this.value.replace(/[^0-9]/g,'');this.select()"
+              oninput="onAmtLive('${listName}','${item.id}',this)"
               onblur="onAmt('${listName}','${item.id}',this)"
             />
           </div>
@@ -491,7 +492,17 @@ function refreshFooter() {
   }
 }
 
-/* ── Amount blur ── */
+/* ── Amount input (real-time: updates state + footer without reformatting) ── */
+function onAmtLive(listName, id, input) {
+  const raw  = parseInt(input.value.replace(/[^0-9]/g, '')) || 0;
+  const list = listName === 'tips' ? tips : payments;
+  const item = list.find(x => x.id === id);
+  if (item) item.amount = raw;
+  refreshCard();
+  refreshFooter();
+}
+
+/* ── Amount blur (reformats value after editing) ── */
 function onAmt(listName, id, input) {
   const raw  = parseInt(input.value.replace(/[^0-9]/g, '')) || 0;
   const list = listName === 'tips' ? tips : payments;
