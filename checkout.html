@@ -592,12 +592,16 @@ function handleCobrar() {
   btn.innerHTML = '<div class="spinner"></div>';
   btn.classList.add('disabled');
   setTimeout(() => {
-    try {
-      DataManager.cerrarMesa(mesaId);
-      localStorage.removeItem('mesa_' + mesaId);
-      localStorage.removeItem('boldPOS_comanda_' + mesaId);
-    } catch(e) {}
-    location.href = 'venta-mesas.html?zona=' + encodeURIComponent(zona) + '&cobrado=1';
+    const p = new URLSearchParams({
+      mesa:     mesaId,
+      zona,
+      total:    Math.round(total()),
+      subtotal: Math.round(subtotal),
+      tax:      Math.round(tax),
+      tip:      Math.round(tipSum()),
+      method:   payments.map(pm => pm.method).join(',')
+    });
+    location.href = 'comprobante.html?' + p.toString();
   }, 1200);
 }
 
