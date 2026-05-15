@@ -232,6 +232,12 @@
       </div>
     </div>
 
+    <!-- Tip coverage warning — Figma 26975:6680 WEB/APP Alert -->
+    <div id="tip-warning">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="12" fill="#FFC217"/><path d="M11.1429 14.7147V6.14328C11.1429 5.66989 11.5266 5.28613 12 5.28613C12.4734 5.28613 12.8571 5.66989 12.8571 6.14328V14.7147C12.8571 15.1881 12.4734 15.5718 12 15.5718C11.5266 15.5718 11.1429 15.1881 11.1429 14.7147Z" fill="white"/><path d="M13 17.7147C13 18.267 12.5523 18.7147 12 18.7147C11.4477 18.7147 11 18.267 11 17.7147C11 17.1624 11.4477 16.7147 12 16.7147C12.5523 16.7147 13 17.1624 13 17.7147Z" fill="white"/></svg>
+      <span>Agrega un método de cobro del mismo tipo para cobrar la propina.</span>
+    </div>
+
     <!-- Propina section -->
     <div class="section">
       <div class="sec-hdr">
@@ -260,16 +266,6 @@
         </button>
       </div>
       <div class="rows-list" id="payments-list"></div>
-    </div>
-
-    <!-- Tip coverage warning — Figma 26975:6680 WEB/APP Alert -->
-    <div id="tip-warning">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0">
-        <rect x="2" y="2" width="20" height="20" rx="6" fill="#ffc217"/>
-        <rect x="11" y="7" width="2" height="7" rx="1" fill="white"/>
-        <circle cx="12" cy="17" r="1.2" fill="white"/>
-      </svg>
-      <span>Agrega un método de cobro del mismo tipo para cobrar la propina.</span>
     </div>
 
   </div><!-- /body -->
@@ -440,11 +436,11 @@ function renderLists() {
 
 function buildRows(list, listName) {
   const amtLabel = listName === 'tips' ? 'Propina' : 'Monto';
-  return list.map(item => `
+  return list.map((item, idx) => `
     <div class="pay-row">
       <div class="pay-row-inner">
         <div class="ml-field">
-          <span class="ml-lbl">Método</span>
+          ${idx === 0 ? '<span class="ml-lbl">Método</span>' : ''}
           <button class="ml-pill" onclick="openBsco('${listName}','${item.id}')">
             <span class="ml-val">${esc(mName(item.method))}</span>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
@@ -453,7 +449,7 @@ function buildRows(list, listName) {
           </button>
         </div>
         <div class="ml-field">
-          <span class="ml-lbl">${esc(amtLabel)}</span>
+          ${idx === 0 ? `<span class="ml-lbl">${esc(amtLabel)}</span>` : ''}
           <div class="ml-pill editable" onclick="this.querySelector('input').focus()">
             <input class="ml-native" type="text" inputmode="numeric"
               value="${esc(fmt(item.amount))}"
