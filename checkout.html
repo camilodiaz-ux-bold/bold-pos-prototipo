@@ -110,12 +110,15 @@
       backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
       display:flex; align-items:center; padding:20px 16px; gap:12px;
     }
-    #ft-left { flex:1; display:flex; flex-direction:column; gap:2px; }
+    #ft-left { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
     /* Caption/Regular 12px #606060 */
     .ft-lbl { font-size:12px; font-weight:400; color:var(--g60); line-height:16px; }
     /* Body/Medium 16px Black/100 */
     .ft-val { font-size:16px; font-weight:500; color:var(--black); line-height:20px; }
     .ft-val.missing { color:var(--coral); }
+    /* Tip coverage error */
+    #ft-err { display:none; font-size:10px; font-weight:500; color:var(--coral); line-height:14px; margin-bottom:2px; }
+    #ft-err.show { display:block; }
     /* Cobrar button: coral 48px radius-100 Bold 14px white 174px */
     #btn-cobrar {
       width:174px; height:48px; border-radius:100px;
@@ -260,6 +263,7 @@
   <!-- Footer -->
   <div id="footer">
     <div id="ft-left">
+      <span id="ft-err"></span>
       <span class="ft-lbl" id="ft-lbl">Cambio</span>
       <span class="ft-val" id="ft-val">$0</span>
     </div>
@@ -470,24 +474,52 @@ function refreshCard() {
   }
 }
 
+/* ── Condición 2: cada propina con monto > 0 debe tener un pago del mismo método
+   con monto >= propina ── */
+function tipCovered() {
+  return tips.every(tip => {
+    if (!tip.amount || tip.amount <= 0) return true;
+    return payments.some(p => p.method === tip.method && (p.amount || 0) >= tip.amount);
+  });
+}
+
 function refreshFooter() {
-  const tot = total();
-  const ps  = paySum();
-  const btn = document.getElementById('btn-cobrar');
-  const lbl = document.getElementById('ft-lbl');
-  const val = document.getElementById('ft-val');
+  const tot   = total();
+  const ps    = paySum();
+  const btn   = document.getElementById('btn-cobrar');
+  const lbl   = document.getElementById('ft-lbl');
+  const val   = document.getElementById('ft-val');
+  const err   = document.getElementById('ft-err');
+  const sumOk = ps >= tot;
+  const tipOk = tipCovered();
 
   btn.textContent = `Cobrar ${fmt(tot)}`;
 
-  if (ps >= tot) {
-    lbl.textContent = 'Cambio';
-    val.textContent = fmt(ps - tot);
-    val.className   = 'ft-val';
-    btn.classList.remove('disabled');
+  // Error de cobertura de propina (condición 2)
+  const showTipErr = !tipOk && tips.some(t => t.amount > 0);
+  if (showTipErr) {
+    err.textContent = 'El método de propina debe estar cubierto por un método de cobro del mismo tipo';
+    err.classList.add('show');
   } else {
+    err.textContent = '';
+    err.classList.remove('show');
+  }
+
+  // Cambio / Falta (condición 1)
+  if (!sumOk) {
     lbl.textContent = 'Falta';
     val.textContent = fmt(tot - ps);
     val.className   = 'ft-val missing';
+  } else {
+    lbl.textContent = 'Cambio';
+    val.textContent = fmt(ps - tot);
+    val.className   = 'ft-val';
+  }
+
+  // Botón: habilitado solo cuando ambas condiciones se cumplen
+  if (sumOk && tipOk) {
+    btn.classList.remove('disabled');
+  } else {
     btn.classList.add('disabled');
   }
 }
