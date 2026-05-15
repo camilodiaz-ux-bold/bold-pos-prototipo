@@ -440,6 +440,44 @@
       font-weight: 500; line-height: 20px; color: #1e1e1e;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
+
+    /* ─── Payment Method Bottom Sheet — Figma 26920:50545 ─── */
+    /* Tokens: Background/0=#f7f8fb · Blue/100=#121e6c · App/Subtitle/Bold=700 16px lh24 · App/Body/medium=500 14px lh20 */
+    #pay-method-overlay { display: none; position: absolute; inset: 0; z-index: 400; background: rgba(0,0,0,.5); align-items: flex-end; }
+    #pay-method-overlay.show { display: flex; }
+    #pay-method-sheet {
+      width: 100%; background: #ffffff; border-radius: 32px 32px 0 0;
+      max-height: 90%; display: flex; flex-direction: column;
+      box-shadow: 0px -4px 8px rgba(0,0,0,.12);
+      transform: translateY(100%); transition: transform 250ms ease;
+    }
+    #pay-method-overlay.show #pay-method-sheet { transform: translateY(0); }
+    .pay-sheet-handle { width: 48px; height: 4px; background: #DADADA; border-radius: 4px; margin: 12px auto 0; flex-shrink: 0; }
+    .pay-sheet-header { display: flex; align-items: center; height: 56px; padding: 0 16px; flex-shrink: 0; }
+    .pay-sheet-nav-btn {
+      width: 24px; height: 24px; flex-shrink: 0; border: none; background: transparent;
+      cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent; transition: opacity .15s;
+    }
+    .pay-sheet-nav-btn:active { opacity: 0.6; }
+    .pay-sheet-title { flex: 1; text-align: center; font-family: var(--font); font-weight: 700; font-size: 16px; color: #121e6c; line-height: 24px; }
+    .pay-sheet-body { overflow-y: auto; padding: 16px; flex: 1; scrollbar-width: none; }
+    .pay-sheet-body::-webkit-scrollbar { display: none; }
+    .pay-method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .pay-method-card {
+      background: #f7f8fb; border-radius: 16px; height: 108px;
+      padding: 12px 16px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+      border: none; cursor: pointer; width: 100%;
+      -webkit-tap-highlight-color: transparent; transition: opacity .15s;
+    }
+    .pay-method-card:active { opacity: 0.7; }
+    .pay-method-icon {
+      width: 32px; height: 32px; border-radius: 100px; overflow: hidden; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pay-method-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .pay-method-label { font-family: var(--font); font-size: 14px; font-weight: 500; color: #1e1e1e; line-height: 20px; text-align: center; width: 100%; }
   </style>
 </head>
 <body>
@@ -722,6 +760,131 @@
           <span id="btn-cancelar-text">Sí, cancelar orden</span>
         </button>
         <button id="btn-confirm-keep" onclick="closeCancelConfirm()">Mantener orden</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── Payment Method Bottom Sheet — Figma 26920:50545 ─── -->
+  <div id="pay-method-overlay" onclick="handlePayOverlayClick(event)">
+    <div id="pay-method-sheet">
+      <!-- Handle -->
+      <div class="pay-sheet-handle"></div>
+      <!-- Header: chevron-left · title · X -->
+      <div class="pay-sheet-header">
+        <button class="pay-sheet-nav-btn" onclick="closePayMethodSheet()" aria-label="Cerrar">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <span class="pay-sheet-title">Agregar método de cobro</span>
+        <button class="pay-sheet-nav-btn" onclick="closePayMethodSheet()" aria-label="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Grid body -->
+      <div class="pay-sheet-body">
+        <div class="pay-method-grid">
+
+          <!-- 1. Bold -->
+          <button class="pay-method-card" onclick="selectPayMethod('bold')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/13a861f8-be57-434d-91d9-a17d7c2f72af" alt="Bold">
+            </div>
+            <span class="pay-method-label">Bold</span>
+          </button>
+
+          <!-- 2. Efectivo -->
+          <button class="pay-method-card" onclick="selectPayMethod('efectivo')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/6f562da4-c32f-4538-85b0-69db817f5e18" alt="Efectivo">
+            </div>
+            <span class="pay-method-label">Efectivo</span>
+          </button>
+
+          <!-- 3. Nequi -->
+          <button class="pay-method-card" onclick="selectPayMethod('nequi')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/14148419-f7ac-4760-8669-e016c808c5b0" alt="Nequi">
+            </div>
+            <span class="pay-method-label">Nequi</span>
+          </button>
+
+          <!-- 4. Daviplata -->
+          <button class="pay-method-card" onclick="selectPayMethod('daviplata')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/2189929e-8f34-4b06-bac0-295edd188051" alt="Daviplata">
+            </div>
+            <span class="pay-method-label">Daviplata</span>
+          </button>
+
+          <!-- 5. Credibanco -->
+          <button class="pay-method-card" onclick="selectPayMethod('credibanco')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/3daa974d-ce06-4bb4-bffa-a98bcf3bee8b" alt="Credibanco">
+            </div>
+            <span class="pay-method-label">Credibanco</span>
+          </button>
+
+          <!-- 6. Redeban -->
+          <button class="pay-method-card" onclick="selectPayMethod('redeban')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/d43389f5-3bd8-471d-83b6-f179df323a3a" alt="Redeban">
+            </div>
+            <span class="pay-method-label">Redeban</span>
+          </button>
+
+          <!-- 7. Addi -->
+          <button class="pay-method-card" onclick="selectPayMethod('addi')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/53d0faff-d817-4a0b-9b25-a07e7c632c7a" alt="Addi">
+            </div>
+            <span class="pay-method-label">Addi</span>
+          </button>
+
+          <!-- 8. Sistecredito -->
+          <button class="pay-method-card" onclick="selectPayMethod('sistecredito')">
+            <div class="pay-method-icon" style="background:#6ac648;">
+              <img src="https://www.figma.com/api/mcp/asset/0a6925c5-6fdd-4761-a337-814043111437" alt="Sistecredito" style="width:57%;height:57%;">
+            </div>
+            <span class="pay-method-label">Sistecredito</span>
+          </button>
+
+          <!-- 9. Otro -->
+          <button class="pay-method-card" onclick="selectPayMethod('otro')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/67d6b6ab-0608-4f58-a04e-f7db5fc04c03" alt="Otro">
+            </div>
+            <span class="pay-method-label">Otro</span>
+          </button>
+
+          <!-- 10. Transferencia bancaria -->
+          <button class="pay-method-card" onclick="selectPayMethod('transferencia')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/ca31695d-d904-49ea-8167-8a13060a5b99" alt="Transferencia bancaria">
+            </div>
+            <span class="pay-method-label">Transferencia bancaria</span>
+          </button>
+
+          <!-- 11. Intercambio -->
+          <button class="pay-method-card" onclick="selectPayMethod('intercambio')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/f6551e2c-10df-4ca8-816b-dbcdf107a572" alt="Intercambio">
+            </div>
+            <span class="pay-method-label">Intercambio</span>
+          </button>
+
+          <!-- 12. Pago contra entrega -->
+          <button class="pay-method-card" onclick="selectPayMethod('pago_contra_entrega')">
+            <div class="pay-method-icon">
+              <img src="https://www.figma.com/api/mcp/asset/f003d697-472a-4b2b-8b7d-47d3fe94afc7" alt="Pago contra entrega">
+            </div>
+            <span class="pay-method-label">Pago contra entrega</span>
+          </button>
+
+        </div>
       </div>
     </div>
   </div>
@@ -1119,12 +1282,21 @@ function handlePrimary() {
     case ESTADOS.COMANDA_CON_AJUSTES:           if (COMANDA_ENABLED) handleGuardarCambios(); break;
     case ESTADOS.CAMBIOS_GUARDADOS:             if (COMANDA_ENABLED) handleReenviarComanda(); break;
     case ESTADOS.CUENTA_SOLICITADA:
-      location.href = `checkout.html?mesa=${mesaId}&zona=${zona}&estado=bill_requested`;
+      openPayMethodSheet();
       break;
   }
 }
 
 function handleSecondary() { if (secondaryFn) secondaryFn(); }
+
+/* ══ Pay Method Sheet ══ */
+function openPayMethodSheet()  { el('pay-method-overlay').classList.add('show'); }
+function closePayMethodSheet() { el('pay-method-overlay').classList.remove('show'); }
+function handlePayOverlayClick(e) { if (e.target === el('pay-method-overlay')) closePayMethodSheet(); }
+function selectPayMethod(method) {
+  closePayMethodSheet();
+  location.href = `checkout.html?mesa=${mesaId}&zona=${zona}&estado=bill_requested&method=${encodeURIComponent(method)}`;
+}
 
 function handleEnviarComanda() {
   const pri = el('btn-primary');
