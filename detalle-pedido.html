@@ -402,29 +402,44 @@
     #btn-confirm-keep { width: 100%; height: 44px; border-radius: var(--radius-pill); border: 1.5px solid rgba(18,30,108,.15); background: transparent; color: var(--blue-100); font-family: var(--font); font-size: 15px; font-weight: 500; cursor: pointer; transition: background .15s; }
     #btn-confirm-keep:active { background: var(--blue-10); }
 
-    /* ─── Checkout fields — CUENTA_SOLICITADA ─── */
+    /* ─── Checkout fields MERLin — CUENTA_SOLICITADA ─── */
+    /* Tokens: font/size/xs=14px · font/height/xs=20px · Black/0=#fff · Blue/100=#121e6c · Black/100=#1e1e1e */
     #dp-checkout-prelude { display: none; flex-direction: column; padding: 0 16px; margin-top: 12px; gap: 8px; flex-shrink: 0; }
     .checkout-fields-row { display: flex; gap: 8px; }
+    /* Wrapper: label externo + field — gap 4px (MERLin .atom/text_input) */
+    .checkout-field-wrapper { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    /* Label externo — [APP]/Body/Semibold: 600 · 14px · lh 20px · Blue/100 */
+    .checkout-field-label {
+      font-family: var(--font); font-size: 14px; font-weight: 600;
+      line-height: 20px; color: #121e6c; letter-spacing: 0;
+    }
+    /* Field pill — .atom/text_input_fields: 40px · rounded-12 · White · pad 8/12 · gap 12 */
     .checkout-field-pill {
-      flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
-      height: 48px; background: var(--black-0); border-radius: 12px;
-      padding: 0 12px; box-shadow: var(--shadow-blue-8);
+      width: 100%; height: 40px; display: flex; align-items: center; gap: 12px;
+      background: #ffffff; border-radius: 12px; padding: 8px 12px;
       border: none; cursor: pointer; text-align: left;
       -webkit-tap-highlight-color: transparent; transition: opacity .15s;
     }
     .checkout-field-pill:active { opacity: 0.75; }
-    .checkout-field-inner { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-    .checkout-field-label { font-size: 10px; font-weight: 600; color: var(--black-40); line-height: 14px; text-transform: uppercase; letter-spacing: .4px; }
-    .checkout-field-value { font-size: 13px; font-weight: 500; color: var(--blue-100); line-height: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* Value — [APP]/Body/Medium: 500 · 14px · lh 20px · Black/100 */
+    .checkout-field-value {
+      flex: 1; min-width: 0; font-family: var(--font); font-size: 14px;
+      font-weight: 500; line-height: 20px; color: #1e1e1e;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    /* Resolution pill — mismo campo, sin label externo */
     .checkout-resolution-pill {
-      display: flex; align-items: center; gap: 8px; height: 40px;
-      background: var(--black-0); border-radius: 12px; padding: 0 12px;
-      box-shadow: var(--shadow-blue-8); border: none; cursor: pointer;
-      width: 100%; text-align: left; -webkit-tap-highlight-color: transparent;
-      transition: opacity .15s;
+      width: 100%; height: 40px; display: flex; align-items: center; gap: 12px;
+      background: #ffffff; border-radius: 12px; padding: 8px 12px;
+      border: none; cursor: pointer; text-align: left;
+      -webkit-tap-highlight-color: transparent; transition: opacity .15s;
     }
     .checkout-resolution-pill:active { opacity: 0.75; }
-    .checkout-resolution-text { flex: 1; font-size: 12px; font-weight: 500; color: var(--blue-100); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .checkout-resolution-text {
+      flex: 1; min-width: 0; font-family: var(--font); font-size: 14px;
+      font-weight: 500; line-height: 20px; color: #1e1e1e;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -496,32 +511,35 @@
   <!-- Cliente + Vendedor + Resolución — solo visible en CUENTA_SOLICITADA -->
   <div id="dp-checkout-prelude">
     <div class="checkout-fields-row">
-      <button class="checkout-field-pill" onclick="showToast('Próximamente: cambiar cliente')">
-        <div class="checkout-field-inner">
-          <span class="checkout-field-label">Cliente</span>
+      <!-- Cliente: label externo + field pill -->
+      <div class="checkout-field-wrapper">
+        <span class="checkout-field-label">Cliente</span>
+        <button class="checkout-field-pill" onclick="showToast('Próximamente: cambiar cliente')">
           <span class="checkout-field-value">Consumidor Final</span>
-        </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <button class="checkout-field-pill" onclick="showToast('Próximamente: cambiar vendedor')">
-        <div class="checkout-field-inner">
-          <span class="checkout-field-label">Vendedor</span>
-          <span class="checkout-field-value">Restaurante Andrés</span>
-        </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Vendedor: label externo + field pill -->
+      <div class="checkout-field-wrapper">
+        <span class="checkout-field-label">Vendedor</span>
+        <button class="checkout-field-pill" onclick="showToast('Próximamente: cambiar vendedor')">
+          <span class="checkout-field-value">Carlos Mendez</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
     </div>
+    <!-- Resolución: sin label externo, ancho completo -->
     <button class="checkout-resolution-pill" onclick="showToast('Próximamente: cambiar resolución')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#121e6c" stroke-width="1.8" stroke-linejoin="round"/>
         <polyline points="14 2 14 8 20 8" stroke="#121e6c" stroke-width="1.8" stroke-linejoin="round"/>
       </svg>
-      <span class="checkout-resolution-text">Resolution Test - Resolution 1234567890</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <span class="checkout-resolution-text">Resolución 1234567890</span>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
