@@ -185,7 +185,7 @@
     /* ─── Status alert ─── */
     #status-alert {
       display: none; margin: 12px 16px 0;
-      height: 44px; border-radius: 16px; padding: 0 12px;
+      border-radius: 16px; padding: 12px;
       flex-shrink: 0; align-items: center; gap: 12px;
       font-family: var(--font); font-size: 12px; font-weight: 400;
       color: var(--black-100); line-height: 16px;
@@ -1081,9 +1081,7 @@ function renderProductList(readOnly) {
               </button>
             </div>
             <button class="btn-trash" onclick="deleteItem('${item.lineId}')">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#969696" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.9069 4.77615C19.1826 4.791 19.3941 5.02656 19.3793 5.30231L18.5293 21.0914C18.4751 22.1301 17.6126 22.9354 16.58 22.9354H7.36002C6.32263 22.9354 5.46443 22.1157 5.41069 21.0814L4.62064 5.30043C4.60684 5.02463 4.81922 4.78986 5.09502 4.77606C5.37082 4.76225 5.60559 4.97463 5.61939 5.25043L6.40935 21.0295C6.43584 21.5349 6.85756 21.9354 7.36002 21.9354H16.58C17.0873 21.9354 17.5047 21.5405 17.5307 21.0395L18.3807 5.24855C18.3956 4.97281 18.6312 4.76131 18.9069 4.77615Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M2.27002 5.27543C2.27002 4.99929 2.49388 4.77543 2.77002 4.77543H21.23C21.5062 4.77543 21.73 4.99929 21.73 5.27543C21.73 5.55157 21.5062 5.77543 21.23 5.77543H2.77002C2.49388 5.77543 2.27002 5.55157 2.27002 5.27543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M7.84002 3.38543C7.84002 2.0975 8.88567 1.06543 10.16 1.06543H13.96C15.2479 1.06543 16.28 2.11108 16.28 3.38543V5.27543C16.28 5.55157 16.0562 5.77543 15.78 5.77543C15.5039 5.77543 15.28 5.55157 15.28 5.27543V3.38543C15.28 2.65978 14.6921 2.06543 13.96 2.06543H10.16C9.43437 2.06543 8.84002 2.65336 8.84002 3.38543V5.27543C8.84002 5.55157 8.61616 5.77543 8.34002 5.77543C8.06388 5.77543 7.84002 5.55157 7.84002 5.27543V3.38543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.78688 7.5756C9.06293 7.56834 9.29259 7.78624 9.29985 8.06229L9.59985 19.4723C9.6071 19.7483 9.38921 19.978 9.11316 19.9853C8.83711 19.9925 8.60745 19.7746 8.60019 19.4986L8.30019 8.08857C8.29293 7.81252 8.51083 7.58286 8.78688 7.5756Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 7.57543C12.2762 7.57543 12.5 7.79929 12.5 8.07543V19.4854C12.5 19.7616 12.2762 19.9854 12 19.9854C11.7239 19.9854 11.5 19.7616 11.5 19.4854V8.07543C11.5 7.79929 11.7239 7.57543 12 7.57543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15.2036 7.57561C15.4796 7.58311 15.6973 7.81297 15.6898 8.08901L15.3798 19.499C15.3723 19.775 15.1425 19.9927 14.8664 19.9852C14.5904 19.9777 14.3727 19.7479 14.3802 19.4719L14.6902 8.06185C14.6977 7.78581 14.9276 7.56811 15.2036 7.57561Z" fill="#121E6C"/></svg>
             </button>
           </div>
         </div>
@@ -1126,7 +1124,7 @@ function showAlert(msg, type) {
   const a = el('status-alert');
   const icons = {
     sent:     `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#6CDCAB"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    modified: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#ffc217"/><line x1="12" y1="7" x2="12" y2="14" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="white"/></svg>`,
+    modified: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="6" fill="#ffc217"/><rect x="11" y="7" width="2" height="7" rx="1" fill="white"/><circle cx="12" cy="17" r="1.2" fill="white"/></svg>`,
   };
   a.className = 'alert-' + type;
   a.innerHTML = (icons[type] || '') + `<span>${msg}</span>`;
