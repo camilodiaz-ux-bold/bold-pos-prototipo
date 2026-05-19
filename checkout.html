@@ -144,9 +144,9 @@
     .toggle-pill.on { background:var(--coral); }
     .toggle-pill::after { content:''; position:absolute; width:22px; height:22px; border-radius:50%; background:var(--white); top:3px; left:3px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
     .toggle-pill.on::after { left:27px; }
-    .ml-pill.ml-readonly { pointer-events:none; cursor:default; }
-    .ml-pill.ml-readonly .ml-val { color:var(--g60); }
-    .ml-native[readonly] { pointer-events:none; color:var(--g60); }
+    .ml-pill.ml-readonly { background:var(--blue10); pointer-events:none; cursor:not-allowed; }
+    .ml-pill.ml-readonly .ml-val { color:var(--g40); }
+    .ml-native[readonly] { pointer-events:none; color:var(--g40); }
 
     /* ── Bottom sheet ── */
     #bsco-ov { display:none; position:absolute; inset:0; z-index:400; background:rgba(0,0,0,.5); align-items:flex-end; }
@@ -482,7 +482,7 @@ function buildRows(list, listName, opts) {
       ? `<button class="ml-pill ml-readonly"><span class="ml-val">${esc(mName(item.method))}</span></button>`
       : `<button class="ml-pill" onclick="openBsco('${listName}','${item.id}')"><span class="ml-val">${esc(mName(item.method))}</span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
     const amtPill = rdAmount
-      ? `<div class="ml-pill editable"><input class="ml-native" type="text" inputmode="numeric" value="${esc(fmt(item.amount))}" readonly /></div>`
+      ? `<div class="ml-pill editable ml-readonly"><input class="ml-native" type="text" inputmode="numeric" value="${esc(fmt(item.amount))}" readonly /></div>`
       : `<div class="ml-pill editable" onclick="this.querySelector('input').focus()"><input class="ml-native" type="text" inputmode="numeric" value="${esc(fmt(item.amount))}" onfocus="this.value=this.value.replace(/[^0-9]/g,'');this.select();this.scrollIntoView({behavior:'smooth',block:'nearest'})" oninput="onAmtLive('${listName}','${item.id}',this)" onblur="onAmt('${listName}','${item.id}',this)" /></div>`;
     return `<div class="pay-row"><div class="pay-row-inner"><div class="ml-field">${idx === 0 ? '<span class="ml-lbl">Método</span>' : ''}${methodPill}</div><div class="ml-field">${idx === 0 ? `<span class="ml-lbl">${esc(amtLabel)}</span>` : ''}${amtPill}</div></div>${noTrash ? '' : `<button class="btn-trash" onclick="removeRow('${listName}','${item.id}')">${trashSvg}</button>`}</div>`;
   }).join('');
