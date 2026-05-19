@@ -247,7 +247,7 @@
     <!-- Tip coverage warning — Figma 26975:6680 WEB/APP Alert -->
     <div id="tip-warning">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="12" fill="#FFC217"/><path d="M11.1429 14.7147V6.14328C11.1429 5.66989 11.5266 5.28613 12 5.28613C12.4734 5.28613 12.8571 5.66989 12.8571 6.14328V14.7147C12.8571 15.1881 12.4734 15.5718 12 15.5718C11.5266 15.5718 11.1429 15.1881 11.1429 14.7147Z" fill="white"/><path d="M13 17.7147C13 18.267 12.5523 18.7147 12 18.7147C11.4477 18.7147 11 18.267 11 17.7147C11 17.1624 11.4477 16.7147 12 16.7147C12.5523 16.7147 13 17.1624 13 17.7147Z" fill="white"/></svg>
-      <span>Agrega un método de cobro del mismo tipo para cobrar la propina.</span>
+      <span id="tip-warning-txt"></span>
     </div>
 
     <!-- Propina section -->
@@ -503,12 +503,23 @@ function refreshCard() {
   }
 }
 
-/* ── Condición 2: cada propina con monto > 0 debe tener un pago del mismo método
-   con monto >= propina ── */
-function tipCovered() {
-  return tips.every(tip => {
-    if (!tip.amount || tip.amount <= 0) return true;
-    return payments.some(p => p.method === tip.method && (p.amount || 0) >= tip.amount);
+/* CASO 1 — método de propina sin fila de cobro del mismo tipo */
+function tipMethodMissing() {
+  return tips.some(t => {
+    if (!t.amount || t.amount <= 0) return false;
+    return !payments.some(p => p.method === t.method);
+  });
+}
+
+/* CASO 2 — método existe pero suma de cobros < suma de propinas para ese método */
+function tipAmountShort() {
+  const byMethod = {};
+  tips.forEach(t => {
+    if (t.amount > 0) byMethod[t.method] = (byMethod[t.method] || 0) + t.amount;
+  });
+  return Object.entries(byMethod).some(([method, tipTotal]) => {
+    const payTotal = payments.filter(p => p.method === method).reduce((s, p) => s + (p.amount || 0), 0);
+    return payTotal < tipTotal;
   });
 }
 
@@ -519,14 +530,21 @@ function refreshFooter() {
   const lbl   = document.getElementById('ft-lbl');
   const val   = document.getElementById('ft-val');
   const warn  = document.getElementById('tip-warning');
+  const txt   = document.getElementById('tip-warning-txt');
   const sumOk = ps >= tot;
-  const tipOk = tipCovered();
+  const activeTips = tips.some(t => t.amount > 0);
+  let tipOk = true;
 
   btn.textContent = `Cobrar ${fmt(tot)}`;
 
-  // Alerta de cobertura de propina (condición 2) — Figma 26975:6680
-  if (!tipOk && tips.some(t => t.amount > 0)) {
+  if (activeTips && tipMethodMissing()) {
+    txt.textContent = 'Cobra la propina con el mismo método que usaste para el pago.';
     warn.classList.add('show');
+    tipOk = false;
+  } else if (activeTips && tipAmountShort()) {
+    txt.textContent = 'El monto de la propina debe quedar cubierto por los métodos de cobro.';
+    warn.classList.add('show');
+    tipOk = false;
   } else {
     warn.classList.remove('show');
   }
