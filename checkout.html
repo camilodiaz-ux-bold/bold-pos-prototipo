@@ -234,7 +234,7 @@
           <span class="tc-rval" id="tc-tax">$0</span>
         </div>
         <div class="tc-row" id="tc-tip-row" style="display:none">
-          <span class="tc-rlbl">Propina</span>
+          <span class="tc-rlbl" id="tc-tip-lbl">Propina</span>
           <span class="tc-rval" id="tc-tip-val">$0</span>
         </div>
         <div class="tc-row">
@@ -493,6 +493,7 @@ function refreshCard() {
   document.getElementById('tc-total').textContent = fmt(tot);
   document.getElementById('tc-sub').textContent   = fmt(subtotal);
   document.getElementById('tc-tax').textContent   = fmt(tax);
+  document.getElementById('tc-tip-lbl').textContent = tipToggle ? 'Propina (10%)' : 'Propina';
   const tipRow = document.getElementById('tc-tip-row');
   if (ts > 0) {
     tipRow.style.display = '';
