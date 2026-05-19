@@ -582,6 +582,7 @@ function addPayment() {
 function removeRow(listName, id) {
   if (listName === 'tips') {
     tips = tips.filter(x => x.id !== id);
+    if (!tips.length) tipToggle = false;
   } else {
     payments = payments.filter(x => x.id !== id);
     if (payments.length < 2) splitToggle = false;
