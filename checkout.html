@@ -450,7 +450,6 @@ function renderLists() {
     const tipTotal = Math.round(subtotal * 0.10);
     const n = tips.length;
     tips.forEach((t, i) => {
-      t.method = payments.length > 0 ? payments[0].method : initMethod;
       t.amount = i < n - 1 ? Math.floor(tipTotal / n) : tipTotal - Math.floor(tipTotal / n) * (n - 1);
     });
   }
@@ -466,7 +465,7 @@ function renderLists() {
     : '';
 
   document.getElementById('tips-list').innerHTML =
-    tipToggleHtml + buildRows(tips, 'tips', { readonlyMethod: tipToggle, readonlyAmount: tipToggle, hideTrash: tipToggle });
+    tipToggleHtml + buildRows(tips, 'tips', { readonlyAmount: tipToggle });
   document.getElementById('payments-list').innerHTML =
     splitToggleHtml + buildRows(payments, 'payments', { readonlyAmount: splitToggle });
 }
