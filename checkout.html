@@ -105,7 +105,7 @@
 
     /* ── Footer — Figma: backdrop-blur pad 20/16 ── */
     #footer {
-      position:fixed; bottom:0; left:0; right:0; z-index:100;
+      position:absolute; bottom:0; left:0; right:0; z-index:100;
       background:rgba(247,248,251,.2);
       backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
       display:flex; align-items:center; padding:20px 16px; gap:12px;
@@ -135,6 +135,18 @@
     #btn-cobrar.disabled { opacity:.5; cursor:not-allowed; pointer-events:none; }
     .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── APP Setting toggle — Figma 27030:5630 ── */
+    .toggle-card { background:var(--white); border-radius:16px; padding:12px; display:flex; align-items:center; gap:12px; cursor:pointer; -webkit-tap-highlight-color:transparent; user-select:none; }
+    .toggle-card:active { opacity:.85; }
+    .toggle-lbl  { flex:1; font-size:14px; font-weight:400; color:var(--black); line-height:20px; }
+    .toggle-pill { width:52px; height:28px; border-radius:100px; background:#d9d9d9; position:relative; flex-shrink:0; transition:background .2s; }
+    .toggle-pill.on { background:var(--blue); }
+    .toggle-pill::after { content:''; position:absolute; width:22px; height:22px; border-radius:50%; background:var(--white); top:3px; left:3px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .toggle-pill.on::after { left:27px; }
+    .ml-pill.ml-readonly { pointer-events:none; cursor:default; }
+    .ml-pill.ml-readonly .ml-val { color:var(--g60); }
+    .ml-native[readonly] { pointer-events:none; color:var(--g60); }
 
     /* ── Bottom sheet ── */
     #bsco-ov { display:none; position:absolute; inset:0; z-index:400; background:rgba(0,0,0,.5); align-items:flex-end; }
@@ -242,7 +254,7 @@
     <div class="section">
       <div class="sec-hdr">
         <span class="sec-title">Propina</span>
-        <button class="btn-add" onclick="addTip()">
+        <button class="btn-add" id="btn-add-tip" onclick="addTip()">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M12 5v14M5 12h14" stroke="#ff2947" stroke-width="2" stroke-linecap="round"/>
           </svg>
@@ -402,7 +414,9 @@ const tax      = Math.round(subtotal * 0.19);
 /* ── State ── */
 let tips     = [];
 let payments = [];
-let bscoTgt  = null; // { list: 'tips'|'payments', id }
+let bscoTgt    = null; // { list: 'tips'|'payments', id }
+let tipToggle  = true;
+let splitToggle = false;
 
 const tipSum = () => tips.reduce((s, t) => s + (t.amount || 0), 0);
 const paySum = () => payments.reduce((s, p) => s + (p.amount || 0), 0);
@@ -430,40 +444,48 @@ function render() {
 }
 
 function renderLists() {
-  document.getElementById('tips-list').innerHTML     = buildRows(tips,     'tips');
-  document.getElementById('payments-list').innerHTML = buildRows(payments, 'payments');
+  // Apply tip toggle: lock method to first payment, amount to 10% subtotal
+  if (tipToggle) {
+    if (!tips.length) tips = [{ id: uid(), method: initMethod, amount: 0 }];
+    tips = [tips[0]];
+    tips[0].method = payments.length > 0 ? payments[0].method : initMethod;
+    tips[0].amount = Math.round(subtotal * 0.10);
+  }
+  // Apply split toggle: divide total equally
+  if (splitToggle && payments.length >= 2) {
+    const each = Math.round(total() / payments.length);
+    payments.forEach(p => p.amount = each);
+  }
+
+  const addTipBtn = document.getElementById('btn-add-tip');
+  if (addTipBtn) addTipBtn.style.visibility = tipToggle ? 'hidden' : 'visible';
+
+  const tipToggleHtml = `<div class="toggle-card" onclick="toggleTip()"><span class="toggle-lbl">Propina con el 10%</span><div class="toggle-pill${tipToggle ? ' on' : ''}"></div></div>`;
+  const splitToggleHtml = payments.length >= 2
+    ? `<div class="toggle-card" onclick="toggleSplit()"><span class="toggle-lbl">Dividir cobro en partes iguales</span><div class="toggle-pill${splitToggle ? ' on' : ''}"></div></div>`
+    : '';
+
+  document.getElementById('tips-list').innerHTML =
+    tipToggleHtml + buildRows(tips, 'tips', { readonlyMethod: tipToggle, readonlyAmount: tipToggle, hideTrash: tipToggle });
+  document.getElementById('payments-list').innerHTML =
+    splitToggleHtml + buildRows(payments, 'payments', { readonlyAmount: splitToggle });
 }
 
-function buildRows(list, listName) {
+function buildRows(list, listName, opts) {
+  const rdMethod = opts && opts.readonlyMethod;
+  const rdAmount = opts && opts.readonlyAmount;
+  const noTrash  = opts && opts.hideTrash;
   const amtLabel = listName === 'tips' ? 'Propina' : 'Monto';
-  return list.map((item, idx) => `
-    <div class="pay-row">
-      <div class="pay-row-inner">
-        <div class="ml-field">
-          ${idx === 0 ? '<span class="ml-lbl">Método</span>' : ''}
-          <button class="ml-pill" onclick="openBsco('${listName}','${item.id}')">
-            <span class="ml-val">${esc(mName(item.method))}</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-              <path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-        <div class="ml-field">
-          ${idx === 0 ? `<span class="ml-lbl">${esc(amtLabel)}</span>` : ''}
-          <div class="ml-pill editable" onclick="this.querySelector('input').focus()">
-            <input class="ml-native" type="text" inputmode="numeric"
-              value="${esc(fmt(item.amount))}"
-              onfocus="this.value=this.value.replace(/[^0-9]/g,'');this.select();this.scrollIntoView({behavior:'smooth',block:'nearest'})"
-              oninput="onAmtLive('${listName}','${item.id}',this)"
-              onblur="onAmt('${listName}','${item.id}',this)"
-            />
-          </div>
-        </div>
-      </div>
-      <button class="btn-trash" onclick="removeRow('${listName}','${item.id}')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.9069 4.77615C19.1826 4.791 19.3941 5.02656 19.3793 5.30231L18.5293 21.0914C18.4751 22.1301 17.6126 22.9354 16.58 22.9354H7.36002C6.32263 22.9354 5.46443 22.1157 5.41069 21.0814L4.62064 5.30043C4.60684 5.02463 4.81922 4.78986 5.09502 4.77606C5.37082 4.76225 5.60559 4.97463 5.61939 5.25043L6.40935 21.0295C6.43584 21.5349 6.85756 21.9354 7.36002 21.9354H16.58C17.0873 21.9354 17.5047 21.5405 17.5307 21.0395L18.3807 5.24855C18.3956 4.97281 18.6312 4.76131 18.9069 4.77615Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M2.27002 5.27543C2.27002 4.99929 2.49388 4.77543 2.77002 4.77543H21.23C21.5062 4.77543 21.73 4.99929 21.73 5.27543C21.73 5.55157 21.5062 5.77543 21.23 5.77543H2.77002C2.49388 5.77543 2.27002 5.55157 2.27002 5.27543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M7.84002 3.38543C7.84002 2.0975 8.88567 1.06543 10.16 1.06543H13.96C15.2479 1.06543 16.28 2.11108 16.28 3.38543V5.27543C16.28 5.55157 16.0562 5.77543 15.78 5.77543C15.5039 5.77543 15.28 5.55157 15.28 5.27543V3.38543C15.28 2.65978 14.6921 2.06543 13.96 2.06543H10.16C9.43437 2.06543 8.84002 2.65336 8.84002 3.38543V5.27543C8.84002 5.55157 8.61616 5.77543 8.34002 5.77543C8.06388 5.77543 7.84002 5.55157 7.84002 5.27543V3.38543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.78688 7.5756C9.06293 7.56834 9.29259 7.78624 9.29985 8.06229L9.59985 19.4723C9.6071 19.7483 9.38921 19.978 9.11316 19.9853C8.83711 19.9925 8.60745 19.7746 8.60019 19.4986L8.30019 8.08857C8.29293 7.81252 8.51083 7.58286 8.78688 7.5756Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 7.57543C12.2762 7.57543 12.5 7.79929 12.5 8.07543V19.4854C12.5 19.7616 12.2762 19.9854 12 19.9854C11.7239 19.9854 11.5 19.7616 11.5 19.4854V8.07543C11.5 7.79929 11.7239 7.57543 12 7.57543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15.2036 7.57561C15.4796 7.58311 15.6973 7.81297 15.6898 8.08901L15.3798 19.499C15.3723 19.775 15.1425 19.9927 14.8664 19.9852C14.5904 19.9777 14.3727 19.7479 14.3802 19.4719L14.6902 8.06185C14.6977 7.78581 14.9276 7.56811 15.2036 7.57561Z" fill="#121E6C"/></svg>
-      </button>
-    </div>`).join('');
+  const trashSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.9069 4.77615C19.1826 4.791 19.3941 5.02656 19.3793 5.30231L18.5293 21.0914C18.4751 22.1301 17.6126 22.9354 16.58 22.9354H7.36002C6.32263 22.9354 5.46443 22.1157 5.41069 21.0814L4.62064 5.30043C4.60684 5.02463 4.81922 4.78986 5.09502 4.77606C5.37082 4.76225 5.60559 4.97463 5.61939 5.25043L6.40935 21.0295C6.43584 21.5349 6.85756 21.9354 7.36002 21.9354H16.58C17.0873 21.9354 17.5047 21.5405 17.5307 21.0395L18.3807 5.24855C18.3956 4.97281 18.6312 4.76131 18.9069 4.77615Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M2.27002 5.27543C2.27002 4.99929 2.49388 4.77543 2.77002 4.77543H21.23C21.5062 4.77543 21.73 4.99929 21.73 5.27543C21.73 5.55157 21.5062 5.77543 21.23 5.77543H2.77002C2.49388 5.77543 2.27002 5.55157 2.27002 5.27543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M7.84002 3.38543C7.84002 2.0975 8.88567 1.06543 10.16 1.06543H13.96C15.2479 1.06543 16.28 2.11108 16.28 3.38543V5.27543C16.28 5.55157 16.0562 5.77543 15.78 5.77543C15.5039 5.77543 15.28 5.55157 15.28 5.27543V3.38543C15.28 2.65978 14.6921 2.06543 13.96 2.06543H10.16C9.43437 2.06543 8.84002 2.65336 8.84002 3.38543V5.27543C8.84002 5.55157 8.61616 5.77543 8.34002 5.77543C8.06388 5.77543 7.84002 5.55157 7.84002 5.27543V3.38543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.78688 7.5756C9.06293 7.56834 9.29259 7.78624 9.29985 8.06229L9.59985 19.4723C9.6071 19.7483 9.38921 19.978 9.11316 19.9853C8.83711 19.9925 8.60745 19.7746 8.60019 19.4986L8.30019 8.08857C8.29293 7.81252 8.51083 7.58286 8.78688 7.5756Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 7.57543C12.2762 7.57543 12.5 7.79929 12.5 8.07543V19.4854C12.5 19.7616 12.2762 19.9854 12 19.9854C11.7239 19.9854 11.5 19.7616 11.5 19.4854V8.07543C11.5 7.79929 11.7239 7.57543 12 7.57543Z" fill="#121E6C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15.2036 7.57561C15.4796 7.58311 15.6973 7.81297 15.6898 8.08901L15.3798 19.499C15.3723 19.775 15.1425 19.9927 14.8664 19.9852C14.5904 19.9777 14.3727 19.7479 14.3802 19.4719L14.6902 8.06185C14.6977 7.78581 14.9276 7.56811 15.2036 7.57561Z" fill="#121E6C"/></svg>`;
+  return list.map((item, idx) => {
+    const methodPill = rdMethod
+      ? `<button class="ml-pill ml-readonly"><span class="ml-val">${esc(mName(item.method))}</span></button>`
+      : `<button class="ml-pill" onclick="openBsco('${listName}','${item.id}')"><span class="ml-val">${esc(mName(item.method))}</span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M6 9l6 6 6-6" stroke="#121e6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+    const amtPill = rdAmount
+      ? `<div class="ml-pill editable"><input class="ml-native" type="text" inputmode="numeric" value="${esc(fmt(item.amount))}" readonly /></div>`
+      : `<div class="ml-pill editable" onclick="this.querySelector('input').focus()"><input class="ml-native" type="text" inputmode="numeric" value="${esc(fmt(item.amount))}" onfocus="this.value=this.value.replace(/[^0-9]/g,'');this.select();this.scrollIntoView({behavior:'smooth',block:'nearest'})" oninput="onAmtLive('${listName}','${item.id}',this)" onblur="onAmt('${listName}','${item.id}',this)" /></div>`;
+    return `<div class="pay-row"><div class="pay-row-inner"><div class="ml-field">${idx === 0 ? '<span class="ml-lbl">Método</span>' : ''}${methodPill}</div><div class="ml-field">${idx === 0 ? `<span class="ml-lbl">${esc(amtLabel)}</span>` : ''}${amtPill}</div></div>${noTrash ? '' : `<button class="btn-trash" onclick="removeRow('${listName}','${item.id}')">${trashSvg}</button>`}</div>`;
+  }).join('');
 }
 
 function refreshCard() {
@@ -551,6 +573,7 @@ function onAmt(listName, id, input) {
 
 /* ── Add / remove ── */
 function addTip() {
+  if (tipToggle) return;
   tips.push({ id: uid(), method: initMethod, amount: 0 });
   render();
 }
@@ -559,8 +582,23 @@ function addPayment() {
   render();
 }
 function removeRow(listName, id) {
-  if (listName === 'tips') tips     = tips.filter(x => x.id !== id);
-  else                      payments = payments.filter(x => x.id !== id);
+  if (listName === 'tips') {
+    tips = tips.filter(x => x.id !== id);
+  } else {
+    payments = payments.filter(x => x.id !== id);
+    if (payments.length < 2) splitToggle = false;
+  }
+  render();
+}
+
+/* ── Toggles ── */
+function toggleTip() {
+  tipToggle = !tipToggle;
+  render();
+}
+function toggleSplit() {
+  if (payments.length < 2) return;
+  splitToggle = !splitToggle;
   render();
 }
 
