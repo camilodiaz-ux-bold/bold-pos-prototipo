@@ -141,7 +141,7 @@
     .toggle-card:active { opacity:.85; }
     .toggle-lbl  { flex:1; font-size:14px; font-weight:400; color:var(--black); line-height:20px; }
     .toggle-pill { width:52px; height:28px; border-radius:100px; background:#d9d9d9; position:relative; flex-shrink:0; transition:background .2s; }
-    .toggle-pill.on { background:var(--blue); }
+    .toggle-pill.on { background:var(--coral); }
     .toggle-pill::after { content:''; position:absolute; width:22px; height:22px; border-radius:50%; background:var(--white); top:3px; left:3px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
     .toggle-pill.on::after { left:27px; }
     .ml-pill.ml-readonly { pointer-events:none; cursor:default; }
@@ -444,21 +444,21 @@ function render() {
 }
 
 function renderLists() {
-  // Apply tip toggle: lock method to first payment, amount to 10% subtotal
+  // Apply tip toggle: distribute 10% of subtotal equally across all tip rows
   if (tipToggle) {
     if (!tips.length) tips = [{ id: uid(), method: initMethod, amount: 0 }];
-    tips = [tips[0]];
-    tips[0].method = payments.length > 0 ? payments[0].method : initMethod;
-    tips[0].amount = Math.round(subtotal * 0.10);
+    const tipTotal = Math.round(subtotal * 0.10);
+    const n = tips.length;
+    tips.forEach((t, i) => {
+      t.method = payments.length > 0 ? payments[0].method : initMethod;
+      t.amount = i < n - 1 ? Math.floor(tipTotal / n) : tipTotal - Math.floor(tipTotal / n) * (n - 1);
+    });
   }
   // Apply split toggle: divide total equally
   if (splitToggle && payments.length >= 2) {
     const each = Math.round(total() / payments.length);
     payments.forEach(p => p.amount = each);
   }
-
-  const addTipBtn = document.getElementById('btn-add-tip');
-  if (addTipBtn) addTipBtn.style.visibility = tipToggle ? 'hidden' : 'visible';
 
   const tipToggleHtml = `<div class="toggle-card" onclick="toggleTip()"><span class="toggle-lbl">Propina con el 10%</span><div class="toggle-pill${tipToggle ? ' on' : ''}"></div></div>`;
   const splitToggleHtml = payments.length >= 2
@@ -573,7 +573,6 @@ function onAmt(listName, id, input) {
 
 /* ── Add / remove ── */
 function addTip() {
-  if (tipToggle) return;
   tips.push({ id: uid(), method: initMethod, amount: 0 });
   render();
 }
@@ -599,6 +598,7 @@ function toggleTip() {
 function toggleSplit() {
   if (payments.length < 2) return;
   splitToggle = !splitToggle;
+  if (!splitToggle) payments.forEach(p => p.amount = total());
   render();
 }
 
