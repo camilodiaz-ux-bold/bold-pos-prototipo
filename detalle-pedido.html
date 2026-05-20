@@ -559,9 +559,9 @@
           </svg>
         </button>
       </div>
-      <!-- Vendedor: label externo + field pill -->
+      <!-- Mesero: label externo + field pill -->
       <div class="checkout-field-wrapper">
-        <span class="checkout-field-label">Vendedor</span>
+        <span class="checkout-field-label">Mesero</span>
         <button class="checkout-field-pill" onclick="showToast('Próximamente: cambiar vendedor')">
           <span class="checkout-field-value">Carlos Mendez</span>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1293,7 +1293,7 @@ function closePayMethodSheet() { el('pay-method-overlay').classList.remove('show
 function handlePayOverlayClick(e) { if (e.target === el('pay-method-overlay')) closePayMethodSheet(); }
 function selectPayMethod(method) {
   closePayMethodSheet();
-  location.href = `checkout.html?mesa=${mesaId}&zona=${zona}&estado=bill_requested&method=${encodeURIComponent(method)}`;
+  location.href = `checkout.html?mesa=${mesaId}&zona=${zona}&estado=bill_requested&method=${encodeURIComponent(method)}&mesero=Carlos%20Mendez`;
 }
 
 function handleEnviarComanda() {

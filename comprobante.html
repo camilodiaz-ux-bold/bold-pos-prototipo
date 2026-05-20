@@ -163,11 +163,15 @@
         <!-- Info section -->
         <div class="r-info">
 
-          <!-- Cliente -->
+          <!-- Cliente + Mesero -->
           <div class="info-group">
             <div class="info-row">
               <span class="info-lbl">Cliente</span>
               <span class="info-val">Consumidor Final</span>
+            </div>
+            <div class="info-row">
+              <span class="info-lbl">Mesero</span>
+              <span class="info-val" id="r-mesero">—</span>
             </div>
           </div>
 
@@ -267,6 +271,7 @@ const subVal    = parseFloat(qp.get('subtotal')) || 0;
 const taxVal    = parseFloat(qp.get('tax'))      || 0;
 const tipVal    = parseFloat(qp.get('tip'))      || 0;
 const methods   = (qp.get('method') || '').split(',').filter(Boolean);
+const mesero    = qp.get('mesero')   || 'Carlos Mendez';
 
 /* ── Method names ── */
 const MNAMES = {
@@ -296,6 +301,7 @@ function fmtDt(d) {
   document.getElementById('r-sub').textContent    = fmt(subVal);
   document.getElementById('r-tax').textContent    = fmt(taxVal);
   document.getElementById('r-no').textContent     = String(Math.floor(Math.random() * 9000) + 1000);
+  document.getElementById('r-mesero').textContent = mesero;
 
   /* Propina row */
   if (tipVal > 0) {

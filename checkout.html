@@ -381,6 +381,7 @@ const qp         = new URLSearchParams(location.search);
 const mesaId     = qp.get('mesa')   || 'S05';
 const zona       = qp.get('zona')   || 'salon';
 const initMethod = qp.get('method') || 'efectivo';
+const mesero     = qp.get('mesero') || 'Carlos Mendez';
 
 /* ── Method display names ── */
 const MNAMES = {
@@ -656,7 +657,8 @@ function handleCobrar() {
       subtotal: Math.round(subtotal),
       tax:      Math.round(tax),
       tip:      Math.round(tipSum()),
-      method:   payments.map(pm => pm.method).join(',')
+      method:   payments.map(pm => pm.method).join(','),
+      mesero
     });
     location.href = 'comprobante.html?' + p.toString();
   }, 1200);
