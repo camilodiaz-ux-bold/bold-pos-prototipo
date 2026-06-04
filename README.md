@@ -31,4 +31,4 @@ Adaptación de Bold POS Retail hacia una experiencia especializada para restaura
 
 ## Diseño
 - Figma: https://www.figma.com/design/D3Xwy9lUguiy1dBmtHn7CT/POS-APP-Restaurantes-V1
-- Design System: Merlin (Bold)
+- Design System: Merlin (Bold) — ver MERLIN-SYSTEM.md
