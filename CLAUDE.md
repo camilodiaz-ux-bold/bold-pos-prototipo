@@ -15,7 +15,7 @@ Prototipo mobile del sistema Bold POS Restaurantes V1. Está dirigido al mesero 
 - detalle-mesa.html → Detalle de mesa ocupada con pedido
 - checkout.html → Flujo de pago
 - data-manager.js → Gestión de estado con localStorage
-- MERLIN-TOKENS.md → Tokens del design system
+- Referencia de tokens en MERLIN-SYSTEM.md
 
 ## Design System — Merlin
 - Fuente siempre Montserrat
