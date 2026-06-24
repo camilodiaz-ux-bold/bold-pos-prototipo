@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Bold CF — Límite de gasto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  :root {
+    /* ── Merlin tokens (MERLIN-SYSTEM.md) ── */
+    --blue-hover:   #091144;
+    --blue-100:     #121e6c;
+    --blue-10:      #f1f2f6;
+    --coral-hover:  #e4102e;
+    --coral-100:    #ff2947;
+    --black-100:    #1e1e1e;
+    --black-60:     #606060;
+    --black-40:     #969696;
+    --black-10:     #f3f3f3;
+    --black-0:      #ffffff;
+    --background-page: #f7f8fb;
+    --error-150:    #910022;
+    --error-10:     #fbf3f5;
+    --warning-150:  #a16b00;
+    --warning-100:  #ffc217;
+    --warning-10:   #fff3d1;
+    --success-200:  #0b3b26;
+    --success-150:  #1b8959;
+    --success-10:   #f4fdf9;
+    --radius-sm:    12px;
+    --radius-md:    16px;
+    --radius-full:  100px;
+    --shadow-4:     0px 4px 16px 0px rgba(18, 30, 108, 0.08);
+    --font:         'Montserrat', sans-serif;
+  }
+
+  * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: var(--font); background: #d0d0d0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; }
+
+  #app { width: 390px; height: 100vh; max-height: 844px; background: var(--background-page); display: flex; flex-direction: column; overflow: hidden; position: relative; box-shadow: 0 0 24px rgba(0,0,0,.25); }
+
+  /* ── Status bar — navy, fija arriba ── */
+  #sb { flex-shrink: 0; background: var(--blue-100); display: flex; align-items: center; padding: 10px 20px; color: var(--black-0); }
+  #sb .sb-time { font-size: 14px; font-weight: 600; }
+  #sb .sb-icons { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  #sb .sb-icons i { width: 16px; height: 16px; }
+
+  /* ── Header de pantalla ── */
+  .hdr { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 16px 16px 12px; }
+  .hdr-back { width: 32px; height: 32px; border: none; background: transparent; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--blue-100); }
+  .hdr-back:active { background: var(--blue-10); }
+  .hdr-back i { width: 22px; height: 22px; }
+  /* APP Title: 16px / 700 / 20 */
+  .hdr-title { font-size: 16px; font-weight: 700; color: var(--blue-100); line-height: 20px; }
+
+  /* ── Body scrollable ── */
+  .body { flex: 1; overflow-y: auto; padding: 4px 16px 24px; display: flex; flex-direction: column; gap: 20px; scrollbar-width: none; }
+  .body::-webkit-scrollbar { display: none; }
+
+  .screen { display: none; flex-direction: column; height: 100%; }
+  .screen.active { display: flex; }
+
+  /* ── Texto base ── */
+  .h-header { font-size: 24px; font-weight: 500; color: var(--blue-100); line-height: 32px; }
+  .h-title  { font-size: 20px; font-weight: 400; color: var(--blue-100); line-height: 28px; }
+  .t-subtitle { font-size: 16px; font-weight: 600; color: var(--blue-100); line-height: 20px; }
+  .t-body   { font-size: 14px; font-weight: 400; color: var(--black-100); line-height: 20px; }
+  .t-caption{ font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; }
+
+  /* ── Card de tarjeta en lista ── */
+  .card-list { display: flex; flex-direction: column; gap: 12px; }
+  .card-row { display: flex; align-items: center; gap: 12px; background: var(--black-0); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-4); cursor: pointer; border: 1px solid transparent; }
+  .card-row.highlight { border-color: var(--coral-100); background: linear-gradient(0deg, var(--black-0), var(--black-0)), var(--black-0); }
+  .card-row:active { background: var(--black-10); }
+  .card-row .ic-wrap { width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--blue-10); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card-row .ic-wrap i { width: 20px; height: 20px; color: var(--blue-100); }
+  .card-row .info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .card-row .name { font-size: 14px; font-weight: 600; color: var(--black-100); line-height: 18px; }
+  .card-row .num  { font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; }
+  .card-row .chev { width: 20px; height: 20px; color: var(--black-40); flex-shrink: 0; }
+
+  /* ── Tag / badge ── */
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; line-height: 16px; white-space: nowrap; }
+  .tag-error   { background: var(--error-10); border: 1px solid var(--error-150); color: var(--error-150); }
+  .tag-warning { background: var(--warning-10); border: 1px solid var(--warning-100); color: var(--warning-150); }
+  .tag-success { background: var(--success-10); border: 1px solid var(--success-150); color: var(--success-150); }
+  .tag-neutral { background: var(--blue-10); border: 1px solid var(--blue-10); color: var(--blue-100); }
+
+  /* ── Card visual de la tarjeta (detalle) ── */
+  .card-visual { position: relative; height: 190px; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(135deg, var(--blue-100) 0%, var(--blue-hover) 100%); color: var(--black-0); box-shadow: var(--shadow-4); overflow: hidden; }
+  .card-visual::after { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,0.06); }
+  .card-visual .cv-top { display: flex; align-items: center; justify-content: space-between; z-index: 1; }
+  .card-visual .cv-brand { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; }
+  .card-visual .cv-chip { width: 34px; height: 24px; border-radius: 6px; background: rgba(255,255,255,0.25); }
+  .card-visual .cv-num { font-size: 18px; font-weight: 500; letter-spacing: 2px; z-index: 1; }
+  .card-visual .cv-bottom { display: flex; align-items: flex-end; justify-content: space-between; z-index: 1; }
+  .card-visual .cv-name { font-size: 14px; font-weight: 600; }
+  .card-visual .cv-type { font-size: 11px; font-weight: 400; opacity: 0.75; }
+
+  /* ── Sección ── */
+  .section { background: var(--black-0); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-4); }
+  .sec-title-row { display: flex; align-items: center; justify-content: space-between; }
+
+  /* ── Empty state ── */
+  .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 16px 8px 4px; }
+  .empty-state .es-ic { width: 48px; height: 48px; border-radius: 50%; background: var(--blue-10); display: flex; align-items: center; justify-content: center; }
+  .empty-state .es-ic i { width: 24px; height: 24px; color: var(--blue-100); }
+
+  /* ── Botones ── */
+  .btn { font-family: var(--font); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; font-weight: 500; }
+  .btn-default { height: 48px; border-radius: var(--radius-full); padding: 0 25px; width: 100%; }
+  .btn-primary { background: var(--coral-100); color: var(--black-0); }
+  .btn-primary:active { background: var(--coral-hover); }
+  .btn-secondary { background: var(--black-0); color: var(--coral-100); border: 1px solid var(--coral-100); }
+  .btn-secondary:active { background: var(--error-10); }
+  .btn-text { background: none; font-size: 14px; font-weight: 600; color: var(--coral-100); text-decoration: underline; text-underline-offset: 2px; height: auto; padding: 8px 0; }
+  .btn-row { display: flex; flex-direction: column; gap: 12px; margin-top: auto; padding-top: 8px; }
+
+  /* ── Input de monto (pantalla 3) ── */
+  .amount-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 24px 0 8px; }
+  .amount-input { border: none; background: transparent; text-align: center; font-family: var(--font); font-size: 40px; font-weight: 500; color: var(--blue-100); width: 100%; outline: none; }
+  .amount-label { font-size: 12px; font-weight: 600; color: var(--black-60); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── Selector de periodo ── */
+  .period-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .period-selector { display: flex; gap: 8px; background: var(--blue-10); padding: 4px; border-radius: var(--radius-full); }
+  .period-opt { flex: 1; text-align: center; padding: 10px 4px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; color: var(--blue-100); cursor: pointer; transition: background .12s, color .12s; }
+  .period-opt.active { background: var(--blue-100); color: var(--black-0); }
+
+  /* ── Confirmación ── */
+  .confirm-wrap { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 24px 8px 0; }
+  .confirm-ic { width: 64px; height: 64px; border-radius: 50%; background: var(--success-10); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .confirm-ic i { width: 32px; height: 32px; color: var(--success-150); }
+
+  .summary-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+  .summary-row + .summary-row { border-top: 1px solid var(--black-10); padding-top: 12px; margin-top: 4px; }
+
+  .alert-box { display: flex; gap: 10px; align-items: flex-start; background: var(--success-10); border: 1px solid var(--success-150); border-radius: var(--radius-md); padding: 12px; }
+  .alert-box i { width: 20px; height: 20px; color: var(--success-150); flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Progreso (pantalla 5) ── */
+  .progress-track { width: 100%; height: 10px; border-radius: var(--radius-full); background: var(--blue-10); overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: var(--radius-full); background: var(--blue-100); }
+  .chips-row { display: flex; gap: 8px; }
+
+  /* ── Header 3 columnas (back / título centrado / ayuda) — pantallas 1 y 2 ── */
+  .hdr3 { flex-shrink: 0; display: flex; align-items: center; padding: 14px 8px 12px; background: var(--black-0); gap: 4px; }
+  .hdr3-btn { width: 32px; height: 32px; border: none; background: transparent; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--blue-100); flex-shrink: 0; }
+  .hdr3-btn:active { background: var(--blue-10); }
+  .hdr3-btn i { width: 22px; height: 22px; }
+  .hdr3-btn.ghost { cursor: default; }
+  .hdr3-title { flex: 1; text-align: center; font-size: 16px; font-weight: 700; color: var(--blue-100); line-height: 20px; }
+
+  /* ── Pantalla 1 — fondo blanco ── */
+  #screen-1 .body, #screen-1 .hdr3 { background: var(--black-0); }
+
+  .label-section { font-size: 12px; font-weight: 600; color: var(--blue-100); padding: 4px 4px 0; }
+
+  .vcard-list { display: flex; flex-direction: column; }
+  .vcard-item { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--black-10); cursor: pointer; }
+  .vcard-item:last-child { border-bottom: none; }
+  .vcard-item:active { background: var(--black-10); }
+  .vcard-item.no-nav { cursor: default; }
+  .vcard-item.no-nav:active { background: transparent; }
+  .vcard-thumb { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .vcard-thumb.brand { background: linear-gradient(135deg, var(--coral-100), var(--blue-100)); color: var(--black-0); font-size: 10px; font-weight: 700; letter-spacing: 0.3px; }
+  .vcard-thumb.silver { background: linear-gradient(135deg, #d8dadf, #f3f3f3); }
+  .vcard-thumb.placeholder { background: var(--black-10); }
+  .vcard-thumb.placeholder i { width: 18px; height: 18px; color: var(--black-40); }
+  .vcard-info { flex: 1; min-width: 0; }
+  .vcard-name { font-size: 14px; font-weight: 700; color: var(--blue-100); line-height: 18px; }
+  .vcard-num, .vcard-sub { font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; margin-top: 2px; }
+  .vcard-chev { width: 20px; height: 20px; color: var(--black-40); flex-shrink: 0; }
+  .vcard-plus { width: 22px; height: 22px; color: var(--blue-100); flex-shrink: 0; }
+
+  /* ── Pantalla 1 — cards individuales minimalistas ── */
+  .p1-card-list { display: flex; flex-direction: column; gap: 12px; }
+  .p1-card { display: flex; align-items: center; gap: 12px; background: var(--black-0); border-radius: var(--radius-md); box-shadow: var(--shadow-4); padding: 16px; cursor: pointer; }
+  .p1-card.no-nav { cursor: default; }
+  .p1-card:active { background: var(--black-10); }
+  .p1-card.no-nav:active { background: var(--black-0); }
+  .p1-thumb { width: 56px; height: 40px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .p1-thumb.virtual { background: linear-gradient(135deg, #ff2947, #121e6c); }
+  .p1-thumb.physical { background: linear-gradient(135deg, #e8e9eb, #f7f8fb); }
+  .p1-thumb.placeholder { background: var(--black-10); }
+  .p1-thumb.placeholder i { width: 18px; height: 18px; color: var(--black-40); }
+  .p1-thumb svg { width: 28px; height: auto; display: block; }
+  .p1-info { flex: 1; min-width: 0; }
+  .p1-name { font-size: 14px; font-weight: 700; color: var(--blue-100); line-height: 18px; }
+  .p1-num { font-size: 12px; font-weight: 400; color: var(--black-60); line-height: 16px; margin-top: 2px; }
+  .p1-chev { width: 20px; height: 20px; color: var(--black-40); flex-shrink: 0; }
+  .p1-chev.disabled { color: var(--black-40); opacity: 0.4; }
+  .p1-label { font-size: 13px; font-weight: 600; color: var(--blue-100); margin-bottom: 8px; }
+  .p1-label.second { margin-top: 16px; }
+
+  /* ── Pantalla 2 — ilustración tarjeta y acciones rápidas ── */
+  .cardv-illus { position: relative; width: 220px; height: 140px; margin: 8px auto 0; border-radius: var(--radius-md); background: linear-gradient(135deg, #e8e9eb 0%, #ffffff 100%); box-shadow: var(--shadow-4); display: flex; align-items: center; justify-content: center; }
+  .cardv-logo { font-size: 32px; font-weight: 700; color: var(--blue-100); }
+  .cardv-badge { position: absolute; left: 16px; bottom: 14px; font-size: 11px; font-weight: 400; color: var(--black-60); }
+  .cardv-mc { position: absolute; right: 16px; bottom: 14px; width: 34px; height: 22px; }
+  .cardv-mc .circ { position: absolute; top: 0; width: 22px; height: 22px; border-radius: 50%; }
+  .cardv-mc .circ.red { left: 0; background: #EB001B; }
+  .cardv-mc .circ.orange { left: 12px; background: #F79E1B; opacity: 0.85; }
+
+  .link-center { display: block; text-align: center; font-size: 14px; font-weight: 600; color: var(--coral-100); text-decoration: underline; text-underline-offset: 2px; background: none; border: none; font-family: var(--font); cursor: pointer; margin: 12px auto 0; }
+
+  .qa-grid { display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 20px; column-gap: 8px; padding: 4px 0; }
+  .qa-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: default; text-align: center; }
+  .qa-item.nav { cursor: pointer; }
+  .qa-circle { width: 56px; height: 56px; border-radius: 50%; background: var(--black-10); display: flex; align-items: center; justify-content: center; }
+  .qa-circle i { width: 24px; height: 24px; color: var(--blue-100); }
+  .qa-label { font-size: 12px; font-weight: 500; color: var(--black-100); line-height: 14px; }
+
+  /* ── Pantalla 2 — card de tarjeta vertical plateada (carnet) ── */
+  .s2-card { width: 220px; height: 320px; margin: 8px auto 0; border-radius: 20px; position: relative; overflow: hidden; box-shadow: var(--shadow-4); background: linear-gradient(160deg, #e8e9eb 0%, #f5f5f7 50%, #ffffff 100%); }
+  .s2-card-inner { position: relative; z-index: 1; height: 100%; padding: 20px; display: flex; flex-direction: column; }
+  .s2-logo-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+  .s2-card-logo { display: block; }
+  .s2-spacer { flex-grow: 1; }
+  .s2-name { font-size: 13px; font-weight: 700; color: var(--black-0); }
+  .s2-type { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .s2-card-footer { display: flex; align-items: flex-end; justify-content: space-between; }
+  .s2-brand-cf { font-size: 10px; font-weight: 700; color: var(--black-0); }
+  .s2-debit-label { font-size: 11px; font-weight: 400; color: var(--black-60); }
+  .s2-mc { display: inline-flex; align-items: center; position: relative; }
+  .s2-mc .circ { width: 22px; height: 22px; border-radius: 50%; opacity: 0.85; }
+  .s2-mc .circ.red { background: #EB001B; }
+  .s2-mc .circ.orange { background: #F79E1B; margin-left: -8px; }
+
+  .btn-black { background: #000000; color: var(--black-0); }
+  .btn-black:active { background: #1e1e1e; }
+
+  /* ── Pantalla 3 — formulario "Nuevo límite de gasto" ── */
+  #screen-3 { position: relative; }
+  #screen-3 .body { padding: 4px 24px 96px; gap: 28px; }
+
+  .s3-title { font-size: 22px; font-weight: 700; color: var(--blue-100); line-height: 1.3; }
+  .s3-subtitle { font-size: 14px; font-weight: 400; color: var(--black-60); line-height: 1.5; margin-top: 8px; }
+
+  .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--blue-100); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+  .s3-amount-input { display: block; border: 2px solid var(--blue-100); border-radius: 12px; background: var(--black-0); font-family: var(--font); font-size: 28px; font-weight: 700; color: var(--blue-100); width: 100%; outline: none; padding: 14px 16px; text-align: left; }
+  .s3-amount-input::placeholder { color: var(--blue-100); opacity: 0.4; }
+
+  .s3-divider { height: 1px; border: none; background: #e8e9eb; margin: 24px 0; }
+
+  .s3-period-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .s3-period-head .form-label { margin-bottom: 0; }
+
+  .period-radio-list { display: flex; flex-direction: column; }
+  .period-radio-row { display: flex; align-items: center; gap: 12px; background: var(--black-0); border: 1.5px solid #e8e9eb; border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; }
+  .period-radio-row:last-child { margin-bottom: 0; }
+  .period-radio-row.active { border-color: var(--blue-100); background: #f0f1fa; }
+  .period-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #babdc8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .period-radio-row.active .period-radio { border-color: var(--blue-100); }
+  .period-radio::after { content: ""; width: 0; height: 0; border-radius: 50%; background: var(--coral-100); transition: width .12s, height .12s; }
+  .period-radio-row.active .period-radio::after { width: 10px; height: 10px; }
+  .period-radio-label { font-size: 14px; font-weight: 700; color: var(--blue-100); }
+
+  .s3-period-hint { font-size: 13px; font-weight: 400; color: #6b7280; margin-top: 8px; }
+
+  .s3-fixed-btn { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; padding: 16px 24px; background: var(--black-0); box-shadow: 0 -4px 12px rgba(0,0,0,0.08); }
+  .s3-fixed-btn .btn { width: 100%; font-weight: 600; }
+
+  /* ── Pantalla 5 — gestión de límite (sin card visual) ── */
+  #screen-5 { position: relative; }
+  #screen-5 .body { padding: 4px 16px 140px; gap: 24px; }
+  .hdr3-spacer { width: 32px; height: 32px; flex-shrink: 0; }
+
+  .s5-id-name { font-size: 18px; font-weight: 700; color: var(--blue-100); }
+  .s5-id-num { font-size: 14px; font-weight: 400; color: var(--black-60); margin-top: 4px; }
+
+  .s5-info-card { background: var(--black-0); border-radius: 16px; box-shadow: var(--shadow-4); padding: 16px; }
+  .s5-info-top { display: flex; align-items: center; gap: 12px; }
+  .s5-info-thumb { width: 48px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #ff2947, #121e6c); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .s5-info-thumb svg { width: 24px; height: auto; display: block; }
+  .s5-info-text { flex: 1; min-width: 0; }
+  .s5-info-name { font-size: 14px; font-weight: 700; color: var(--blue-100); }
+  .s5-info-num { font-size: 12px; font-weight: 400; color: var(--black-60); margin-top: 2px; }
+  .s5-info-divider { height: 1px; background: var(--black-10); margin: 12px 0; }
+  .s5-status-row { display: flex; align-items: center; justify-content: space-between; }
+  .s5-status-label { font-size: 12px; font-weight: 400; color: var(--black-60); }
+  .s5-status-chip { background: #f4fdf9; border: 1px solid #1b8959; color: #1b8959; border-radius: 99px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+
+  .s5-limit-card { background: var(--black-0); border-radius: 16px; padding: 16px; box-shadow: var(--shadow-4); margin-top: 0; }
+  .s5-limit-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .s5-limit-title { font-size: 16px; font-weight: 700; color: var(--blue-100); }
+  .s5-chips { display: flex; gap: 8px; flex-shrink: 0; }
+  .s5-chip-period { background: var(--black-10); color: var(--black-60); border-radius: 99px; padding: 4px 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .s5-chip-active { background: var(--black-0); border: 1.5px solid #1b8959; color: #1b8959; border-radius: 99px; padding: 4px 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .s5-progress-track { background: #e8e9eb; height: 6px; border-radius: 99px; overflow: hidden; margin-top: 12px; }
+  .s5-progress-fill { height: 100%; background: var(--blue-100); border-radius: 99px; }
+  .s5-amounts { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; }
+  .s5-amount-main { font-size: 16px; font-weight: 700; color: var(--blue-100); }
+  .s5-amount-sub { font-size: 14px; font-weight: 400; color: var(--black-60); }
+  .s5-renew-hint { font-size: 12px; font-weight: 400; color: var(--black-60); margin-top: 4px; }
+
+  .s5-fixed-btns { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; background: var(--black-0); padding: 12px 24px 24px; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); }
+  .s5-btn-edit { display: block; width: 100%; height: 48px; border-radius: 100px; background: var(--black-0); border: 1.5px solid var(--coral-100); color: var(--coral-100); font-weight: 600; font-size: 16px; font-family: var(--font); cursor: pointer; }
+  .s5-btn-edit:active { background: var(--error-10); }
+  .s5-btn-delete { display: block; width: 100%; height: 36px; margin-top: 8px; background: transparent; border: none; color: var(--coral-100); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; font-family: var(--font); cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Status bar -->
+  <div id="sb">
+    <span class="sb-time" id="sb-time">9:41</span>
+    <div class="sb-icons">
+      <i data-lucide="signal"></i>
+      <i data-lucide="wifi"></i>
+      <i data-lucide="battery-full"></i>
+    </div>
+  </div>
+
+  <!-- ============ PANTALLA 1 — Tarjetas débito ============ -->
+  <div class="screen active" id="screen-1">
+    <div class="hdr3">
+      <button class="hdr3-btn ghost"><i data-lucide="arrow-left"></i></button>
+      <span class="hdr3-title">Tarjetas débito</span>
+      <button class="hdr3-btn ghost"><i data-lucide="circle-help"></i></button>
+    </div>
+    <div class="body">
+
+      <span class="p1-label">Virtuales (1 de 3)</span>
+      <div class="p1-card-list">
+
+        <div class="p1-card no-nav">
+          <div class="p1-thumb virtual"><svg width="141" height="50" viewBox="0 0 141 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M42.55 33.916H77.4692C76.6296 42.9253 69.1215 49.9985 60.0081 49.9985C50.8947 49.9985 43.3881 42.9253 42.5485 33.916H42.55ZM17.637 14.5612V49.9185C26.5302 49.0683 33.5179 41.4647 33.5179 32.2391C33.5179 23.0136 26.5302 15.413 17.637 14.5627V14.5612ZM60.0096 14.4812C50.8977 14.4812 43.3896 21.5574 42.55 30.5667H77.4692C76.6296 21.5574 69.1215 14.4812 60.0081 14.4812H60.0096ZM0 27.3864V50H14.2237V0H0V27.3864ZM126.776 0V49.9985H141V0H126.776ZM107.584 32.2406C107.584 33.3634 107.692 34.4596 107.89 35.5247C109.318 43.2127 115.654 49.1705 123.466 49.917V14.5612C114.573 15.4115 107.586 23.015 107.586 32.2406H107.584ZM84.6624 49.9985H98.8861V0H84.6624V49.9985Z" fill="#ffffff"/></svg></div>
+          <div class="p1-info">
+            <div class="p1-name">Netflix</div>
+            <div class="p1-num">••••1234</div>
+          </div>
+          <i data-lucide="chevron-right" class="p1-chev disabled"></i>
+        </div>
+
+        <div class="p1-card" onclick="goTo('screen-2')">
+          <div class="p1-thumb virtual"><svg width="141" height="50" viewBox="0 0 141 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M42.55 33.916H77.4692C76.6296 42.9253 69.1215 49.9985 60.0081 49.9985C50.8947 49.9985 43.3881 42.9253 42.5485 33.916H42.55ZM17.637 14.5612V49.9185C26.5302 49.0683 33.5179 41.4647 33.5179 32.2391C33.5179 23.0136 26.5302 15.413 17.637 14.5627V14.5612ZM60.0096 14.4812C50.8977 14.4812 43.3896 21.5574 42.55 30.5667H77.4692C76.6296 21.5574 69.1215 14.4812 60.0081 14.4812H60.0096ZM0 27.3864V50H14.2237V0H0V27.3864ZM126.776 0V49.9985H141V0H126.776ZM107.584 32.2406C107.584 33.3634 107.692 34.4596 107.89 35.5247C109.318 43.2127 115.654 49.1705 123.466 49.917V14.5612C114.573 15.4115 107.586 23.015 107.586 32.2406H107.584ZM84.6624 49.9985H98.8861V0H84.6624V49.9985Z" fill="#ffffff"/></svg></div>
+          <div class="p1-info">
+            <div class="p1-name">Didi/Gas</div>
+            <div class="p1-num">••••2210</div>
+          </div>
+          <i data-lucide="chevron-right" class="p1-chev"></i>
+        </div>
+
+        <div class="p1-card no-nav">
+          <div class="p1-thumb virtual"><svg width="141" height="50" viewBox="0 0 141 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M42.55 33.916H77.4692C76.6296 42.9253 69.1215 49.9985 60.0081 49.9985C50.8947 49.9985 43.3881 42.9253 42.5485 33.916H42.55ZM17.637 14.5612V49.9185C26.5302 49.0683 33.5179 41.4647 33.5179 32.2391C33.5179 23.0136 26.5302 15.413 17.637 14.5627V14.5612ZM60.0096 14.4812C50.8977 14.4812 43.3896 21.5574 42.55 30.5667H77.4692C76.6296 21.5574 69.1215 14.4812 60.0081 14.4812H60.0096ZM0 27.3864V50H14.2237V0H0V27.3864ZM126.776 0V49.9985H141V0H126.776ZM107.584 32.2406C107.584 33.3634 107.692 34.4596 107.89 35.5247C109.318 43.2127 115.654 49.1705 123.466 49.917V14.5612C114.573 15.4115 107.586 23.015 107.586 32.2406H107.584ZM84.6624 49.9985H98.8861V0H84.6624V49.9985Z" fill="#ffffff"/></svg></div>
+          <div class="p1-info">
+            <div class="p1-name">Proveedores</div>
+            <div class="p1-num">••••9034</div>
+          </div>
+          <i data-lucide="chevron-right" class="p1-chev disabled"></i>
+        </div>
+
+        <div class="p1-card no-nav">
+          <div class="p1-thumb placeholder"><i data-lucide="plus"></i></div>
+          <div class="p1-info">
+            <div class="p1-name">Crea una tarjeta virtual</div>
+            <div class="p1-num">Actívala en segundos</div>
+          </div>
+          <i data-lucide="plus" class="p1-chev disabled"></i>
+        </div>
+
+      </div>
+
+      <span class="p1-label second">Física</span>
+      <div class="p1-card-list">
+        <div class="p1-card no-nav">
+          <div class="p1-thumb physical"><svg width="141" height="50" viewBox="0 0 141 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M42.55 33.916H77.4692C76.6296 42.9253 69.1215 49.9985 60.0081 49.9985C50.8947 49.9985 43.3881 42.9253 42.5485 33.916H42.55ZM17.637 14.5612V49.9185C26.5302 49.0683 33.5179 41.4647 33.5179 32.2391C33.5179 23.0136 26.5302 15.413 17.637 14.5627V14.5612ZM60.0096 14.4812C50.8977 14.4812 43.3896 21.5574 42.55 30.5667H77.4692C76.6296 21.5574 69.1215 14.4812 60.0081 14.4812H60.0096ZM0 27.3864V50H14.2237V0H0V27.3864ZM126.776 0V49.9985H141V0H126.776ZM107.584 32.2406C107.584 33.3634 107.692 34.4596 107.89 35.5247C109.318 43.2127 115.654 49.1705 123.466 49.917V14.5612C114.573 15.4115 107.586 23.015 107.586 32.2406H107.584ZM84.6624 49.9985H98.8861V0H84.6624V49.9985Z" fill="#121e6c"/></svg></div>
+          <div class="p1-info">
+            <div class="p1-name">Tarjeta física</div>
+            <div class="p1-num">••••4821</div>
+          </div>
+          <i data-lucide="chevron-right" class="p1-chev disabled"></i>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ PANTALLA 2 — Mi tarjeta virtual ============ -->
+  <div class="screen" id="screen-2">
+    <div class="hdr3">
+      <button class="hdr3-btn" onclick="goTo('screen-1')"><i data-lucide="arrow-left"></i></button>
+      <span class="hdr3-title">Mi tarjeta virtual</span>
+      <button class="hdr3-btn ghost"><i data-lucide="circle-help"></i></button>
+    </div>
+    <div class="body">
+
+      <div class="s2-card">
+        <div class="s2-card-inner">
+          <div class="s2-logo-wrap">
+            <svg class="s2-card-logo" width="110" height="39" viewBox="0 0 141 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M42.55 33.916H77.4692C76.6296 42.9253 69.1215 49.9985 60.0081 49.9985C50.8947 49.9985 43.3881 42.9253 42.5485 33.916H42.55ZM17.637 14.5612V49.9185C26.5302 49.0683 33.5179 41.4647 33.5179 32.2391C33.5179 23.0136 26.5302 15.413 17.637 14.5627V14.5612ZM60.0096 14.4812C50.8977 14.4812 43.3896 21.5574 42.55 30.5667H77.4692C76.6296 21.5574 69.1215 14.4812 60.0081 14.4812H60.0096ZM0 27.3864V50H14.2237V0H0V27.3864ZM126.776 0V49.9985H141V0H126.776ZM107.584 32.2406C107.584 33.3634 107.692 34.4596 107.89 35.5247C109.318 43.2127 115.654 49.1705 123.466 49.917V14.5612C114.573 15.4115 107.586 23.015 107.586 32.2406H107.584ZM84.6624 49.9985H98.8861V0H84.6624V49.9985Z" fill="#121e6c"/></svg>
+          </div>
+          <div class="s2-card-footer">
+            <span class="s2-debit-label">Débito virtual</span>
+            <div class="s2-mc"><span class="circ red"></span><span class="circ orange"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="link-center">Ver datos</button>
+
+      <div class="qa-grid">
+        <div class="qa-item">
+          <div class="qa-circle"><i data-lucide="snowflake"></i></div>
+          <span class="qa-label">Congelar</span>
+        </div>
+        <div class="qa-item">
+          <div class="qa-circle"><i data-lucide="shield-off"></i></div>
+          <span class="qa-label">Bloquear</span>
+        </div>
+        <div class="qa-item">
+          <div class="qa-circle"><i data-lucide="lock"></i></div>
+          <span class="qa-label">Clave</span>
+        </div>
+        <div class="qa-item">
+          <div class="qa-circle"><i data-lucide="grid-2x2"></i></div>
+          <span class="qa-label">Activar pago a 4 cuotas</span>
+        </div>
+        <div class="qa-item nav" onclick="goTo('screen-3')">
+          <div class="qa-circle"><i data-lucide="receipt"></i></div>
+          <span class="qa-label">Límite de gasto</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-default btn-black"><span style="font-size:16px;line-height:1">&#xF8FF;</span> Agregar a Apple Pay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PANTALLA 3 — Nuevo límite de gasto ============ -->
+  <div class="screen" id="screen-3">
+    <div class="hdr">
+      <button class="hdr-back" onclick="goTo('screen-2')"><i data-lucide="arrow-left"></i></button>
+    </div>
+    <div class="body">
+
+      <div>
+        <div class="s3-title">¿Cuánto quieres gastar con esta tarjeta?</div>
+        <div class="s3-subtitle">La tarjeta se bloquea automáticamente al llegar a este monto. El dinero sigue en tu cuenta.</div>
+      </div>
+
+      <div>
+        <span class="form-label">Monto del límite</span>
+        <input class="s3-amount-input" id="amount-input" type="text" placeholder="$0" value="$500.000" />
+      </div>
+
+      <hr class="s3-divider" />
+
+      <div>
+        <div class="s3-period-head">
+          <span class="form-label">Periodo del límite</span>
+        </div>
+
+        <div class="period-radio-list">
+          <div class="period-radio-row" data-period="Semanal" onclick="selectPeriod(this)">
+            <span class="period-radio"></span>
+            <span class="period-radio-label">Semanal</span>
+          </div>
+          <div class="period-radio-row" data-period="Quincenal" onclick="selectPeriod(this)">
+            <span class="period-radio"></span>
+            <span class="period-radio-label">Quincenal</span>
+          </div>
+          <div class="period-radio-row active" data-period="Mensual" onclick="selectPeriod(this)">
+            <span class="period-radio"></span>
+            <span class="period-radio-label">Mensual</span>
+          </div>
+        </div>
+
+        <div class="s3-period-hint" id="period-hint">El límite se renueva el 1 de cada mes</div>
+      </div>
+
+    </div>
+
+    <div class="s3-fixed-btn">
+      <button class="btn btn-default btn-primary" onclick="goTo('screen-4')">Guardar límite</button>
+    </div>
+  </div>
+
+  <!-- ============ PANTALLA 4 — Confirmación ============ -->
+  <div class="screen" id="screen-4">
+    <div class="hdr">
+      <span class="hdr-title" style="margin-left:0">Límite de gasto</span>
+    </div>
+    <div class="body">
+
+      <div class="confirm-wrap">
+        <div class="confirm-ic"><i data-lucide="check"></i></div>
+        <span class="h-title">Límite configurado</span>
+        <span class="t-body" style="color:var(--black-60)">Virtual Didi/Gas •• 2210</span>
+      </div>
+
+      <div class="section">
+        <div class="summary-row">
+          <span class="t-body" style="color:var(--black-60)">Monto</span>
+          <span class="t-body" style="font-weight:600">$500.000</span>
+        </div>
+        <div class="summary-row">
+          <span class="t-body" style="color:var(--black-60)">Periodo</span>
+          <span class="t-body" style="font-weight:600" id="confirm-period">Mensual</span>
+        </div>
+        <div class="summary-row">
+          <span class="t-body" style="color:var(--black-60)">Reset</span>
+          <span class="t-body" style="font-weight:600" id="confirm-reset">1 de julio</span>
+        </div>
+      </div>
+
+      <div class="alert-box">
+        <i data-lucide="bell-ring"></i>
+        <span class="t-body" style="font-size:12px; line-height:16px">Recibirás alertas automáticas cuando alcances el <strong>80%</strong> y el <strong>100%</strong> de tu límite.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-default btn-primary" onclick="goTo('screen-5')">Listo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PANTALLA 5 — Tarjeta con límite activo ============ -->
+  <div class="screen" id="screen-5">
+    <div class="hdr3">
+      <button class="hdr3-btn" onclick="goTo('screen-2')"><i data-lucide="arrow-left"></i></button>
+      <span class="hdr3-title">Límite de gasto</span>
+      <button class="hdr3-btn" onclick="goTo('screen-1')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="body">
+
+      <div class="s5-info-card">
+        <div class="s5-info-top">
+          <div class="s5-info-thumb"><svg width="24" height="9" viewBox="0 0 141 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M42.55 33.916H77.4692C76.6296 42.9253 69.1215 49.9985 60.0081 49.9985C50.8947 49.9985 43.3881 42.9253 42.5485 33.916H42.55ZM17.637 14.5612V49.9185C26.5302 49.0683 33.5179 41.4647 33.5179 32.2391C33.5179 23.0136 26.5302 15.413 17.637 14.5627V14.5612ZM60.0096 14.4812C50.8977 14.4812 43.3896 21.5574 42.55 30.5667H77.4692C76.6296 21.5574 69.1215 14.4812 60.0081 14.4812H60.0096ZM0 27.3864V50H14.2237V0H0V27.3864ZM126.776 0V49.9985H141V0H126.776ZM107.584 32.2406C107.584 33.3634 107.692 34.4596 107.89 35.5247C109.318 43.2127 115.654 49.1705 123.466 49.917V14.5612C114.573 15.4115 107.586 23.015 107.586 32.2406H107.584ZM84.6624 49.9985H98.8861V0H84.6624V49.9985Z" fill="#ffffff"/></svg></div>
+          <div class="s5-info-text">
+            <div class="s5-info-name">Virtual Didi/Gas</div>
+            <div class="s5-info-num">••••2210</div>
+          </div>
+        </div>
+        <div class="s5-info-divider"></div>
+        <div class="s5-status-row">
+          <span class="s5-status-label">Estado</span>
+          <span class="s5-status-chip">Activa</span>
+        </div>
+      </div>
+
+      <div class="s5-limit-card">
+        <div class="s5-limit-head">
+          <span class="s5-limit-title">Límite de gasto</span>
+          <div class="s5-chips">
+            <span class="s5-chip-period">Mensual</span>
+            <span class="s5-chip-active">Activo</span>
+          </div>
+        </div>
+        <div class="s5-progress-track"><div class="s5-progress-fill" style="width:36%"></div></div>
+        <div class="s5-amounts">
+          <span class="s5-amount-main">$183.000</span>
+          <span class="s5-amount-sub">de $500.000</span>
+        </div>
+        <div class="s5-renew-hint">El límite se renueva el 1 de cada mes</div>
+      </div>
+
+    </div>
+
+    <div class="s5-fixed-btns">
+      <button class="s5-btn-edit" onclick="goTo('screen-3')">Editar límite</button>
+      <button class="s5-btn-delete" onclick="goTo('screen-2')">Eliminar límite</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
+    var target = document.getElementById(id);
+    target.classList.add('active');
+    var body = target.querySelector('.body');
+    if (body) body.scrollTop = 0;
+  }
+
+  var periodHints = {
+    'Semanal': 'Reset cada lunes',
+    'Quincenal': 'Reset el 1 y 16 de cada mes',
+    'Mensual': 'Reset el 1 de julio'
+  };
+
+  var periodFormHints = {
+    'Semanal': 'El límite se renueva cada lunes',
+    'Quincenal': 'El límite se renueva los días 1 y 16 de cada mes',
+    'Mensual': 'El límite se renueva el 1 de cada mes'
+  };
+
+  function selectPeriod(el) {
+    document.querySelectorAll('.period-radio-row').forEach(function (o) { o.classList.remove('active'); });
+    el.classList.add('active');
+    var period = el.getAttribute('data-period');
+    document.getElementById('period-hint').textContent = periodFormHints[period];
+    var cp = document.getElementById('confirm-period');
+    var cr = document.getElementById('confirm-reset');
+    if (cp) cp.textContent = period;
+    if (cr) cr.textContent = periodHints[period].replace(/^Reset (cada |el )?/, '');
+  }
+
+  function tick() {
+    var now = new Date();
+    var h = now.getHours() % 12 || 12;
+    var m = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('sb-time').textContent = h + ':' + m;
+  }
+  tick();
+  setInterval(tick, 30000);
+
+  lucide.createIcons();
+</script>
+</body>
+</html>
